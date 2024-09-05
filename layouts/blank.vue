@@ -7,7 +7,6 @@
             src="https://img5.pic.in.th/file/secure-sv1/Logo9c6e72969abf7f59.md.png"
             max-width="120"
             contain
-            class="logo-img"
           />
         </v-toolbar-title>
 
@@ -20,8 +19,8 @@
               </v-icon>
             </h4>
           </v-btn>
-          <v-btn text @click="gotoLogin" rounded :class="loginBtnClass">
-            Log In
+          <v-btn text @click="gotoRegister" rounded :class="loginBtnClass">
+            Register
           </v-btn>
         </div>
       </v-app-bar>
@@ -46,8 +45,8 @@ export default {
     };
   },
   methods: {
-    gotoLogin() {
-      this.$router.push('/auth');
+    gotoRegister() {
+      this.$router.push('/auth/register');
     },
 
     toggleTheme() {
@@ -76,10 +75,6 @@ export default {
 </script>
 
 <style scoped>
-.logo-img {
-  cursor: pointer; /* เปลี่ยนรูปเป็น icon มือเมื่อเลื่อนไปที่รูป */
-}
-
 .theme-toggle-btn {
   background-color: #000000 !important;
   margin-right: 16px; /* เว้นช่องว่างระหว่างปุ่มเปลี่ยนธีมและปุ่ม Login */
