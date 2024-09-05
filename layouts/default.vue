@@ -68,7 +68,7 @@ export default {
       return this.$vuetify.theme.dark ? 'background-dark' : 'background-light';
     },
     navBarColor() {
-      return this.$vuetify.theme.dark ? '#545454' : '#fefefe';
+      return this.$vuetify.theme.dark ? '#545454' : '#fff6ea';
     }
   }
 };
@@ -107,7 +107,7 @@ export default {
 }
 
 .background-light {
-  background-color: #fefefe !important; /* สีพื้นหลังตามธีมกลางวัน */
+  background-color: #fff6ea !important; /* สีพื้นหลังตามธีมกลางวัน */
   background-image: url('https://xauusdmasters.in/assets/images/home2/1.png') !important;
   background-size: 45% !important; /* ลดขนาดรูปภาพพื้นหลังเป็น 50% */
   background-position: center;
