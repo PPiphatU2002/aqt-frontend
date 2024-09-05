@@ -6,17 +6,29 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate"
+    "generate": "nuxt generate",
+    "lint:prettier": "prettier --check .",
+    "lint:prettier:fix": "prettier --write .",
+    "lint": "npm run lint:prettier",
+    "lintfix": "prettier --write --list-different ."
   },
   "dependencies": {
-    "core-js": "^3.25.3",
+    "@nuxtjs/auth-next": "^5.0.0-1667386184.dfbbb54",
+    "@nuxtjs/axios": "^5.13.6",
+    "@nuxtjs/moment": "^1.6.1",
+    "core-js": "^3.38.1",
     "nuxt": "^2.15.8",
+    "punycode": "^2.3.1",
     "vue": "^2.7.10",
     "vue-server-renderer": "^2.7.10",
     "vue-template-compiler": "^2.7.10",
-    "vuetify": "^2.6.10"
+    "vue2-google-maps": "^0.10.7",
+    "vuetify": "^2.6.10",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@nuxtjs/vuetify": "^1.12.3"
+    "@nuxtjs/vuetify": "^1.12.3",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3"
   }
 }
