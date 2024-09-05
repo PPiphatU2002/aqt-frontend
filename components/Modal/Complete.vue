@@ -9,8 +9,8 @@
     >
       <v-card>
         <v-card-title class="text-h5"
-          ><v-icon justify="left" class="mr-3" size="50">mdi-alert</v-icon>
-          Error
+          ><v-icon justify="left" class="mr-3" size="50">mdi-check-circle</v-icon>
+          Success
         </v-card-title>
         <v-divider class="mb-3"></v-divider>
         <v-card-text>
@@ -20,7 +20,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="confirm" class="rounded-xl font-weight-medium mt-3">
-            Accept
+            OK
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -35,7 +35,6 @@
       },
       message: {
         type: String,
-        default: 'Somthing went wrong.',
       },
     },
     data() {
@@ -44,10 +43,10 @@
     methods: {
       confirm() {
         if (this.method === null) {
-          this.$emit('update:error', false)
+          this.$emit('update:complete', false)
         } else {
           this.method()
-          this.$emit('update:error', false)
+          this.$emit('update:complete', false)
         }
       },
     },
