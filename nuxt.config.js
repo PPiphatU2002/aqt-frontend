@@ -3,8 +3,8 @@ import colors from 'vuetify/es5/util/colors'
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - aqt-frontend',
-    title: 'aqt-frontend',
+    titleTemplate: '%s - AQT Fix Port',
+    title: 'AQT Fix Port',
     htmlAttrs: {
       lang: 'en'
     },
@@ -39,6 +39,12 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
   ],
+
+  axios: {
+    // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
+    baseURL: 'http://localhost:3001',
+    credentials: true,
+  },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
