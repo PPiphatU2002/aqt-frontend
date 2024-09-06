@@ -37,8 +37,6 @@
 
 <script>
 export default {
-  name: 'DefaultLayout',
-
   data() {
     return {
       clipped: false,
@@ -82,7 +80,7 @@ export default {
 
 .theme-toggle-btn {
   background-color: #000000 !important;
-  margin-right: 16px; /* เว้นช่องว่างระหว่างปุ่มเปลี่ยนธีมและปุ่ม Login */
+  margin-right: 8px; /* เว้นช่องว่างระหว่างปุ่มเปลี่ยนธีมและปุ่ม Login */
 }
 
 .day-icon {
