@@ -1,6 +1,6 @@
 <template>
   <v-dialog persistent :retain-focus="false" v-model="open" max-width="400" max-height="300" content-class="rounded-xl"
-  @keydown.esc="confirm">
+    @keydown.esc="confirm">
     <v-card>
       <v-card-title class="d-flex align-center justify-center text-h5">
         <v-icon class="mr-3 red--text" size="50">mdi-alert</v-icon>
