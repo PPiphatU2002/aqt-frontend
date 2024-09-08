@@ -2,8 +2,8 @@
   <v-dialog persistent :retain-focus="false" v-model="open" max-width="400" max-height="300" content-class="rounded-xl"
     @keydown.esc="confirm">
     <v-card>
-      <v-card-title class="d-flex align-center justify-center text-h5">
-        <v-icon class="mr-3 red--text" size="50">mdi-alert</v-icon>
+      <v-card-title class="d-flex align-center justify-center text-h6">
+        <v-icon class="mr-3 red--text" size="40">mdi-alert</v-icon>
         ERROR
       </v-card-title>
       <v-divider class="mb-3"></v-divider>

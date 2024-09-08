@@ -1,18 +1,19 @@
 <template>
   <v-dialog persistent :retain-focus="false" v-model="open" max-width="400" max-height="300" content-class="rounded-xl"
-    @keydown.esc="cancel" @keydown.enter="confirm">
+    @keydown.esc="confirm">
     <v-card>
       <v-card-title class="d-flex align-center justify-center text-h6">
-        <v-icon justify="center" class="mr-3" size="40">mdi-logout-variant</v-icon>
-        DO YOU WANT TO LOGOUT?
+        <v-icon class="mr-3 red--text" size="40">mdi-account-alert</v-icon>
+        WARNING
       </v-card-title>
+      <v-divider class="mb-3"></v-divider>
+      <v-card-text class="text-center">
+        {{ message }}
+      </v-card-text>
 
       <v-card-actions class="justify-center">
-        <v-btn color="primary" @click="confirm" class="rounded-xl font-weight-medium mt-0">
-          Logout
-        </v-btn>
-        <v-btn color="error" @click="cancel" class="rounded-xl font-weight-medium mt-0">
-          Cancel
+        <v-btn color="#bf2b2b" @click="confirm" class="rounded-xl font-weight-medium mt-0">
+          OK
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -22,9 +23,12 @@
 <script>
 export default {
   props: {
-    method: { type: Function },
+    method: { type: Function, default: null },
     open: {
       required: true,
+    },
+    message: {
+      type: String,
     },
   },
   watch: {
@@ -36,21 +40,23 @@ export default {
       }
     },
   },
+  data() {
+    return {}
+  },
   methods: {
     confirm() {
-      this.method();
-      this.$emit("update:confirmLogout", false);
-    },
-    cancel() {
-      this.$emit("update:confirmLogout", false);
+      if (this.method === null) {
+        this.$emit('update:warning', false)
+      } else {
+        this.method()
+        this.$emit('update:warning', false)
+      }
     },
     handleKeydown(e) {
       if (e.key === 'Escape') {
-        this.cancel();
-      } else if (e.key === 'Enter') {
         this.confirm();
       }
     },
   },
-};
+}
 </script>

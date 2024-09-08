@@ -24,7 +24,7 @@
                 <v-icon class="icon-tab">mdi-account-plus</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">NEW USER</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">NEW CUSTOMER</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -39,15 +39,24 @@
 
             <v-list-item @click="goToNewEmp" class="custom-list-item">
               <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-home-account</v-icon>
+                <v-icon class="icon-tab">mdi-home-plus</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title style="font-size: 0.8rem;">NEW EMPLOYEE</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+
+            <v-list-item @click="goToEmpManagement" class="custom-list-item">
+              <v-list-item-icon style="margin-right: 4px;">
+                <v-icon class="icon-tab">mdi-home-account</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title style="font-size: 0.8rem;">MANAGEMENT</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-menu>
-
+        
 
         <v-menu bottom right :offset-y="true" :nudge-top="8" :nudge-right="8" class="user-menu">
           <template v-slot:activator="{ on, attrs }">
@@ -226,6 +235,9 @@ export default {
     },
     goToNewEmp() {
       this.$router.push('/developer/user/new_employee');
+    },
+    goToEmpManagement(){
+      this.$router.push('/developer/user/employee_management');
     },
 
     goToTransHist() {

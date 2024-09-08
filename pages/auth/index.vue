@@ -2,6 +2,7 @@
   <div @keyup.enter="login" class="login-container">
     <ModalComplete :open="modal.complete.open" :message="modal.complete.message" :complete.sync="modal.complete.open" />
     <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
+    <ModalWarning :open="modal.warning.open" :message="modal.warning.message" :warning.sync="modal.warning.open" />
     <v-container fluid fill-height class="d-flex align-center justify-center">
       <v-row align="center" justify="center">
         <v-col cols="12" sm="8" md="6">
@@ -11,16 +12,16 @@
             </v-card-title>
             <v-card-subtitle>LOGIN WITH YOUR ACCOUNT</v-card-subtitle>
             <v-card-text>
-              <v-text-field v-model="form.email" label="E-MAIL" prepend-icon="mdi-email" type="email" outlined dense
+              <v-text-field v-model="form.email" label="อีเมล" prepend-icon="mdi-email" type="email" outlined dense
                 class="small-text-field"></v-text-field>
-              <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="PASSWORD"
+              <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="รหัสผ่าน"
                 :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
                 @click:append="show1 = !show1" outlined dense class="small-text-field"></v-text-field>
               <v-btn @click="login" :disabled="!form.email || !form.password" color="primary" block>
-                Log In
+                LOGIN
               </v-btn>
               <a @click="forgotPassword" class="forgot-password-text">
-                Forgot Password?
+                FORGOT PASSWORD?
               </a>
             </v-card-text>
           </v-card>
@@ -69,26 +70,41 @@ export default {
         },
         error: {
           open: false,
-          message: 'THE INFORMATION IS INCORRECT OR THE USER HAS NOT APPROVED IT!',
+          message: 'THE INFORMATION IS INCORRECT!',
+        },
+        warning: {
+          open: false,
+          message: 'THIS USER HAS NOT BEEN APPROVED YET!',
         },
       },
     }
   },
 
   methods: {
+
     async checkRank() {
       if (this.$auth.loggedIn) {
+
+        const Status = this.$auth.user.status.toString();
         const RankID = this.$auth.user.ranks_id.toString();
-        if (RankID === '1') {
-          console.log('Welcome Back Developer!');
-          this.$router.push('/developer/home');
-        } else if (RankID === '2') {
-          console.log('Welcome Back Employee!');
-          this.$router.push('/employee/home');
-        } else {
-          console.log('You Can Not Access This Page!');
+
+        if (Status === '2') {
           this.$router.push('/auth');
+          this.modal.warning.open = true;
         }
+        else {
+          if (RankID === '1') {
+            console.log('Welcome Back Developer!');
+            this.$router.push('/developer/home');
+          } else if (RankID === '2') {
+            console.log('Welcome Back Employee!');
+            this.$router.push('/employee/home');
+          } else {
+            console.log('You Can Not Access This Page!');
+            this.$router.push('/auth');
+          }
+        }
+
       } else {
         console.log('User Is Not Logged In!');
         this.$router.push('/auth');
@@ -103,10 +119,7 @@ export default {
             password: this.form.password,
           }
         })
-        const status = this.$auth.user.status.toString();
-        if (status === '2') {
-          return;
-        };
+          ;
         this.recordLog();
         this.modal.complete.open = true;
       } catch (error) {

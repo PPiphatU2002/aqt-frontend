@@ -1,33 +1,91 @@
-<template></template>
+<template>
+    <div>
+        <ModalWarning :open="modal.warning.open" :message="modal.warning.message" :warning.sync="modal.warning.open" />
+        <v-container class="fill-height" fluid justify="center" align="center">
+            <v-row justify="center">
+                <v-col cols="12" sm="8" md="4" :style="{ marginTop: '10vh' }">
+                    <v-row justify="center">
+                        <v-col cols="12" class="d-flex justify-center">
+                            <v-btn color="#508d4e" @click="fixport"
+                                :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
+                                FIX PORT
+                            </v-btn>
+                        </v-col>
+
+                        <v-col cols="12" class="d-flex justify-center">
+                            <v-btn color="#508d4e" @click="transaction"
+                                :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
+                                TRANSACTION
+                            </v-btn>
+                        </v-col>
+
+                        <v-col cols="12" class="d-flex justify-center">
+                            <v-btn color="#508d4e" @click="management"
+                                :style="{ fontSize: '20px', height: '60px', width: '150%' }">
+                                MANAGEMENT
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                </v-col>
+            </v-row>
+        </v-container>
+    </div>
+</template>
+
 
 <script>
-    export default {
-        layout: 'employee',
-        middleware: 'auth',
-        async mounted() {
-            await this.checkRank();
-        },
+export default {
+    layout: 'employee',
+    middleware: 'auth',
+    async mounted() {
+        await this.checkRank();
+    },
 
-        methods: {
+    data() {
+        return {
+            modal: {
+                warning: {
+                    open: false,
+                    message: 'THE USER HAS NOT APPROVED IT!',
+                },
+            },
+        }
+    },
+
+    methods: {
         async checkRank() {
             if (this.$auth.loggedIn) {
-            console.log(this.$auth.loggedIn)
-            const rankId = this.$auth.user.ranks_id.toString();
-            console.log('Ranks_id :',rankId)
-            if (rankId === '1') {
-                console.log('Welcome Back Developer!');
-                this.$router.push('/developer/home');
-            } else if (rankId === '2') {
-                console.log('Welcome Back Employee!');
-                this.$router.push('/employee/home');
+                const Status = this.$auth.user.status.toString();
+                const RankID = this.$auth.user.ranks_id.toString();
+                if (Status === '2') {
+                    this.$router.push('/auth');
+                }
+                else {
+                    if (RankID === '1') {
+                        console.log('Welcome Back Developer!');
+                        this.$router.push('/developer/home');
+                    } else if (RankID === '2') {
+                        console.log('Welcome Back Employee!');
+                        this.$router.push('/employee/home');
+                    } else {
+                        console.log('You Can Not Access This Page!');
+                        this.$router.push('/auth');
+                    }
+                }
             } else {
-                console.log('You Can Not Access This Page!');
+                console.log('User Is Not Logged In!');
                 this.$router.push('/auth');
             }
-        } else {
-            console.log('You Is Not Logged In!');
-            this.$router.push('/auth');
-        }
+        },
+
+        fixport() {
+            this.$router.push('/employee/transaction/fixport');
+        },
+        transaction() {
+            this.$router.push('/employee/transaction/transaction');
+        },
+        management() {
+            this.$router.push('/employee/transaction/management');
         },
     }
 }

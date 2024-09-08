@@ -17,7 +17,7 @@
             </h4>
           </v-btn>
           <v-btn text @click="gotoLogin" rounded :class="loginBtnClass">
-            LOG IN
+            LOGIN
           </v-btn>
         </div>
       </v-app-bar>

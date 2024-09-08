@@ -6,23 +6,16 @@
                 <v-col cols="12" sm="8" md="4" :style="{ marginTop: '10vh' }">
                     <v-row justify="center">
                         <v-col cols="12" class="d-flex justify-center">
-                            <v-btn color="#508d4e" @click="fixport"
+                            <v-btn color="#85d7df" @click="fixport"
                                 :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
-                                FIX PORT
+                                FIX PORT MANAGEMENT
                             </v-btn>
                         </v-col>
 
                         <v-col cols="12" class="d-flex justify-center">
-                            <v-btn color="#508d4e" @click="transaction"
+                            <v-btn color="#85d7df" @click="transaction"
                                 :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
-                                TRANSACTION
-                            </v-btn>
-                        </v-col>
-
-                        <v-col cols="12" class="d-flex justify-center">
-                            <v-btn color="#508d4e" @click="management"
-                                :style="{ fontSize: '20px', height: '60px', width: '150%' }">
-                                MANAGEMENT
+                                TRANSACTION MANAGEMENT
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -63,10 +56,10 @@ export default {
                 else {
                     if (RankID === '1') {
                         console.log('Welcome Back Developer!');
-                        this.$router.push('/developer/home');
+                        this.$router.push('/developer/transaction/management');
                     } else if (RankID === '2') {
                         console.log('Welcome Back Employee!');
-                        this.$router.push('/employee/home');
+                        this.$router.push('/employee/transaction/management');
                     } else {
                         console.log('You Can Not Access This Page!');
                         this.$router.push('/auth');
