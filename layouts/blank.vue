@@ -3,11 +3,7 @@
     <v-app :class="appBackground">
       <v-app-bar :clipped-left="clipped" fixed app :color="navBarColor" dark>
         <v-toolbar-title class="d-flex align-center" @click="home">
-          <v-img
-            src="https://img5.pic.in.th/file/secure-sv1/Logo9c6e72969abf7f59.md.png"
-            max-width="120"
-            contain
-          />
+          <v-img src="https://img5.pic.in.th/file/secure-sv1/Logo9c6e72969abf7f59.md.png" max-width="120" contain />
         </v-toolbar-title>
 
         <v-spacer />
@@ -20,7 +16,7 @@
             </h4>
           </v-btn>
           <v-btn text @click="gotoRegister" rounded :class="loginBtnClass">
-            Register
+            REGISTER
           </v-btn>
         </div>
       </v-app-bar>
@@ -75,40 +71,40 @@ export default {
 <style scoped>
 .theme-toggle-btn {
   background-color: #000000 !important;
-  margin-right: 8px; /* เว้นช่องว่างระหว่างปุ่มเปลี่ยนธีมและปุ่ม Login */
+  margin-right: 8px;
 }
 
 .day-icon {
-  color: #ffc800 !important; /* สีสำหรับกลางวัน */
+  color: #ffc800 !important;
 }
 
 .night-icon {
-  color: #85d7df !important; /* สีสำหรับกลางคืน */
+  color: #85d7df !important;
 }
 
 .login-btn-night {
-  background-color: #000000 !important; /* พื้นหลังของปุ่ม Login ตามธีมกลางคืน */
-  color: #85d7df !important; /* สีตัวอักษรตามธีมกลางคืน */
+  background-color: #000000 !important;
+  color: #85d7df !important;
 }
 
 .login-btn-day {
-  background-color: #000000 !important; /* พื้นหลังของปุ่ม Login ตามธีมกลางวัน */
-  color: #ffc800 !important; /* สีตัวอักษรตามธีมกลางวัน */
+  background-color: #000000 !important;
+  color: #ffc800 !important;
 }
 
 .background-dark {
-  background-color: #545454 !important; /* สีพื้นหลังตามธีมกลางคืน */
+  background-color: #545454 !important;
   background-image: url('https://xauusdmasters.in/assets/images/home2/1.png') !important;
-  background-size: 45% !important; /* ลดขนาดรูปภาพพื้นหลังเป็น 50% */
+  background-size: 45% !important;
   background-position: center;
-  background-repeat: no-repeat; /* ป้องกันการซ้ำซ้อนของรูปภาพพื้นหลัง */
+  background-repeat: no-repeat;
 }
 
 .background-light {
-  background-color: #fff6ea !important; /* สีพื้นหลังตามธีมกลางวัน */
+  background-color: #fff6ea !important;
   background-image: url('https://xauusdmasters.in/assets/images/home2/1.png') !important;
-  background-size: 45% !important; /* ลดขนาดรูปภาพพื้นหลังเป็น 50% */
+  background-size: 45% !important;
   background-position: center;
-  background-repeat: no-repeat; /* ป้องกันการซ้ำซ้อนของรูปภาพพื้นหลัง */
+  background-repeat: no-repeat;
 }
 </style>
