@@ -1,6 +1,6 @@
 <template>
-  <v-dialog persistent :retain-focus="false" v-model="open" max-width="400" max-height="300" content-class="rounded-xl"
-    @keydown.esc="confirm">
+  <v-dialog persistent :retain-focus="false" v-model="open" max-width="350" max-height="300" content-class="rounded-xl"
+    @keydown.enter="confirm">
     <v-card>
       <v-card-title class="d-flex align-center justify-center text-h6">
         <v-icon class="mr-3 red--text" size="40">mdi-account-alert</v-icon>
@@ -53,7 +53,7 @@ export default {
       }
     },
     handleKeydown(e) {
-      if (e.key === 'Escape') {
+      if (e.key === 'Enter') {
         this.confirm();
       }
     },

@@ -58,7 +58,7 @@ export default {
                 const Status = this.$auth.user.status.toString();
                 const RankID = this.$auth.user.ranks_id.toString();
                 if (Status === '2') {
-                    this.$router.push('/auth');
+                    this.$router.push('/');
                 }
                 else {
                     if (RankID === '1') {

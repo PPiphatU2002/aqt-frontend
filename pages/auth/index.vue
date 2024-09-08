@@ -12,9 +12,9 @@
             </v-card-title>
             <v-card-subtitle>LOGIN WITH YOUR ACCOUNT</v-card-subtitle>
             <v-card-text>
-              <v-text-field v-model="form.email" label="อีเมล" prepend-icon="mdi-email" type="email" outlined dense
+              <v-text-field v-model="form.email" label="E-MAIL" prepend-icon="mdi-email" type="email" outlined dense
                 class="small-text-field"></v-text-field>
-              <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="รหัสผ่าน"
+              <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="PASSWORD"
                 :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
                 @click:append="show1 = !show1" outlined dense class="small-text-field"></v-text-field>
               <v-btn @click="login" :disabled="!form.email || !form.password" color="primary" block>
@@ -89,8 +89,9 @@ export default {
         const RankID = this.$auth.user.ranks_id.toString();
 
         if (Status === '2') {
-          this.$router.push('/auth');
+          this.$router.push('/');
           this.modal.warning.open = true;
+          await this.$auth.logout();
         }
         else {
           if (RankID === '1') {

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent :retain-focus="false" v-model="open" max-width="400" max-height="300" content-class="rounded-xl"
+  <v-dialog persistent :retain-focus="false" v-model="open" max-width="300" max-height="300" content-class="rounded-xl"
     @keydown.esc="confirm">
     <v-card>
       <v-card-title class="d-flex align-center justify-center text-h6">
