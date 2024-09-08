@@ -28,7 +28,7 @@
 
 <script>
 export default {
-    layout: 'employee',
+    layout: 'developer',
     middleware: 'auth',
     async mounted() {
         await this.checkRank();
@@ -72,13 +72,10 @@ export default {
         },
 
         fixport() {
-            this.$router.push('/developer/transaction/fixport');
+            this.$router.push('/employee/transaction/management/fixport');
         },
         transaction() {
-            this.$router.push('/developer/transaction/transaction');
-        },
-        management() {
-            this.$router.push('/developer/transaction/management');
+            this.$router.push('/employee/transaction/management/transaction');
         },
     }
 }

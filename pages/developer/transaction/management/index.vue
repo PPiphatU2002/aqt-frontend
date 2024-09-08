@@ -72,13 +72,10 @@ export default {
         },
 
         fixport() {
-            this.$router.push('/developer/transaction/fixport');
+            this.$router.push('/developer/transaction/management/fixport');
         },
         transaction() {
-            this.$router.push('/developer/transaction/transaction');
-        },
-        management() {
-            this.$router.push('/developer/transaction/management');
+            this.$router.push('/developer/transaction/management/transaction');
         },
     }
 }
