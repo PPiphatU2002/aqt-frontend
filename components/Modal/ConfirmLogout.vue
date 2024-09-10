@@ -6,12 +6,13 @@
         <v-icon justify="center" class="mr-3" size="40">mdi-logout-variant</v-icon>
         DO YOU WANT TO LOGOUT?
       </v-card-title>
+      <v-divider class="mb-3"></v-divider>
 
       <v-card-actions class="justify-center">
-        <v-btn color="primary" @click="confirm" class="rounded-xl font-weight-medium mt-0">
+        <v-btn color="#508d4e" @click="confirm" class="rounded-xl font-weight-medium mt-0">
           Logout
         </v-btn>
-        <v-btn color="error" @click="cancel" class="rounded-xl font-weight-medium mt-0">
+        <v-btn color="#bf2b2b" @click="cancel" class="rounded-xl font-weight-medium mt-0">
           Cancel
         </v-btn>
       </v-card-actions>

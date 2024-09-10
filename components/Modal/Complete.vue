@@ -12,7 +12,7 @@
       </v-card-text>
 
       <v-card-actions class="justify-center">
-        <v-btn color="#bf2b2b" @click="confirm" class="rounded-xl font-weight-medium mt-0">
+        <v-btn color="#508d4e" @click="confirm" class="rounded-xl font-weight-medium mt-0">
           OK
         </v-btn>
       </v-card-actions>
@@ -46,10 +46,10 @@ export default {
   methods: {
     confirm() {
       if (this.method === null) {
-        this.$emit('update:error', false)
+        this.$emit('update:complete', false)
       } else {
         this.method()
-        this.$emit('update:error', false)
+        this.$emit('update:complete', false)
       }
     },
     handleKeydown(e) {

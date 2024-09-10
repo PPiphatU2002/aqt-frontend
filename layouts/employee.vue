@@ -170,9 +170,16 @@
 </template>
 
 <script>
+import moment from 'moment';
+moment.locale('th');
+
 export default {
+  async mounted() {
+    await this.fetchEmployeeData();
+  },
   data() {
     return {
+      employees: [],
       clipped: false,
       fixed: false,
       menuActive: false,
@@ -198,6 +205,39 @@ export default {
     },
     sign_out() {
       this.$auth.logout();
+      this.recordLog();
+    },
+    async fetchEmployeeData() {
+      this.employees = await this.$store.dispatch('api/employee/getEmployees');
+    },
+    async recordLog() {
+      const empId = this.$auth.user.no;
+      const employee = this.employees.find(employee => employee.no === empId);
+      const employeeFName = employee ? employee.fname : 'Unknown';
+      const employeeSName = employee ? employee.lname : 'Unknown';
+
+      let userLocation = 'Unknown';
+      let userIP = 'Unknown';
+
+      try {
+        const response = await fetch('https://ipinfo.io/json?token=a29d27593626a2');
+        const data = await response.json();
+        userLocation = `${data.city}, ${data.region}, ${data.country}`;
+        userIP = data.ip;
+      } catch (error) {
+        console.error('Error fetching IP information:', error);
+      }
+
+      const log = {
+        emp_name: employeeFName + ' ' + employeeSName,
+        emp_email: this.$auth.user.email,
+        type: 4,
+        action: 'LOGOUT',
+        detail: `Location: ${userLocation},\nIP: ${userIP}`,
+        time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+      };
+      console.log(log);
+      this.$store.dispatch('api/log/addLogs', log);
     },
 
     goToNewUser() {
