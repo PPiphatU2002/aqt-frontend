@@ -37,10 +37,10 @@ moment.locale('th');
 
 export default {
   layout: 'blank',
-  name: 'Login',
 
   async mounted() {
     await this.checkRank();
+    await this.fetchEmployeeData();
   },
 
   watch: {
@@ -55,6 +55,8 @@ export default {
 
   data() {
     return {
+      employees: [],
+
       valid: false,
       show1: false,
       show2: false,
@@ -81,6 +83,10 @@ export default {
   },
 
   methods: {
+
+    async fetchEmployeeData() {
+      this.employees = await this.$store.dispatch('api/employee/getEmployees');
+    },
 
     async checkRank() {
       if (this.$auth.loggedIn) {
@@ -128,8 +134,6 @@ export default {
       }
     },
 
-
-
     forgotPassword() {
       this.$router.push('/auth/forgot_password');
     },
@@ -140,15 +144,33 @@ export default {
       }
     },
 
-    recordLog() {
-      const log = {
-        emp_id: this.$auth.user.no,
-        type: 1,
-        action: 'LOGIN',
-        time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-      }
-      console.log(log);
+    async recordLog() {
+      const empId = this.$auth.user.no;
+      const employee = this.employees.find(employee => employee.no === empId);
+      const employeeFName = employee ? employee.fname : 'Unknown';
+      const employeeSName = employee ? employee.lname : 'Unknown';
 
+      let userLocation = 'Unknown';
+      let userIP = 'Unknown';
+
+      try {
+        const response = await fetch('https://ipinfo.io/json?token=a29d27593626a2');
+        const data = await response.json();
+        userLocation = `${data.city}, ${data.region}, ${data.country}`;
+        userIP = data.ip;
+      } catch (error) {
+        console.error('Error fetching IP information:', error);
+      }
+
+      const log = {
+        emp_name: employeeFName + ' ' + employeeSName,
+        emp_email: this.$auth.user.email,
+        type: 4,
+        action: 'LOGIN',
+        detail: `Location: ${userLocation},\nIP: ${userIP}`,
+        time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+      };
+      console.log(log);
       this.$store.dispatch('api/log/addLogs', log);
     },
   },
