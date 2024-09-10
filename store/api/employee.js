@@ -33,10 +33,5 @@ export const actions = {
     return await this.$axios
       .post('auth/register', data)
       .then((res) => res.data)
-  },
-  async checkEmailDuplicate({ getters }, data) {
-    return await this.$axios
-      .post(`auth/check-email-duplicate/`, data)
-      .then((res) => res.data)
   }
 }
