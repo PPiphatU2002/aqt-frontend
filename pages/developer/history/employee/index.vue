@@ -1,5 +1,6 @@
 <template>
     <div>
+        <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
         <v-card flat>
             <v-container>
                 <v-row justify="center" align="center">
@@ -9,29 +10,84 @@
                             <h3 class="mb-0">EMPLOYEE HISTORY</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
-                            <v-icon class="small-icon">mdi-format-list-bulleted-type</v-icon>
-                            <v-select v-model="searchType" :items="searchTypes" dense outlined class="mx-2 search-size small-font"
-                                @change="onSearchTypeChange"></v-select>
+                            <div class="d-flex align-center mt-2 justify-center">
+                                <v-icon class="small-icon" @click="toggleSavedSearchesDialog">
+                                    mdi-format-list-bulleted-type
+                                </v-icon>
+                                <span>{{ savedSearches.length }}</span>
+                            </div>
 
-                            <v-text-field v-if="isSearchFieldVisible" v-model="searchQuery" label="SEARCH" dense outlined
-                                append-icon="mdi-magnify" class="mx-2 same-size small-font"></v-text-field>
+                            <v-dialog v-model="showSavedSearchesDialog" max-width="400px">
+                                <v-card>
+                                    <v-card-title class="headline" style="justify-content: center; display: flex;">SAVED
+                                        SEARCHES</v-card-title>
+                                    <v-card-text>
+                                        <v-list>
+                                            <v-list-item-group v-if="savedSearches.length > 0">
+                                                <v-list-item v-for="(search, index) in savedSearches" :key="index">
+                                                    <v-list-item-content>
+                                                        <v-list-item-title>
+                                                            <strong>TYPE :</strong> {{ search.type }}
+                                                        </v-list-item-title>
+                                                        <v-list-item-subtitle>
+                                                            <strong>QUERY :</strong> {{ search.query }}
+                                                        </v-list-item-subtitle>
+                                                        <v-list-item-subtitle v-if="search.start && search.end">
+                                                            <strong>TIME RANGE :</strong> {{
+                                                                formatDateTime(search.start)
+                                                            }} - {{ formatDateTime(search.end) }}
+                                                        </v-list-item-subtitle>
+                                                        <v-list-item-subtitle v-if="search.topics">
+                                                            <strong>TOPICS :</strong> {{ search.topics.join(', ') }}
+                                                        </v-list-item-subtitle>
+                                                    </v-list-item-content>
+                                                    <v-list-item-action>
+                                                        <v-btn icon @click="deleteSearch(index)">
+                                                            <v-icon color=#e50211>mdi-delete</v-icon>
+                                                        </v-btn>
+                                                    </v-list-item-action>
+                                                </v-list-item>
+                                            </v-list-item-group>
+                                            <v-list-item v-else>
+                                                <v-list-item-content style="justify-content: center; display: flex;">
+                                                    <v-icon color=#e50211>mdi-alert-circle</v-icon>
+                                                    NO SAVED SEARCHES AVAILABLE!</v-list-item-content>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-card-text>
+                                    <v-card-actions>
+                                        <v-spacer></v-spacer>
+                                        <v-btn color="#e50211" @click="showSavedSearchesDialog = false">Close</v-btn>
+                                        <v-spacer></v-spacer>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
 
-                            <v-select v-if="searchType === 'action'" v-model="selectedTopic" :items="actionTopics" dense outlined
-                                class="mx-2 search-size small-font">
-                            </v-select>
+                            <v-select v-model="searchType" :items="searchTypes" dense outlined
+                                class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-menu v-if="searchType === 'time'" v-model="datePickerMenu" :close-on-content-click="false"
-                                transition="scale-transition" offset-y>
+                            <v-text-field v-if="searchType !== 'action' && searchType !== 'time'" v-model="searchQuery"
+                                label="SEARCH" dense outlined append-icon="mdi-magnify"
+                                class="mx-2 same-size small-font">
+                            </v-text-field>
+
+                            <v-select v-if="searchType === 'action'" v-model="selectedTopics" :items="actionTopics"
+                                dense outlined multiple class="mx-2 search-size small-font"></v-select>
+
+
+                            <v-menu v-if="searchType === 'time'" v-model="datePickerMenu"
+                                :close-on-content-click="false" transition="scale-transition" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <div v-bind="attrs" v-on="on" class="date-picker-activator">
                                         <v-icon class="small-label">mdi-calendar-start-outline</v-icon>
-                                        <date-picker v-model="startDateTime" format="YYYY-MM-DD HH:mm" type="datetime" />
+                                        <date-picker v-model="startDateTime" format="YYYY-MM-DD HH:mm"
+                                            type="datetime" />
                                     </div>
                                 </template>
                             </v-menu>
 
-                            <v-menu v-if="searchType === 'time'" v-model="endDatePickerMenu" :close-on-content-click="false"
-                                transition="scale-transition" offset-y>
+                            <v-menu v-if="searchType === 'time'" v-model="endDatePickerMenu"
+                                :close-on-content-click="false" transition="scale-transition" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <div v-bind="attrs" v-on="on" class="date-picker-activator ml-2">
                                         <v-icon class="small-label">mdi-calendar-end-outline</v-icon>
@@ -39,27 +95,46 @@
                                     </div>
                                 </template>
                             </v-menu>
+
+                            <v-btn icon @click="addSearch">
+                                <v-icon class="small-icon ">mdi-plus</v-icon>
+                            </v-btn>
+
                         </div>
                     </v-col>
                 </v-row>
             </v-container>
 
-            <v-data-table :headers="headers" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
+            <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
+                <template v-slot:activator="{ on }">
+                    <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
+                        color="#85d7df">mdi-playlist-check</v-icon>
+                </template>
+                <v-list class="header-list">
+                    <v-list-item v-for="header in headers" :key="header.value" class="header-item">
+                        <v-list-item-content>
+                            <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
+
+
+            <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 item-key="id" :items-per-page="5">
-                <template v-slot:item.avatar="{ item }">
+                <template v-slot:item.picture="{ item }">
                     <v-avatar size="40">
-                        <img :src="`http://localhost:3001/files/avatar/${getUserAvatar(item.user_id)}`" alt="avatar" />
+                        <img :src="`http://localhost:3001/files/profile/${item.picture}`" alt="picture" />
                     </v-avatar>
                 </template>
-                <template v-slot:item.user_email="{ item }">
+                <template v-slot:item.emp_email="{ item }">
                     <div class="text-center">{{ item.emp_email }}</div>
                 </template>
-                <template v-slot:item.user_name="{ item }">
+                <template v-slot:item.emp_name="{ item }">
                     <div class="text-center">{{ item.emp_name }}</div>
                 </template>
                 <template v-slot:item.action="{ item }">
-                    <div class="text-center"
-                         :style="{ color: getActionColor(item.action) }">
+                    <div class="text-center" :style="{ color: getActionColor(item.action) }">
                         {{ item.action }}
                     </div>
                 </template>
@@ -76,7 +151,7 @@
 
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
-                <v-card-title class="headline">DETAIL</v-card-title>
+                <v-card-title class="headline" style="justify-content: center; display: flex;">DETAIL</v-card-title>
                 <v-card-text>
                     <div v-for="line in formattedDetailLines" :key="line">
                         <template v-if="line.includes('NAME')">
@@ -106,7 +181,8 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" @click="dialog = false">ปิด</v-btn>
+                    <v-btn color="#e50211" @click="dialog = false">CLOSE</v-btn>
+                    <v-spacer></v-spacer>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -126,7 +202,7 @@ export default {
     async mounted() {
         await this.checkRole();
         await this.fetchLogData();
-        await this.fetchUserData();
+        await this.fetchEmployeeData();
     },
 
     components: {
@@ -135,11 +211,23 @@ export default {
 
     data() {
         return {
+            modal: {
+                error: {
+                    open: false,
+                    message: 'DATE ENTRY HAS AN ERROR!',
+                },
+            },
+
             logs: [],
-            users: [],
+            employees: [],
             searchQuery: '',
-            searchType: 'action',
-            selectedTopic: '',
+            searchType: '',
+            selectedTopics: [],
+            savedSearches: [],
+            searchQueries: {
+                'emp_name': [],
+                'emp_email': [],
+            },
             searchTypes: [
                 { text: 'NAME', value: 'emp_name' },
                 { text: 'E-MAIL', value: 'emp_email' },
@@ -160,7 +248,10 @@ export default {
             endDatePickerMenu: false,
             startDateTime: '',
             endDateTime: '',
+            showSavedSearchesDialog: false,
 
+            showColumnSelector: false,
+            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'detail'],
             headers: [
                 {
                     text: 'TIME',
@@ -170,7 +261,7 @@ export default {
                 },
                 {
                     text: 'PROFILE',
-                    value: 'avatar',
+                    value: 'picture',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -184,14 +275,14 @@ export default {
                 },
                 {
                     text: 'E-MAIL',
-                    value: 'user_email',
+                    value: 'emp_email',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
                 {
                     text: 'NAME',
-                    value: 'user_name',
+                    value: 'emp_name',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -209,38 +300,22 @@ export default {
 
     computed: {
         filtered() {
-            const query = (this.searchQuery || '').toLowerCase();
-            const start = this.startDateTime ? moment(this.startDateTime, 'YYYY-MM-DD HH:mm').startOf('minute') : null;
-            const end = this.endDateTime ? moment(this.endDateTime, 'YYYY-MM-DD HH:mm').endOf('minute') : null;
-
-            return this.logs.filter(log => {
-                const field = log[this.searchType] ? log[this.searchType].toLowerCase() : '';
-                const logDate = moment(log.time);
-
-                const isQueryMatched = field.includes(query) ||
-                    moment(log.time).format('YYYY-MM-DD HH:mm').includes(query);
-
-                let isTimeMatched = true;
-                if (this.searchType === 'time') {
-                    if (start && end) {
-                        isTimeMatched = logDate.isBetween(start, end, null, '[]');
-                    } else if (start) {
-                        isTimeMatched = logDate.isSameOrAfter(start);
-                    } else if (end) {
-                        isTimeMatched = logDate.isSameOrBefore(end);
-                    }
-                }
-
-                const isActionMatched = this.searchType === 'action' && this.selectedTopic
-                    ? log.action === this.selectedTopic
-                    : true;
-
-                return isQueryMatched && isTimeMatched && isActionMatched;
+            let filteredLogs = this.logs;
+            this.savedSearches.forEach(search => {
+                filteredLogs = filteredLogs.filter(log => {
+                    return this.applySearchFilter(log, search);
+                });
             });
+
+            return filteredLogs;
         },
 
         formattedDetailLines() {
             return this.selectedItemDetail.split('\n');
+        },
+
+        filteredHeaders() {
+            return this.headers.filter(header => this.visibleColumns.includes(header.value));
         },
     },
 
@@ -250,8 +325,6 @@ export default {
                 const roleId = this.$auth.user.ranks_id.toString();
                 if (roleId === '1') {
                     this.$router.push('/developer/history/employee');
-                } else if (roleId === '2') {
-                    this.$router.push('/it/log');
                 } else {
                     this.$router.push('/auth');
                 }
@@ -264,27 +337,24 @@ export default {
             this.logs = await this.$store.dispatch('api/log/getLogsType', '4');
         },
 
-        async fetchUserData() {
-            this.users = await this.$store.dispatch('api/employee/getEmployees');
+        async fetchEmployeeData() {
+            this.employees = await this.$store.dispatch('api/employee/getEmployees');
         },
 
-        getUserEmail(userId) {
-            const user = this.users.find(user => user.no === userId);
-            return user ? user.email : 'N/A';
-        },
-
-        getUserAvatar(userId) {
-            const user = this.users.find(user => user.id === userId);
-            return user ? user.avatar : 'person-icon.jpg';
+        getEmployeeProfile(employeeID) {
+            const employee = this.employees.find(employee => employee.no === employeeID);
+            const picture = employee ? employee.picture : 'person-icon.jpg';
+            console.log(`Employee ID: ${employeeID}, Picture: ${picture}`);
+            return picture;
         },
 
         getActionColor(action) {
             if (action === 'LOGOUT') {
-                return '#e50211'; // สีสำหรับ LOGOUT
+                return '#e50211';
             } else if (action === 'LOGIN') {
-                return '#24b224'; // สีสำหรับ LOGIN
+                return '#24b224';
             } else {
-                return 'inherit'; // สีเริ่มต้นสำหรับค่าอื่นๆ
+                return 'inherit';
             }
         },
 
@@ -302,7 +372,7 @@ export default {
 
         exportExcel() {
             const userLogs = this.logs.map(log => ({
-                'อีเมล': this.getUserEmail(log.user_id),
+                'อีเมล': this.getUserEmail(log.emp_id),
                 'การจัดการ': log.action,
                 'เวลา': moment(log.time).format('LLL'),
             }));
@@ -313,12 +383,106 @@ export default {
         },
 
         onSearchTypeChange() {
-            if (this.searchType === 'emp_email' || this.searchType === 'emp_name') {
-                this.isSearchFieldVisible = true;
+            this.isSearchFieldVisible = this.searchType !== 'time' && this.searchType !== 'action';
+        }
+        ,
+
+        validateDateRange() {
+            const start = moment(this.startDateTime);
+            const end = moment(this.endDateTime);
+
+            if (start.isValid() && end.isValid() && start.isAfter(end)) {
+                this.modal.error.open = true;
+                return false;
+            }
+            return true;
+        },
+
+        addSearch() {
+            if (!this.validateDateRange()) {
+                return;
+            }
+
+            if (this.searchType === 'action') {
+                this.addTopicToSearch();
+            } else if (this.searchType === 'emp_name' || this.searchType === 'emp_email') {
+                this.addTextToSearch();
             } else {
-                this.isSearchFieldVisible = false;
+                this.savedSearches.push({
+                    query: this.searchQuery,
+                    type: this.searchType,
+                    topic: this.selectedTopic,
+                    start: this.startDateTime,
+                    end: this.endDateTime
+                });
+                this.searchQuery = '';
+                this.selectedTopic = '';
+                this.startDateTime = '';
+                this.endDateTime = '';
             }
         },
+
+        addTextToSearch() {
+            const trimmedQuery = this.searchQuery.trim();
+            if (trimmedQuery) {
+                this.searchQueries[this.searchType].push(trimmedQuery);
+                this.savedSearches.push({
+                    query: this.searchQueries[this.searchType],
+                    type: this.searchType,
+                    start: this.startDateTime,
+                    end: this.endDateTime
+                });
+                this.searchQuery = '';
+            }
+        },
+
+        addTopicToSearch() {
+            this.savedSearches.push({
+                query: '',
+                type: 'action',
+                topics: [...this.selectedTopics],
+                start: this.startDateTime,
+                end: this.endDateTime
+            });
+            this.selectedTopics = [];
+            this.startDateTime = '';
+            this.endDateTime = '';
+        },
+
+        applySearchFilter(log, search) {
+            const field = log[search.type] ? log[search.type].toLowerCase() : '';
+            let queryMatched = true;
+
+            if (search.type === 'emp_name' || search.type === 'emp_email') {
+                queryMatched = this.searchQueries[search.type].some(query =>
+                    field.includes(query.toLowerCase())
+                );
+            } else {
+                const searchQuery = search.query.toLowerCase();
+                queryMatched = field.includes(searchQuery);
+            }
+
+            const timeMatched = search.type === 'time' ? this.checkTimeRange(log, search) : true;
+            const topicMatched = search.topics ? search.topics.some(topic => topic === log.action) : true;
+            return queryMatched && timeMatched && topicMatched;
+        },
+
+        checkTimeRange(log, search) {
+            const logTime = moment(log.time);
+            const startTime = moment(search.start);
+            const endTime = moment(search.end);
+            return (!startTime.isValid() || logTime.isSameOrAfter(startTime)) &&
+                (!endTime.isValid() || logTime.isSameOrBefore(endTime));
+        },
+
+        toggleSavedSearchesDialog() {
+            this.showSavedSearchesDialog = !this.showSavedSearchesDialog;
+        },
+
+        deleteSearch(index) {
+            this.savedSearches.splice(index, 1);
+        },
+
     },
 };
 </script>
@@ -341,6 +505,13 @@ export default {
 }
 
 .small-icon {
+    font-size: 1.5rem;
+    margin-right: 6px;
+    margin-left: 6px;
+}
+
+.tab-icon {
+    cursor: pointer;
     margin-right: 6px;
     margin-left: 24px;
 }
@@ -400,5 +571,37 @@ export default {
 
 ::v-deep .v-text-field.small-font .v-input__control .v-input__label {
     font-size: 0.8rem !important;
+}
+
+.v-menu__content {
+    top: 100%;
+    left: 0;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.custom-list-item {
+    padding: 0 0;
+}
+
+.v-list-item__content {
+    padding: 0;
+}
+
+.header-list {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    gap: 0px;
+}
+
+.header-item {
+    flex: 1 0 20%;
+    box-sizing: border-box;
+}
+
+.v-list-item__content {
+    display: flex;
+    align-items: center;
 }
 </style>

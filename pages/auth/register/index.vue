@@ -11,51 +11,89 @@
                         <v-card-title>
                             <span class="headline">CREATE YOUR ACCOUNT</span>
                         </v-card-title>
-                        <v-card-subtitle>REGISTER BELOW</v-card-subtitle>
+                        <v-card-subtitle class="pa-0 ml-4">REGISTER BELOW</v-card-subtitle>
                         <v-form ref="form" v-model="valid" lazy-validation>
-                            <v-card-text>
-                                <v-text-field v-model="form.email" label="E-MAIL" prepend-icon="mdi-email" type="email"
-                                    outlined dense class="small-text-field"
-                                    :rules="[rules.required, rules.email]"></v-text-field>
+                            <v-card-text class="pa-8">
 
-                                <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="PASSWORD"
-                                    :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
-                                    @click:append="show1 = !show1" outlined dense class="small-text-field"
-                                    :rules="[rules.required, rules.minPassword]"></v-text-field>
+                                <v-row class="pa-0">
+                                    <v-col cols="12" class="pa-1">
+                                        <v-text-field v-model="form.email" label="E-MAIL" prepend-icon="mdi-email"
+                                            type="email" outlined dense class="small-text-field"
+                                            :rules="[rules.required, rules.email]"></v-text-field>
+                                    </v-col>
+                                </v-row>
 
-                                <v-text-field v-model="form.confirmPassword" prepend-icon="mdi-lock-check"
-                                    label="CONFIRM PASSWORD" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
-                                    :type="show2 ? 'text' : 'password'" @click:append="show2 = !show2" outlined dense
-                                    class="small-text-field"
-                                    :rules="[rules.required, rules.passwordMatch]"></v-text-field>
+                                <v-row class="pa-0">
+                                    <v-col cols="12" sm="6" class="pa-1">
+                                        <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="PASSWORD"
+                                            :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                                            :type="show1 ? 'text' : 'password'" @click:append="show1 = !show1" outlined
+                                            dense class="small-text-field"
+                                            :rules="[rules.required, rules.minPassword]"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6" class="pa-1">
+                                        <v-text-field v-model="form.confirmPassword" prepend-icon="mdi-lock-check"
+                                            label="CONFIRM PASSWORD" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+                                            :type="show2 ? 'text' : 'password'" @click:append="show2 = !show2" outlined
+                                            dense class="small-text-field"
+                                            :rules="[rules.required, rules.passwordMatch]"></v-text-field>
+                                    </v-col>
+                                </v-row>
 
-                                <v-text-field v-model="form.fname" label="NAME" prepend-icon="mdi-face-woman-profile"
-                                    outlined dense class="small-text-field"
-                                    :rules="[rules.required, rules.englishOnly]"></v-text-field>
+                                <v-row class="pa-0">
+                                    <v-col cols="12" sm="6" class="pa-1">
+                                        <v-text-field v-model="form.fname" label="NAME" prepend-icon="mdi-pen" outlined
+                                            dense class="small-text-field"
+                                            :rules="[rules.required, rules.englishOnly]"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6" class="pa-1">
+                                        <v-text-field v-model="form.lname" label="SURNAME" prepend-icon="mdi-home-group"
+                                            outlined dense class="small-text-field"
+                                            :rules="[rules.required, rules.englishOnly]"></v-text-field>
+                                    </v-col>
+                                </v-row>
 
-                                <v-text-field v-model="form.lname" label="SURNAME" prepend-icon="mdi-face-man-profile"
-                                    outlined dense class="small-text-field"
-                                    :rules="[rules.required, rules.englishOnly]"></v-text-field>
+                                <v-row class="pa-0">
+                                    <v-col cols="12" sm="6" class="pa-1">
+                                        <v-text-field v-model="form.phone" label="TELEPHONE NUMBER"
+                                            prepend-icon="mdi-phone" outlined dense class="small-text-field"
+                                            :rules="[rules.required, rules.phoneNumber]"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6" class="pa-1">
+                                        <v-select v-model="form.gender" :items="genderOptions" label="GENDER"
+                                            prepend-icon="mdi-gender-male-female" outlined dense class="last-text-field"
+                                            :rules="[rules.required]" ref="genderSelect">
+                                            <template v-slot:item="data">
+                                                <v-list-item :value="data.item.value"
+                                                    @click="selectGender(data.item.value)">
+                                                    <v-list-item-icon>
+                                                        <v-icon>{{ data.item.icon }}</v-icon>
+                                                    </v-list-item-icon>
+                                                    <v-list-item-content>
+                                                        <v-list-item-title>{{ data.item.text }}</v-list-item-title>
+                                                    </v-list-item-content>
+                                                </v-list-item>
+                                            </template>
+                                        </v-select>
+                                    </v-col>
+                                </v-row>
 
-                                <v-text-field v-model="form.phone" label="TELEPHONE NUMBER" prepend-icon="mdi-phone"
-                                    outlined dense class="last-text-field"
-                                    :rules="[rules.required, rules.phoneNumber]"></v-text-field>
-
-                                <v-row align="center" justify="center">
-                                    <v-col cols="6">
-                                        <v-btn :disabled="!valid" @click="confirm" color="primary" block>
+                                <v-row align="center" justify="center" class="pa-0">
+                                    <v-col cols="6" class="pa-1 last-text-field">
+                                        <v-btn :disabled="!valid" @click="confirm" color="#85d7df" block>
                                             REGISTER
                                         </v-btn>
                                     </v-col>
-
-                                    <v-col cols="6">
-                                        <v-btn color="error" @click="goBack" block>
+                                    
+                                    <v-col cols="6" class="pa-1 last-text-field">
+                                        <v-btn color="#e50211" @click="goBack" block>
                                             CANCEL
                                         </v-btn>
                                     </v-col>
                                 </v-row>
                             </v-card-text>
                         </v-form>
+
                     </v-card>
                 </v-col>
             </v-row>
@@ -85,6 +123,7 @@ export default {
                 fname: null,
                 lname: null,
                 phone: null,
+                gender: null,
                 status: 2,
                 ranks_id: 2,
                 created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -103,7 +142,12 @@ export default {
                 passwordMatch: value => value === this.form.password || 'PASSWORD MUST MATCH!',
                 phoneNumber: value => /^0[0-9]{9}$/.test(value) || 'TELEPHONE NUMBER MUST BE 10 DIGITS!',
                 englishOnly: value => /^[a-zA-Z]+$/.test(value) || 'ONLY ENGLISH LETTERS ARE ALLOWED!'
-            }
+            },
+            genderOptions: [
+                { text: 'MALE', value: 'Male', icon: 'mdi-face-man' },
+                { text: 'FEMALE', value: 'Female', icon: 'mdi-face-woman' },
+                { text: 'NOT SPECIFIED', value: 'Not Specified', icon: 'mdi-not-equal-variant' },
+            ]
         };
     },
     methods: {
@@ -161,9 +205,10 @@ export default {
         recordLog() {
             const log = {
                 emp_email: this.form.email,
-                type:4,
-                detail: 'NAME : '+this.form.fname+'\nSURNAME : '+this.form.lname
-                +'\nTELEPHONE NUMBER : '+this.form.phone,
+                type: 4,
+                detail: 'NAME ' + this.form.fname + ' ' + this.form.lname
+                    + '\nPHONE ' + this.form.phone
+                    + '\nGENDER ' + this.form.gender,
                 action: 'REQUEST TO REGISTER',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             }
@@ -175,6 +220,26 @@ export default {
         goBack() {
             this.$router.push('/auth')
         },
+
+        resetForm() {
+            this.form.email = null;
+            this.form.password = null;
+            this.form.confirmPassword = null;
+            this.form.fname = null;
+            this.form.lname = null;
+            this.form.phone = null;
+            this.form.gender = null;
+
+            // Reset form validation
+            this.$refs.form.resetValidation();
+        },
+
+        selectGender(gender) {
+            this.form.gender = gender;
+            this.$nextTick(() => {
+                this.$refs.genderSelect.blur();
+            });
+        }
     }
 };
 </script>
@@ -184,16 +249,16 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 85vh;
+    height: 80vh;
 }
 
 .v-card {
     max-width: 600px;
-    max-height: 600px;
+    max-height: 800px;
     margin: auto;
 }
 
 .last-text-field {
-    margin-bottom: 6px;
+    margin-bottom: 2px;
 }
 </style>

@@ -167,7 +167,7 @@ export default {
         emp_email: this.$auth.user.email,
         type: 4,
         action: 'LOGIN',
-        detail: `Location: ${userLocation},\nIP: ${userIP}`,
+        detail: `LOCATION ${userLocation}\nIP ${userIP}`,
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };
       console.log(log);

@@ -261,7 +261,7 @@ export default {
         emp_email: emplyeeEmail,
         type: 4,
         action: 'LOGOUT',
-        detail: `Location: ${userLocation},\nIP: ${userIP}`,
+        detail: `LOCATION ${userLocation}\nIP ${userIP}`,
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };
       console.log(log);
