@@ -8,10 +8,11 @@
             <v-row align="center" justify="center">
                 <v-col cols="12" sm="8" md="6">
                     <v-card>
-                        <v-card-title>
+                        <v-card-title style="justify-content: center; display: flex;">
                             <span class="headline">CREATE YOUR ACCOUNT</span>
                         </v-card-title>
-                        <v-card-subtitle class="pa-0 ml-4">REGISTER BELOW</v-card-subtitle>
+                        <v-card-subtitle class="pa-0 ml-4" style="justify-content: center; display: flex;">REGISTER
+                            BELOW</v-card-subtitle>
                         <v-form ref="form" v-model="valid" lazy-validation>
                             <v-card-text class="pa-8">
 
@@ -80,11 +81,11 @@
 
                                 <v-row align="center" justify="center" class="pa-0">
                                     <v-col cols="6" class="pa-1 last-text-field">
-                                        <v-btn :disabled="!valid" @click="confirm" color="#85d7df" block>
+                                        <v-btn :disabled="!valid" @click="confirm" color="#24b224" block>
                                             REGISTER
                                         </v-btn>
                                     </v-col>
-                                    
+
                                     <v-col cols="6" class="pa-1 last-text-field">
                                         <v-btn color="#e50211" @click="goBack" block>
                                             CANCEL

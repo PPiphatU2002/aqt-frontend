@@ -7,17 +7,17 @@
       <v-row align="center" justify="center">
         <v-col cols="12" sm="8" md="6">
           <v-card>
-            <v-card-title>
+            <v-card-title style="justify-content: center; display: flex;">
               <span class="headline">WELCOME!</span>
             </v-card-title>
-            <v-card-subtitle>LOGIN WITH YOUR ACCOUNT</v-card-subtitle>
+            <v-card-subtitle style="justify-content: center; display: flex;">LOGIN WITH YOUR ACCOUNT</v-card-subtitle>
             <v-card-text>
               <v-text-field v-model="form.email" label="E-MAIL" prepend-icon="mdi-email" type="email" outlined dense
                 class="small-text-field"></v-text-field>
               <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="PASSWORD"
                 :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
                 @click:append="show1 = !show1" outlined dense class="small-text-field"></v-text-field>
-              <v-btn @click="login" :disabled="!form.email || !form.password" color="primary" block>
+              <v-btn @click="login" :disabled="!form.email || !form.password" color="#24b224" block>
                 LOGIN
               </v-btn>
               <a @click="forgotPassword" class="forgot-password-text">
