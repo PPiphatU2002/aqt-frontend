@@ -19,14 +19,16 @@
 
                             <v-dialog v-model="showSavedSearchesDialog" max-width="400px">
                                 <v-card>
-                                    <v-card-title class="headline" style="justify-content: center; display: flex;">บันทึกการค้นหา</v-card-title>
+                                    <v-card-title class="headline"
+                                        style="justify-content: center; display: flex;">บันทึกการค้นหา</v-card-title>
                                     <v-card-text>
                                         <v-list>
                                             <v-list-item-group v-if="savedSearches.length > 0">
                                                 <v-list-item v-for="(search, index) in savedSearches" :key="index">
                                                     <v-list-item-content>
                                                         <v-list-item-title>
-                                                            <strong>ประเภท :</strong> {{ search.type }}
+                                                            <strong>ประเภท :</strong>
+                                                            {{ getSearchTypeText(search.type) }}
                                                         </v-list-item-title>
                                                         <v-list-item-subtitle v-if="search.start && search.end">
                                                             <strong>ระยะเวลา :</strong> {{
@@ -96,6 +98,9 @@
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
                             </v-btn>
 
+                            <v-btn color="success" @click="exportCSV" icon>
+                                <v-icon>mdi-file-excel</v-icon>
+                            </v-btn>
                         </div>
                     </v-col>
                 </v-row>
@@ -117,7 +122,7 @@
 
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                item-key="id" :items-per-page="5">
+                item-key="id" :items-per-page="10">
                 <template v-slot:item.picture="{ item }">
                     <v-avatar size="40">
                         <img :src="`http://localhost:3001/files/profile/${item.picture}`" alt="picture" />
@@ -147,14 +152,11 @@
 
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
-                <v-card-title class="headline" style="justify-content: center; display: flex;">รายละเอียดเพิ่มเติม</v-card-title>
+                <v-card-title class="headline"
+                    style="justify-content: center; display: flex;">รายละเอียดเพิ่มเติม</v-card-title>
                 <v-card-text>
                     <div v-for="line in formattedDetailLines" :key="line">
-                        <template v-if="line.includes('NAME')">
-                            <v-icon color="white">mdi-pen</v-icon>
-                            {{ line.replace('NAME', '').trim() }}
-                        </template>
-                        <template v-else-if="line.includes('PHONE')">
+                        <template v-if="line.includes('PHONE')">
                             <v-icon color="green">mdi-phone</v-icon>
                             {{ line.replace('PHONE', '').trim() }}
                         </template>
@@ -191,6 +193,7 @@ import moment from 'moment';
 import 'moment/locale/th'
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
+import Papa from 'papaparse';
 
 export default {
     layout: 'developer',
@@ -479,6 +482,48 @@ export default {
             this.savedSearches.splice(index, 1);
         },
 
+        getSearchTypeText(type) {
+            const found = this.searchTypes.find(item => item.value === type);
+            return found ? found.text : type;
+        },
+
+        exportCSV() {
+            // Filter out 'picture' field and map data to be exported
+            const filteredData = this.filtered.map(item => {
+                const dataItem = {};
+                this.filteredHeaders.forEach(header => {
+                    if (header.value !== 'picture') {
+                        dataItem[header.text] = item[header.value];
+                    }
+                });
+                return dataItem;
+            });
+
+            // Convert data to CSV format
+            const csv = Papa.unparse(filteredData);
+
+            // Add BOM (Byte Order Mark) to ensure UTF-8 encoding
+            const bom = '\uFEFF';
+            const csvWithBom = bom + csv;
+
+            // Create a Blob and trigger download
+            const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const currentDate = moment().format('YYYY-MM-DD');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', `ประวัติพนักงาน-${currentDate}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+
+        convertToCSV(objArray) {
+            const array = [Object.keys(objArray[0])].concat(objArray);
+
+            return array.map(row => {
+                return Object.values(row).map(value => `"${value}"`).join(',');
+            }).join('\n');
+        },
     },
 };
 </script>
