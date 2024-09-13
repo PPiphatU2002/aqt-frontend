@@ -4,7 +4,7 @@
     <v-card>
       <v-card-title class="d-flex align-center justify-center text-h6">
         <v-icon class="mr-3 green--text" size="40">mdi-check-circle</v-icon>
-        SUCCESS
+        สำเร็จ
       </v-card-title>
       <v-divider class="mb-3"></v-divider>
       <v-card-text class="text-center">
@@ -13,7 +13,7 @@
 
       <v-card-actions class="justify-center">
         <v-btn color="#508d4e" @click="confirm" class="rounded-xl font-weight-medium mt-0">
-          OK
+          ตกลง
         </v-btn>
       </v-card-actions>
     </v-card>
