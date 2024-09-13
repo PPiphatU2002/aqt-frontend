@@ -7,7 +7,7 @@
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
                             <v-icon class="little-icon">mdi-home-clock-outline</v-icon>&nbsp;
-                            <h3 class="mb-0">EMPLOYEE HISTORY</h3>
+                            <h3 class="mb-0">ประวัติพนักงาน</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
                             <div class="d-flex align-center mt-2 justify-center">
@@ -19,26 +19,22 @@
 
                             <v-dialog v-model="showSavedSearchesDialog" max-width="400px">
                                 <v-card>
-                                    <v-card-title class="headline" style="justify-content: center; display: flex;">SAVED
-                                        SEARCHES</v-card-title>
+                                    <v-card-title class="headline" style="justify-content: center; display: flex;">บันทึกการค้นหา</v-card-title>
                                     <v-card-text>
                                         <v-list>
                                             <v-list-item-group v-if="savedSearches.length > 0">
                                                 <v-list-item v-for="(search, index) in savedSearches" :key="index">
                                                     <v-list-item-content>
                                                         <v-list-item-title>
-                                                            <strong>TYPE :</strong> {{ search.type }}
+                                                            <strong>ประเภท :</strong> {{ search.type }}
                                                         </v-list-item-title>
-                                                        <v-list-item-subtitle>
-                                                            <strong>QUERY :</strong> {{ search.query }}
-                                                        </v-list-item-subtitle>
                                                         <v-list-item-subtitle v-if="search.start && search.end">
-                                                            <strong>TIME RANGE :</strong> {{
+                                                            <strong>ระยะเวลา :</strong> {{
                                                                 formatDateTime(search.start)
                                                             }} - {{ formatDateTime(search.end) }}
                                                         </v-list-item-subtitle>
                                                         <v-list-item-subtitle v-if="search.topics">
-                                                            <strong>TOPICS :</strong> {{ search.topics.join(', ') }}
+                                                            <strong>หัวข้อ :</strong> {{ search.topics.join(', ') }}
                                                         </v-list-item-subtitle>
                                                     </v-list-item-content>
                                                     <v-list-item-action>
@@ -51,13 +47,13 @@
                                             <v-list-item v-else>
                                                 <v-list-item-content style="justify-content: center; display: flex;">
                                                     <v-icon color=#e50211>mdi-alert-circle</v-icon>
-                                                    NO SAVED SEARCHES AVAILABLE!</v-list-item-content>
+                                                    ไม่มีข้อมูลการค้นหา</v-list-item-content>
                                             </v-list-item>
                                         </v-list>
                                     </v-card-text>
                                     <v-card-actions>
                                         <v-spacer></v-spacer>
-                                        <v-btn color="#e50211" @click="showSavedSearchesDialog = false">Close</v-btn>
+                                        <v-btn color="#e50211" @click="showSavedSearchesDialog = false">ปิด</v-btn>
                                         <v-spacer></v-spacer>
                                     </v-card-actions>
                                 </v-card>
@@ -67,7 +63,7 @@
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
                             <v-text-field v-if="searchType !== 'action' && searchType !== 'time'" v-model="searchQuery"
-                                label="SEARCH" dense outlined append-icon="mdi-magnify"
+                                label="ค้นหา" dense outlined append-icon="mdi-magnify"
                                 class="mx-2 same-size small-font">
                             </v-text-field>
 
@@ -151,7 +147,7 @@
 
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
-                <v-card-title class="headline" style="justify-content: center; display: flex;">DETAIL</v-card-title>
+                <v-card-title class="headline" style="justify-content: center; display: flex;">รายละเอียด</v-card-title>
                 <v-card-text>
                     <div v-for="line in formattedDetailLines" :key="line">
                         <template v-if="line.includes('NAME')">
@@ -181,7 +177,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="#e50211" @click="dialog = false">CLOSE</v-btn>
+                    <v-btn color="#e50211" @click="dialog = false">ปิด</v-btn>
                     <v-spacer></v-spacer>
                 </v-card-actions>
             </v-card>
@@ -229,15 +225,15 @@ export default {
                 'emp_email': [],
             },
             searchTypes: [
-                { text: 'NAME', value: 'emp_name' },
-                { text: 'E-MAIL', value: 'emp_email' },
-                { text: 'ACTION', value: 'action' },
-                { text: 'TIME', value: 'time' }
+                { text: 'ชื่อ', value: 'emp_name' },
+                { text: 'อีเมล', value: 'emp_email' },
+                { text: 'การกระทำ', value: 'action' },
+                { text: 'เวลา', value: 'time' }
             ],
             actionTopics: [
-                { text: 'LOGIN', value: 'LOGIN' },
-                { text: 'LOGOUT', value: 'LOGOUT' },
-                { text: 'REQUEST TO REGISTER', value: 'REQUEST TO REGISTER' },
+                { text: 'เข้าสู่ระบบ', value: 'เข้าสู่ระบบ' },
+                { text: 'ออกจากระบบ', value: 'ออกจากระบบ' },
+                { text: 'ส่งคำร้องขอสมัครสมาชิก', value: 'ส่งคำร้องขอสมัครสมาชิก' },
             ],
             sortBy: 'time',
             sortDesc: true,
@@ -254,41 +250,41 @@ export default {
             visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'detail'],
             headers: [
                 {
-                    text: 'TIME',
+                    text: 'เวลา',
                     value: 'time',
                     align: 'center',
                     cellClass: 'text-center',
                 },
                 {
-                    text: 'PROFILE',
+                    text: 'โปรไฟล์',
                     value: 'picture',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
                 {
-                    text: 'ACTION',
+                    text: 'การกระทำ',
                     value: 'action',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
                 {
-                    text: 'E-MAIL',
+                    text: 'อีเมล',
                     value: 'emp_email',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
                 {
-                    text: 'NAME',
+                    text: 'ชื่อ-นามสกุล',
                     value: 'emp_name',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
                 {
-                    text: 'DETAIL',
+                    text: 'รายละเอียด',
                     value: 'detail',
                     sortable: false,
                     align: 'center',

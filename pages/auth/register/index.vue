@@ -9,16 +9,16 @@
                 <v-col cols="12" sm="8" md="6">
                     <v-card>
                         <v-card-title style="justify-content: center; display: flex;">
-                            <span class="headline">CREATE YOUR ACCOUNT</span>
+                            <span class="headline">สร้างผู้ใช้งาน</span>
                         </v-card-title>
-                        <v-card-subtitle class="pa-0 ml-4" style="justify-content: center; display: flex;">REGISTER
-                            BELOW</v-card-subtitle>
+                        <v-card-subtitle class="pa-0"
+                            style="justify-content: center; display: flex;">กรอกข้อมูลให้ครบถ้วน</v-card-subtitle>
                         <v-form ref="form" v-model="valid" lazy-validation>
                             <v-card-text class="pa-8">
 
                                 <v-row class="pa-0">
                                     <v-col cols="12" class="pa-1">
-                                        <v-text-field v-model="form.email" label="E-MAIL" prepend-icon="mdi-email"
+                                        <v-text-field v-model="form.email" label="อีเมล" prepend-icon="mdi-email"
                                             type="email" outlined dense class="small-text-field"
                                             :rules="[rules.required, rules.email]"></v-text-field>
                                     </v-col>
@@ -26,7 +26,7 @@
 
                                 <v-row class="pa-0">
                                     <v-col cols="12" sm="6" class="pa-1">
-                                        <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="PASSWORD"
+                                        <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="รหัสผ่าน"
                                             :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
                                             :type="show1 ? 'text' : 'password'" @click:append="show1 = !show1" outlined
                                             dense class="small-text-field"
@@ -34,7 +34,7 @@
                                     </v-col>
                                     <v-col cols="12" sm="6" class="pa-1">
                                         <v-text-field v-model="form.confirmPassword" prepend-icon="mdi-lock-check"
-                                            label="CONFIRM PASSWORD" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+                                            label="ยืนยันรหัสผ่าน" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
                                             :type="show2 ? 'text' : 'password'" @click:append="show2 = !show2" outlined
                                             dense class="small-text-field"
                                             :rules="[rules.required, rules.passwordMatch]"></v-text-field>
@@ -43,25 +43,25 @@
 
                                 <v-row class="pa-0">
                                     <v-col cols="12" sm="6" class="pa-1">
-                                        <v-text-field v-model="form.fname" label="NAME" prepend-icon="mdi-pen" outlined
+                                        <v-text-field v-model="form.fname" label="ชื่อ" prepend-icon="mdi-pen" outlined
                                             dense class="small-text-field"
-                                            :rules="[rules.required, rules.englishOnly]"></v-text-field>
+                                            :rules="[rules.required, rules.thaiOnly]"></v-text-field>
                                     </v-col>
                                     <v-col cols="12" sm="6" class="pa-1">
-                                        <v-text-field v-model="form.lname" label="SURNAME" prepend-icon="mdi-home-group"
+                                        <v-text-field v-model="form.lname" label="นามสกุล" prepend-icon="mdi-home-group"
                                             outlined dense class="small-text-field"
-                                            :rules="[rules.required, rules.englishOnly]"></v-text-field>
+                                            :rules="[rules.required, rules.thaiOnly]"></v-text-field>
                                     </v-col>
                                 </v-row>
 
                                 <v-row class="pa-0">
                                     <v-col cols="12" sm="6" class="pa-1">
-                                        <v-text-field v-model="form.phone" label="TELEPHONE NUMBER"
+                                        <v-text-field v-model="form.phone" label="เบอร์โทรศัพท์"
                                             prepend-icon="mdi-phone" outlined dense class="small-text-field"
                                             :rules="[rules.required, rules.phoneNumber]"></v-text-field>
                                     </v-col>
                                     <v-col cols="12" sm="6" class="pa-1">
-                                        <v-select v-model="form.gender" :items="genderOptions" label="GENDER"
+                                        <v-select v-model="form.gender" :items="genderOptions" label="เพศ"
                                             prepend-icon="mdi-gender-male-female" outlined dense class="last-text-field"
                                             :rules="[rules.required]" ref="genderSelect">
                                             <template v-slot:item="data">
@@ -82,13 +82,13 @@
                                 <v-row align="center" justify="center" class="pa-0">
                                     <v-col cols="6" class="pa-1 last-text-field">
                                         <v-btn :disabled="!valid" @click="confirm" color="#24b224" block>
-                                            REGISTER
+                                            ลงทะเบียน
                                         </v-btn>
                                     </v-col>
 
                                     <v-col cols="6" class="pa-1 last-text-field">
                                         <v-btn color="#e50211" @click="goBack" block>
-                                            CANCEL
+                                            ยกเลิก
                                         </v-btn>
                                     </v-col>
                                 </v-row>
@@ -133,21 +133,21 @@ export default {
 
             modal: {
                 confirm: { open: false, },
-                complete: { open: false, message: 'MEMBERSHIP REGISTRATION COMPLETED, PLEASE WAIT FOR USER APPROVAL!' },
-                error: { open: false, message: 'SOMETHING WAS WRONG!' }
+                complete: { open: false, message: 'การลงทะเบียนสมาชิกเสร็จสมบูรณ์ กรุณารอการอนุมัติผู้ใช้งาน' },
+                error: { open: false, message: 'มีบางอย่างผิดปกติ' }
             },
             rules: {
-                required: value => !!value || 'FIELD IS REQUIRED!',
-                email: value => /.+@.+\..+/.test(value) || 'E-MAIL MUST BE VALID!',
-                minPassword: value => (value && value.length >= 8) || 'PASSWORD MUST BE ATLEAST 8 CHARACTERS!',
-                passwordMatch: value => value === this.form.password || 'PASSWORD MUST MATCH!',
-                phoneNumber: value => /^0[0-9]{9}$/.test(value) || 'TELEPHONE NUMBER MUST BE 10 DIGITS!',
-                englishOnly: value => /^[a-zA-Z]+$/.test(value) || 'ONLY ENGLISH LETTERS ARE ALLOWED!'
+                required: value => !!value || 'กรุณากรอกข้อมูล',
+                email: value => /.+@.+\..+/.test(value) || 'กรุณากรอกอีเมลให้ถูกต้อง',
+                minPassword: value => (value && value.length >= 8) || 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร!',
+                passwordMatch: value => value === this.form.password || 'รหัสผ่านต้องเหมือนกัน',
+                phoneNumber: value => /^0[0-9]{9}$/.test(value) || 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง',
+                thaiOnly: value => /^[ก-๙]+$/.test(value) || 'กรุณาใช้ชื่อเป็นภาษาไทย'
             },
             genderOptions: [
-                { text: 'MALE', value: 'Male', icon: 'mdi-face-man' },
-                { text: 'FEMALE', value: 'Female', icon: 'mdi-face-woman' },
-                { text: 'NOT SPECIFIED', value: 'Not Specified', icon: 'mdi-not-equal-variant' },
+                { text: 'ชาย', value: 'ชาย', icon: 'mdi-face-man' },
+                { text: 'หญิง', value: 'หญิง', icon: 'mdi-face-woman' },
+                { text: 'ไม่ระบุ', value: 'ไม่ระบุ', icon: 'mdi-not-equal-variant' },
             ]
         };
     },
@@ -190,7 +190,7 @@ export default {
                 }
             } else {
                 this.modal.error.open = true;
-                this.modal.error.message = "PLEASE FILL IN ALL INFORMATION COMPLETELY!";
+                this.modal.error.message = "กรุณากรอกข้อมูลให้ครบถ้วน";
             }
         },
         async create() {
@@ -200,7 +200,7 @@ export default {
                 this.modal.complete.open = true
             } catch (error) {
                 this.modal.error.open = true
-                this.modal.error.message = "E-MAIL ALREADY EXISTS!";
+                this.modal.error.message = "มีอีเมลนี้อยู่แล้ว";
             }
         },
         recordLog() {
@@ -210,7 +210,7 @@ export default {
                 detail: 'NAME ' + this.form.fname + ' ' + this.form.lname
                     + '\nPHONE ' + this.form.phone
                     + '\nGENDER ' + this.form.gender,
-                action: 'REQUEST TO REGISTER',
+                action: 'ส่งคำร้องขอสมัครสมาชิก',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             }
             console.log(log);

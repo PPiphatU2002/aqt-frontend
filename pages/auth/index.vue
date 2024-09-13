@@ -8,20 +8,20 @@
         <v-col cols="12" sm="8" md="6">
           <v-card>
             <v-card-title style="justify-content: center; display: flex;">
-              <span class="headline">WELCOME!</span>
+              <span class="headline">ยินดีต้อนรับ</span>
             </v-card-title>
-            <v-card-subtitle style="justify-content: center; display: flex;">LOGIN WITH YOUR ACCOUNT</v-card-subtitle>
+            <v-card-subtitle style="justify-content: center; display: flex;">เข้าสู่ระบบด้วยผู้ใช้งานของคุณ</v-card-subtitle>
             <v-card-text>
-              <v-text-field v-model="form.email" label="E-MAIL" prepend-icon="mdi-email" type="email" outlined dense
+              <v-text-field v-model="form.email" label="อีเมล" prepend-icon="mdi-email" type="email" outlined dense
                 class="small-text-field"></v-text-field>
-              <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="PASSWORD"
+              <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="รหัสผ่าน"
                 :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
                 @click:append="show1 = !show1" outlined dense class="small-text-field"></v-text-field>
               <v-btn @click="login" :disabled="!form.email || !form.password" color="#24b224" block>
-                LOGIN
+                เข้าสู่ระบบ
               </v-btn>
               <a @click="forgotPassword" class="forgot-password-text">
-                FORGOT PASSWORD?
+                ลืมรหัสผ่าน?
               </a>
             </v-card-text>
           </v-card>
@@ -68,15 +68,15 @@ export default {
       modal: {
         complete: {
           open: false,
-          message: 'LOGIN SUCCESSFUL!',
+          message: 'เข้าสู่ระบบสำเร็จ',
         },
         error: {
           open: false,
-          message: 'THE INFORMATION IS INCORRECT!',
+          message: 'มีข้อมูลบางอย่างไม่ถูกต้อง',
         },
         warning: {
           open: false,
-          message: 'THIS USER HAS NOT BEEN APPROVED YET!',
+          message: 'ผู้ใช้นี้ยังไม่ได้รับการอนุมัติ',
         },
       },
     }
@@ -166,7 +166,7 @@ export default {
         emp_name: employeeFName + ' ' + employeeSName,
         emp_email: this.$auth.user.email,
         type: 4,
-        action: 'LOGIN',
+        action: 'เข้าสู่ระบบ',
         detail: `LOCATION ${userLocation}\nIP ${userIP}`,
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };

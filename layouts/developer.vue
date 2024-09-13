@@ -260,7 +260,7 @@ export default {
         emp_name: employeeFName + ' ' + employeeSName,
         emp_email: emplyeeEmail,
         type: 4,
-        action: 'LOGOUT',
+        action: 'ออกจากระบบ',
         detail: `LOCATION ${userLocation}\nIP ${userIP}`,
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };

@@ -20,7 +20,7 @@ export default {
             modal: {
                 warning: {
                     open: false,
-                    message: 'THIS USER HAS NOT BEEN APPROVED YET!',
+                    message: 'ผู้ใช้นี้ยังไม่ได้รับการอนุมัติ',
                 },
             },
         }
