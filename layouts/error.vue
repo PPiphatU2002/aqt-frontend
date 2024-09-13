@@ -1,8 +1,8 @@
 <template>
     <div class="error-page">
-      <h1>404 - PAGE NOT FOUND</h1>
-      <p>THE PAGE YOU ARE LOOKING FOR DOES NOT EXIST.</p>
-      <router-link to="/" class="home-button">GO BACK TO HOME</router-link>
+      <h1>404 - ไม่พบเพจนี้</h1>
+      <p>หน้าที่คุณกำลังมองหาไม่มีอยู่</p>
+      <router-link to="/" class="home-button">กลับไปที่หน้าหลัก</router-link>
     </div>
   </template>
   

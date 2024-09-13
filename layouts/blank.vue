@@ -16,7 +16,7 @@
             </h4>
           </v-btn>
           <v-btn text @click="gotoRegister" rounded :class="loginBtnClass">
-            REGISTER
+            ลงทะเบียน
           </v-btn>
         </div>
       </v-app-bar>

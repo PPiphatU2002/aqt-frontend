@@ -17,7 +17,7 @@
             </h4>
           </v-btn>
           <v-btn text @click="gotoLogin" rounded :class="loginBtnClass">
-            LOGIN
+            เข้าสู่ระบบ
           </v-btn>
         </div>
       </v-app-bar>

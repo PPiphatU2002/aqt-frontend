@@ -24,7 +24,7 @@
                 <v-icon class="icon-tab">mdi-account-plus</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">NEW CUSTOMER</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ลูกค้าใหม่</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -33,7 +33,7 @@
                 <v-icon class="icon-tab">mdi-account-cog</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">MANAGEMENT</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">การจัดการลูกค้า</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -42,7 +42,7 @@
                 <v-icon class="icon-tab">mdi-home-plus</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">NEW EMPLOYEE</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">พนักงานใหม่</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -51,7 +51,7 @@
                 <v-icon class="icon-tab">mdi-home-account</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">MANAGEMENT</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">การจัดการพนักงาน</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -71,7 +71,7 @@
                 <v-icon class="icon-tab">mdi-archive-plus</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">NEW STOCKS</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">หุ้นใหม่</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -80,7 +80,7 @@
                 <v-icon class="icon-tab">mdi-archive-cog</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">MANAGEMENT</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">การจัดการหุ้น</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -89,7 +89,7 @@
                 <v-icon class="icon-tab">mdi-archive-arrow-up</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">UPDATE STOCKS</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">อัพเดทหุ้น</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -108,7 +108,7 @@
                 <v-icon class="icon-tab">mdi-archive-clock-outline</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">TRANSACTIONS HISTORY</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ประวัติการซื้อขายหุ้น</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -117,7 +117,7 @@
                 <v-icon class="icon-tab">mdi-store-clock-outline</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">STOCKS HISTORY</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ประวัติหุ้น</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -126,7 +126,7 @@
                 <v-icon class="icon-tab">mdi-account-clock-outline</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">USERS HISTORY</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ประวัติลูกค้า</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -135,7 +135,7 @@
                 <v-icon class="icon-tab">mdi-home-clock-outline</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">EMPLOYEES HISTORY</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ประวัติพนักงาน</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -169,7 +169,7 @@
                   <v-icon class="icon-tab">mdi-card-account-details-outline</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title style="font-size: 0.8rem;">PROFILE</v-list-item-title>
+                  <v-list-item-title style="font-size: 0.8rem;">โปรไฟล์</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
 
@@ -178,7 +178,7 @@
                   <v-icon class="icon-tab">mdi-logout</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
-                  <v-list-item-title style="font-size: 0.8rem;">LOGOUT</v-list-item-title>
+                  <v-list-item-title style="font-size: 0.8rem;">ออกจากระบบ</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list>
