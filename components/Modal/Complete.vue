@@ -3,7 +3,7 @@
     @keydown.esc="confirm">
     <v-card>
       <v-card-title class="d-flex align-center justify-center text-h6">
-        <v-icon class="mr-3 green--text" size="40">mdi-check-circle</v-icon>
+        <v-icon class="mr-3" color="#24b224" size="40">mdi-check-circle</v-icon>
         สำเร็จ
       </v-card-title>
       <v-divider class="mb-3"></v-divider>
@@ -12,7 +12,7 @@
       </v-card-text>
 
       <v-card-actions class="justify-center">
-        <v-btn color="#508d4e" @click="confirm" class="rounded-xl font-weight-medium mt-0">
+        <v-btn color="#24b224" @click="confirm" class="rounded-xl font-weight-medium mt-0">
           ตกลง
         </v-btn>
       </v-card-actions>

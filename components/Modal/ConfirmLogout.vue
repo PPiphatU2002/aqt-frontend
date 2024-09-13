@@ -3,16 +3,16 @@
     @keydown.esc="cancel" @keydown.enter="confirm">
     <v-card>
       <v-card-title class="d-flex align-center justify-center text-h6">
-        <v-icon justify="center" class="mr-3" size="40">mdi-logout-variant</v-icon>
+        <v-icon justify="center" class="mr-3" size="40" color="#e50211">mdi-logout-variant</v-icon>
         คุณต้องการออกจากระบบหรือไม่?
       </v-card-title>
       <v-divider class="mb-3"></v-divider>
 
       <v-card-actions class="justify-center">
-        <v-btn color="#508d4e" @click="confirm" class="rounded-xl font-weight-medium mt-0">
+        <v-btn color="#24b224" @click="confirm" class="rounded-xl font-weight-medium mt-0">
           ออกจากระบบ
         </v-btn>
-        <v-btn color="#bf2b2b" @click="cancel" class="rounded-xl font-weight-medium mt-0">
+        <v-btn color="#e50211" @click="cancel" class="rounded-xl font-weight-medium mt-0">
           ยกเลิก
         </v-btn>
       </v-card-actions>

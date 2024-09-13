@@ -3,7 +3,7 @@
     @keydown.enter="confirm">
     <v-card>
       <v-card-title class="d-flex align-center justify-center text-h6">
-        <v-icon class="mr-3 red--text" size="40">mdi-account-alert</v-icon>
+        <v-icon class="mr-3" size="40" color="#e50211">mdi-account-alert</v-icon>
         คำเตือน
       </v-card-title>
       <v-divider class="mb-3"></v-divider>
@@ -12,7 +12,7 @@
       </v-card-text>
 
       <v-card-actions class="justify-center">
-        <v-btn color="#bf2b2b" @click="confirm" class="rounded-xl font-weight-medium mt-0">
+        <v-btn color="#24b224" @click="confirm" class="rounded-xl font-weight-medium mt-0">
           ตกลง
         </v-btn>
       </v-card-actions>
