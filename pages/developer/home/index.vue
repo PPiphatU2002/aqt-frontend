@@ -8,21 +8,21 @@
                         <v-col cols="12" class="d-flex justify-center">
                             <v-btn color="#24b224" @click="fixport"
                                 :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
-                                FIX PORT
+                                ข้อมูลหุ้นของลูกค้า
                             </v-btn>
                         </v-col>
 
                         <v-col cols="12" class="d-flex justify-center">
                             <v-btn color="#24b224" @click="transaction"
                                 :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
-                                TRANSACTION
+                                ซื้อหุ้น
                             </v-btn>
                         </v-col>
 
                         <v-col cols="12" class="d-flex justify-center">
                             <v-btn color="#24b224" @click="management"
                                 :style="{ fontSize: '20px', height: '60px', width: '150%' }">
-                                MANAGEMENT
+                                ขายหุ้น
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -79,13 +79,13 @@ export default {
         },
 
         fixport() {
-            this.$router.push('/developer/transaction/fixport');
+            this.$router.push('/developer/transaction/customer_stock');
         },
         transaction() {
-            this.$router.push('/developer/transaction/transaction');
+            this.$router.push('/developer/transaction/buy');
         },
         management() {
-            this.$router.push('/developer/transaction/management');
+            this.$router.push('/developer/transaction/sale');
         },
     }
 }

@@ -205,10 +205,10 @@ export default {
         },
         recordLog() {
             const log = {
+                emp_name: employeeFName + ' ' + employeeSName,
                 emp_email: this.form.email,
                 type: 4,
-                detail: 'NAME ' + this.form.fname + ' ' + this.form.lname
-                    + '\nPHONE ' + this.form.phone
+                detail: 'PHONE ' + this.form.phone +
                     + '\nGENDER ' + this.form.gender,
                 action: 'ส่งคำร้องขอสมัครสมาชิก',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),

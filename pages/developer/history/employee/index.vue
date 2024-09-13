@@ -147,7 +147,7 @@
 
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
-                <v-card-title class="headline" style="justify-content: center; display: flex;">รายละเอียด</v-card-title>
+                <v-card-title class="headline" style="justify-content: center; display: flex;">รายละเอียดเพิ่มเติม</v-card-title>
                 <v-card-text>
                     <div v-for="line in formattedDetailLines" :key="line">
                         <template v-if="line.includes('NAME')">
@@ -210,7 +210,7 @@ export default {
             modal: {
                 error: {
                     open: false,
-                    message: 'DATE ENTRY HAS AN ERROR!',
+                    message: 'การป้อนข้อมูลเวลาไม่ถูกต้อง',
                 },
             },
 
@@ -284,7 +284,7 @@ export default {
                     cellClass: 'text-center',
                 },
                 {
-                    text: 'รายละเอียด',
+                    text: 'หมายเหตุ',
                     value: 'detail',
                     sortable: false,
                     align: 'center',

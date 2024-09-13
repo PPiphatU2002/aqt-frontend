@@ -10,7 +10,8 @@
             <v-card-title style="justify-content: center; display: flex;">
               <span class="headline">ยินดีต้อนรับ</span>
             </v-card-title>
-            <v-card-subtitle style="justify-content: center; display: flex;">เข้าสู่ระบบด้วยผู้ใช้งานของคุณ</v-card-subtitle>
+            <v-card-subtitle
+              style="justify-content: center; display: flex;">เข้าสู่ระบบด้วยผู้ใช้งานของคุณ</v-card-subtitle>
             <v-card-text>
               <v-text-field v-model="form.email" label="อีเมล" prepend-icon="mdi-email" type="email" outlined dense
                 class="small-text-field"></v-text-field>
@@ -95,9 +96,9 @@ export default {
         const RankID = this.$auth.user.ranks_id.toString();
 
         if (Status === '2') {
-          this.$router.push('/');
           this.modal.warning.open = true;
           await this.$auth.logout();
+          this.$router.push('/');
         }
         else {
           if (RankID === '1') {
@@ -125,14 +126,19 @@ export default {
             email: this.form.email,
             password: this.form.password,
           }
-        })
-          ;
-        this.recordLog();
+        });
+
+
+        if (this.$auth.user.status.toString() !== '2') {
+          this.recordLog();
+        }
+
         this.modal.complete.open = true;
       } catch (error) {
         this.modal.error.open = true;
       }
     },
+
 
     forgotPassword() {
       this.$router.push('/auth/forgot_password');
