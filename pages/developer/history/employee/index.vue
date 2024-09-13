@@ -345,9 +345,9 @@ export default {
         },
 
         getActionColor(action) {
-            if (action === 'LOGOUT') {
+            if (action === 'ออกจากระบบ') {
                 return '#e50211';
-            } else if (action === 'LOGIN') {
+            } else if (action === 'เข้าสู่ระบบ') {
                 return '#24b224';
             } else {
                 return 'inherit';

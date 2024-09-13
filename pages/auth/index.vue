@@ -72,7 +72,7 @@ export default {
         },
         error: {
           open: false,
-          message: 'มีข้อมูลบางอย่างไม่ถูกต้อง',
+          message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
         },
         warning: {
           open: false,
