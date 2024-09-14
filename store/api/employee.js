@@ -9,6 +9,16 @@ export const actions = {
       .get(`employee/${no}`)
       .then((res) => res.data)
   },
+  async getEmployeeEmail({ getters }, email) {
+    return await this.$axios
+      .get(`employee/email/${email}`)
+      .then((res) => res.data)
+  },
+  async getEmployeePhone({ getters }, phone) {
+    return await this.$axios
+      .get(`employee/phone/${phone}`)
+      .then((res) => res.data)
+  },
   async updateEmployee({ getters }, data) {
     return await this.$axios
       .$put(`employee/update-Employee/${data.no}`, data)

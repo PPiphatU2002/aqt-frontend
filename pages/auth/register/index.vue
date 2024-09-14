@@ -125,6 +125,7 @@ export default {
                 lname: null,
                 phone: null,
                 gender: null,
+                picture: 'person-icon.jpg',
                 status: 2,
                 ranks_id: 2,
                 created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -205,10 +206,11 @@ export default {
         },
         recordLog() {
             const log = {
-                emp_name: employeeFName + ' ' + employeeSName,
+                emp_name: this.form.fname + ' ' + this.form.lname,
                 emp_email: this.form.email,
+                picture: 'person-icon.jpg',
                 type: 4,
-                detail: 'PHONE ' + this.form.phone +
+                detail: 'PHONE ' + this.form.phone
                     + '\nGENDER ' + this.form.gender,
                 action: 'ส่งคำร้องขอสมัครสมาชิก',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),

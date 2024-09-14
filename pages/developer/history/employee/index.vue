@@ -122,10 +122,10 @@
 
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                item-key="id" :items-per-page="10">
+                item-key="no" :items-per-page="10">
                 <template v-slot:item.picture="{ item }">
                     <v-avatar size="40">
-                        <img :src="`http://localhost:3001/files/profile/${item.picture}`" alt="picture" />
+                        <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />
                     </v-avatar>
                 </template>
                 <template v-slot:item.emp_email="{ item }">
@@ -156,9 +156,19 @@
                     style="justify-content: center; display: flex;">รายละเอียดเพิ่มเติม</v-card-title>
                 <v-card-text>
                     <div v-for="line in formattedDetailLines" :key="line">
-                        <template v-if="line.includes('PHONE')">
+                        <template v-if="line.includes('.jpg') || line.includes('.png') || line.includes('.jpeg')">
+                            <div class="image-container">
+                                <img :src="`http://localhost:3001/file/profile/${line}`" alt="detail image" width="60"
+                                    height="60" />
+                            </div>
+                        </template>
+                        <template v-else-if="line.includes('PHONE')">
                             <v-icon color="green">mdi-phone</v-icon>
                             {{ line.replace('PHONE', '').trim() }}
+                        </template>
+                        <template v-else-if="line.includes('NEW')">
+                            <v-icon color="white">mdi-lock-reset</v-icon>
+                            {{ maskNewData(line.replace('NEW', '').trim()) }}
                         </template>
                         <template v-else-if="line.includes('GENDER')">
                             <v-icon color="blue">mdi-gender-male-female</v-icon>
@@ -237,6 +247,8 @@ export default {
                 { text: 'เข้าสู่ระบบ', value: 'เข้าสู่ระบบ' },
                 { text: 'ออกจากระบบ', value: 'ออกจากระบบ' },
                 { text: 'ส่งคำร้องขอสมัครสมาชิก', value: 'ส่งคำร้องขอสมัครสมาชิก' },
+                { text: 'อัพโหลดรูปภาพ', value: 'อัพโหลดรูปภาพ' },
+                { text: 'เปลี่ยนรหัสผ่าน', value: 'เปลี่ยนรหัสผ่าน' },
             ],
             sortBy: 'time',
             sortDesc: true,
@@ -352,7 +364,13 @@ export default {
                 return '#e50211';
             } else if (action === 'เข้าสู่ระบบ') {
                 return '#24b224';
-            } else {
+            } else if (action === 'เปลี่ยนรหัสผ่าน') {
+                return '#ffc800';
+            }
+            else if (action === 'อัพโหลดรูปภาพ') {
+                return '#38b6ff';
+            }
+             else {
                 return 'inherit';
             }
         },
@@ -488,7 +506,6 @@ export default {
         },
 
         exportCSV() {
-            // Filter out 'picture' field and map data to be exported
             const filteredData = this.filtered.map(item => {
                 const dataItem = {};
                 this.filteredHeaders.forEach(header => {
@@ -499,14 +516,10 @@ export default {
                 return dataItem;
             });
 
-            // Convert data to CSV format
             const csv = Papa.unparse(filteredData);
-
-            // Add BOM (Byte Order Mark) to ensure UTF-8 encoding
             const bom = '\uFEFF';
             const csvWithBom = bom + csv;
 
-            // Create a Blob and trigger download
             const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const currentDate = moment().format('YYYY-MM-DD');
@@ -523,6 +536,19 @@ export default {
             return array.map(row => {
                 return Object.values(row).map(value => `"${value}"`).join(',');
             }).join('\n');
+        },
+
+        maskNewData(data) {
+            if (!data) return '';
+
+            const length = data.length;
+            if (length <= 4) return data;
+
+            const firstPart = data.slice(0, 1);
+            const lastPart = data.slice(-1);
+            const maskedPart = '*'.repeat(length - 4)
+
+            return `${firstPart}${maskedPart}${lastPart}`;
         },
     },
 };
@@ -644,5 +670,22 @@ export default {
 .v-list-item__content {
     display: flex;
     align-items: center;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    /* Center the image horizontally */
+    align-items: center;
+    /* Center the image vertically */
+    margin: 10px 0;
+    /* Optional: Add some margin */
+}
+
+.image-container img {
+    max-width: 100%;
+    /* Make sure image fits within container */
+    max-height: 60px;
+    /* Set maximum height */
 }
 </style>

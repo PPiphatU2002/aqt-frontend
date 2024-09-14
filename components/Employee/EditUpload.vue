@@ -9,27 +9,28 @@
     <v-dialog persistent :retain-focus="false" v-model="open" v-if="data" max-width="300" max-height="200"
       content-class="rounded-xl">
       <v-card class="rounded-xl">
-        <v-card-title>
+        <v-card-title class="card-title-center mb-3">
           อัพโหลดรูปภาพ
         </v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
-            <v-row>
-              <v-col cols="12">
-                <v-file-input v-model="file" :rules="[
+            <v-row dense>
+              <v-col cols="12" class="pa-0">
+                <v-file-input v-model="file" :rules="[ 
                   (v) => !!v || 'โปรดเลือกไฟล์',
                   (v) => (v && v.size < 15000000) || 'ไฟล์ต้องมีขนาดไม่เกิน 15 MB',
                   (v) => (v && ['image/jpeg', 'image/png'].includes(v.type)) || 'ไฟล์ต้องเป็นรูปภาพเท่านั้น',
-                ]" accept="image/*" label="เลือกไฟล์" outlined required></v-file-input>
+                ]" accept="image/*" label="เลือกไฟล์" outlined required class="file-input"></v-file-input>
               </v-col>
-              <v-col cols="12">
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" @click="confirm" :disabled="!valid || file === null || file === undefined"
-                    depressed class="font-weight-medium mt-3">
+              <v-col cols="12" class="pa-0">
+                <v-card-actions class="card-title-center pa-0">
+                  <v-btn color="#24b224" @click="confirm" :disabled="!valid || file === null || file === undefined"
+                    depressed class="font-weight-medium mr-2" style="min-width: 100px;">
                     อัพโหลด
                   </v-btn>
-                  <v-btn color="error" @click="cancel" class="font-weight-medium mt-3">ยกเลิก</v-btn>
+                  <v-btn color="#e50211" @click="cancel" class="font-weight-medium" style="min-width: 100px;">
+                    ยกเลิก
+                  </v-btn>
                 </v-card-actions>
               </v-col>
             </v-row>
@@ -41,7 +42,6 @@
 </template>
 
 <script>
-
 import moment from 'moment'
 moment.locale('th')
 
@@ -140,7 +140,7 @@ export default {
       const log = {
         emp_name: employeeFName + ' ' + employeeSName,
         emp_email: employeeEmail,
-        detail: 'Picture \n'+this.file.name,
+        detail: this.file.name,
         type: 4,
         picture: employeePicture,
         action: 'อัพโหลดรูปภาพ',
@@ -160,3 +160,23 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.card-title-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.file-input {
+    margin-bottom: 0px !important; /* บังคับให้ margin-bottom เป็น 0 */
+}
+
+.v-card-actions {
+    padding: 0 !important; /* ลด padding ให้ไม่มีระยะห่าง */
+}
+
+.v-btn {
+    margin-top: 0px !important; /* เอา margin บนปุ่มออก */
+}
+</style>

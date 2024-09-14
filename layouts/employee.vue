@@ -215,6 +215,7 @@ export default {
       const employee = this.employees.find(employee => employee.no === empId);
       const employeeFName = employee ? employee.fname : 'Unknown';
       const employeeSName = employee ? employee.lname : 'Unknown';
+      const employeePicture = employee ? employee.picture : 'Unknown';
 
       let userLocation = 'Unknown';
       let userIP = 'Unknown';
@@ -231,6 +232,7 @@ export default {
       const log = {
         emp_name: employeeFName + ' ' + employeeSName,
         emp_email: this.$auth.user.email,
+        picture: employeePicture,
         type: 4,
         action: 'ออกจากระบบ',
         detail: `LOCATION ${userLocation}\nIP ${userIP}`,
