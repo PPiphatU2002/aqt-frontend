@@ -21,7 +21,7 @@ export const actions = {
   },
   async updateEmployee({ getters }, data) {
     return await this.$axios
-      .$put(`employee/update-Employee/${data.no}`, data)
+      .$put(`employee/update-employee/${data.no}`, data)
       .then((res) => res.data)
   },
   async updateEmployeeAll({ getters }, data) {
@@ -31,7 +31,7 @@ export const actions = {
   },
   async deleteUser({ getters }, no) {
     return await this.$axios
-      .delete(`Employee/${no}`)
+      .delete(`employee/${no}`)
       .then((res) => res.data)
   },
   async updatePassword({ getters }, data) {
