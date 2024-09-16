@@ -35,11 +35,11 @@
 
                 <v-spacer></v-spacer>
                 <v-card-actions class="card-title-center">
-                    <v-btn color="#85d7df" @click="() => { editDialog = true; editData = employee }">
+                    <v-btn class="mb-3" color="#85d7df" @click="() => { editDialog = true; editData = employee }">
                         <v-icon left>mdi-pencil</v-icon>
                         แก้ไขข้อมูล
                     </v-btn>
-                    <v-btn color="#24b224" @click="() => { editPasswordDialog = true; editPasswordData = employee }">
+                    <v-btn class="mb-3" color="#24b224" @click="() => { editPasswordDialog = true; editPasswordData = employee }">
                         <v-icon left>mdi-lock</v-icon>
                         เปลี่ยนรหัสผ่าน
                     </v-btn>
