@@ -5,7 +5,7 @@
         <EmployeeEditUpload :open="editUploadDialog" :edit.sync="editUploadDialog" :data="editUploadData" />
 
         <v-col v-for="employee in employees" :key="employee.no" cols="12">
-            <v-card class="mx-auto my-12 rounded-xl text-center" max-width="380" hover>
+            <v-card class="mx-auto my-12 rounded-xl text-center" max-width="400" hover>
 
                 <v-img height="250" @click="
                     editUploadDialog = true
