@@ -36,8 +36,8 @@
         <v-card-actions class="card-title-center">
           <v-btn color="#24b224" @click="confirm"
             :disabled="!valid || data.new_password === null || data.new_password === undefined || data.confirm_password === null || data.confirm_password === undefined"
-            depressed class="font-weight-medium mb-5">
-            เปลี่ยนรหัสผ่าน
+            depressed class="font-weight-medium mb-5 mr-2">
+            เปลี่ยน
           </v-btn>
           <v-btn color="#e50211" @click="cancel" class="font-weight-medium mb-5">
             ยกเลิก

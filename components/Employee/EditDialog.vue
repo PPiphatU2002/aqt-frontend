@@ -90,7 +90,7 @@ export default {
   mounted() {
     this.setGenderOptions();
     this.originalData = { ...this.data };
-    document.addEventListener('keydown', this.handleKeydown);
+    document.addEventListener('keydown', this.handleKeydown); // ESC only
   },
 
   beforeDestroy() {
@@ -109,9 +109,7 @@ export default {
 
     handleKeydown(event) {
       if (event.key === 'Escape') {
-        this.cancel();
-      } else if (event.key === 'Enter') {
-        this.confirm();
+        this.cancel(); // Only trigger cancel on ESC key, disable Enter key functionality
       }
     },
 

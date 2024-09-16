@@ -6,7 +6,7 @@
       :method="goBack" />
     <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
 
-    <v-dialog persistent :retain-focus="false" v-model="open" v-if="data" max-width="300" max-height="200"
+    <v-dialog persistent :retain-focus="false" v-model="open" v-if="data" max-width="400" max-height="300"
       content-class="rounded-xl">
       <v-card class="rounded-xl">
         <v-card-title class="card-title-center mb-3">
@@ -25,10 +25,10 @@
               <v-col cols="12" class="pa-0">
                 <v-card-actions class="card-title-center pa-0">
                   <v-btn color="#24b224" @click="confirm" :disabled="!valid || file === null || file === undefined"
-                    depressed class="font-weight-medium mr-2" style="min-width: 100px;">
+                    depressed class="font-weight-medium mr-2 mb-2" style="min-width: 100px;">
                     อัพโหลด
                   </v-btn>
-                  <v-btn color="#e50211" @click="cancel" class="font-weight-medium" style="min-width: 100px;">
+                  <v-btn color="#e50211" @click="cancel" class="font-weight-medium mb-2" style="min-width: 100px;">
                     ยกเลิก
                   </v-btn>
                 </v-card-actions>
@@ -48,6 +48,11 @@ moment.locale('th')
 export default {
   async mounted() {
     await this.fetchEmployeeData();
+    document.addEventListener('keydown', this.handleKeydown); // Add event listener for ESC key
+  },
+
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.handleKeydown); // Remove the event listener on component destruction
   },
 
   props: {
@@ -85,6 +90,12 @@ export default {
   },
 
   methods: {
+    handleKeydown(event) {
+      if (event.key === 'Escape') {
+        this.cancel(); // Call cancel function when Escape is pressed
+      }
+    },
+
     async confirm() {
       try {
         this.$emit('update:edit', false)
@@ -93,6 +104,7 @@ export default {
         this.modal.error.open = true
       }
     },
+    
     cancel() {
       this.$emit('update:edit', false)
     },
@@ -101,27 +113,17 @@ export default {
       try {
         const formData = new FormData();
         formData.append('file', this.file);
-
-        // Upload the file
         const uploadResponse = await this.$store.dispatch('api/file/uploadProfile', formData);
         console.log('Upload response:', uploadResponse);
-
-        // Prepare data for updating the avatar path
         const data = {
           no: this.data.no,
           picture: this.file.name,
         };
         console.log('Data:', data);
-
-        // Update the file path in the database
         const updateResponse = await this.$store.dispatch('api/file/updateProfile', data);
         console.log('Update response:', updateResponse);
-
-        // Show success modal
         this.modal.complete.open = true;
-
-        // Log the update
-        this.recordLogUpdate(this.data.id);
+        this.recordLogUpdate(this.data.no);
       } catch (error) {
         console.error('Error:', error);
         this.modal.error.message = 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ โปรดลองอีกครั้ง';
@@ -143,7 +145,7 @@ export default {
         detail: this.file.name,
         type: 4,
         picture: employeePicture,
-        action: 'อัพโหลดรูปภาพ',
+        action: 'แก้ไขข้อมูลส่วนตัว',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       }
       console.log(log)
@@ -169,14 +171,14 @@ export default {
     text-align: center;
 }
 .file-input {
-    margin-bottom: 0px !important; /* บังคับให้ margin-bottom เป็น 0 */
+    margin-bottom: 0px !important;
 }
 
 .v-card-actions {
-    padding: 0 !important; /* ลด padding ให้ไม่มีระยะห่าง */
+    padding: 0 !important;
 }
 
 .v-btn {
-    margin-top: 0px !important; /* เอา margin บนปุ่มออก */
+    margin-top: 0px !important;
 }
 </style>
