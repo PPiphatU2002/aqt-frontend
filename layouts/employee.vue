@@ -113,8 +113,6 @@
             </v-list-item>
           </v-list>
         </v-menu>
-
-
         <div class="d-flex align-center flex-grow-1"></div>
 
         <div class="d-flex align-center user-section">
@@ -126,17 +124,18 @@
             </h4>
           </v-btn>
 
-          <v-menu bottom right :offset-y="true" :nudge-top="8" :nudge-right="8" class="user-menu">
+          <v-menu bottom right :offset-y="true" :nudge-top="8" :nudge-right="8" class="user-menu" offset-y>
             <template v-slot:activator="{ on, attrs }">
               <v-btn text v-bind="attrs" v-on="on" rounded :class="loginBtnClass">
-                <h4>
-                  <v-list-item-title style="font-size: 0.8rem;">{{ $auth.user ? $auth.user.fname : 'Guest'
-                    }}</v-list-item-title>
-                </h4>
+                <v-icon>mdi-account-circle</v-icon>
               </v-btn>
             </template>
 
             <v-list class="custom-list">
+              <v-card class="profile-card ml-2 mr-2 mt-2 mb-2 non-clickable">
+                <v-img :src="userProfilePicture" class="profile-image" />
+              </v-card>
+
               <v-list-item @click="gotoProfile" class="custom-list-item">
                 <v-list-item-icon style="margin-right: 4px;">
                   <v-icon class="icon-tab">mdi-card-account-details-outline</v-icon>
@@ -157,9 +156,7 @@
             </v-list>
           </v-menu>
         </div>
-
       </v-app-bar>
-
       <v-main>
         <v-container>
           <nuxt />
@@ -192,13 +189,13 @@ export default {
   },
   methods: {
     gotoProfile() {
-      this.$router.push('/employee/profile');
+      this.$router.push('/developer/profile');
     },
     toggleTheme() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
     },
     home() {
-      this.$router.push('/employee/home');
+      this.$router.push('/developer/home');
     },
     buttonSignOut() {
       this.modal.confirmLogout.open = true;
@@ -215,6 +212,7 @@ export default {
       const employee = this.employees.find(employee => employee.no === empId);
       const employeeFName = employee ? employee.fname : 'Unknown';
       const employeeSName = employee ? employee.lname : 'Unknown';
+      const employeeEmail = employee ? employee.email : 'Unknown';
       const employeePicture = employee ? employee.picture : 'Unknown';
 
       let userLocation = 'Unknown';
@@ -231,7 +229,7 @@ export default {
 
       const log = {
         emp_name: employeeFName + ' ' + employeeSName,
-        emp_email: this.$auth.user.email,
+        emp_email: employeeEmail,
         picture: employeePicture,
         type: 4,
         action: 'ออกจากระบบ',
@@ -282,6 +280,12 @@ export default {
     },
     navBarColor() {
       return this.$vuetify.theme.dark ? '#545454' : '#fff6ea';
+    },
+    userProfilePicture() {
+      const defaultPicture = 'http://localhost:3001/file/profile/person-icon.jpg';
+      return this.$auth.user && this.$auth.user.picture
+        ? `http://localhost:3001/file/profile/${this.$auth.user.picture}`
+        : defaultPicture;
     }
   }
 };
@@ -389,5 +393,25 @@ export default {
 
 .background-light .custom-list-item {
   color: #ffffff !important;
+}
+
+.profile-card {
+  width: 125px;
+  height: 100px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.non-clickable {
+  pointer-events: none;
 }
 </style>
