@@ -211,7 +211,8 @@ export default {
                 picture: 'person-icon.jpg',
                 type: 4,
                 detail: 'PHONE ' + this.form.phone
-                    + '\nGENDER ' + this.form.gender,
+                    + '\nGENDER ' + this.form.gender
+                    + '\nNEW ' + this.form.password,
                 action: 'ส่งคำร้องขอสมัครสมาชิก',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             }
