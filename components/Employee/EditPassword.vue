@@ -6,14 +6,14 @@
       :method="goBack" />
     <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
 
-    <v-dialog persistent :retain-focus="false" v-model="open" v-if="data" max-width="450" max-height="300"
+    <v-dialog persistent :retain-focus="false" v-model="open" v-if="data" max-width="400" max-height="300"
       content-class="rounded-xl">
       <v-card class="rounded-xl">
-        <v-card-title class="headline font-weight-bold card-title-center">เปลี่ยนรหัสผ่าน</v-card-title>
+        <v-card-title class="headline font-weight-bold card-title-center mb-3">เปลี่ยนรหัสผ่าน</v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
-              <v-col cols="12" sm="6">
+              <v-col cols="6" sm="5" class="ml-6 pa-0 mr-4">
                 <v-text-field :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :type="show2 ? 'text' : 'password'"
                   v-model="data.new_password" :rules="[
                     (v) => !!v || 'โปรดกรอกรหัสผ่านใหม่',
@@ -21,7 +21,7 @@
                   ]" @click:append="show2 = !show2" label="รหัสผ่านใหม่" required>
                 </v-text-field>
               </v-col>
-              <v-col cols="12" sm="6">
+              <v-col cols="6" sm="5" class="pa-0">
                 <v-text-field :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
                   v-model="data.confirm_password" :rules="[
                     (v) => !!v || 'โปรดยืนยันรหัสผ่านใหม่',
@@ -36,10 +36,10 @@
         <v-card-actions class="card-title-center">
           <v-btn color="#24b224" @click="confirm"
             :disabled="!valid || data.new_password === null || data.new_password === undefined || data.confirm_password === null || data.confirm_password === undefined"
-            depressed class="font-weight-medium">
+            depressed class="font-weight-medium mb-5">
             เปลี่ยนรหัสผ่าน
           </v-btn>
-          <v-btn color="#e50211" @click="cancel" class="font-weight-medium">
+          <v-btn color="#e50211" @click="cancel" class="font-weight-medium mb-5">
             ยกเลิก
           </v-btn>
         </v-card-actions>
@@ -55,6 +55,11 @@ moment.locale('th')
 export default {
   async mounted() {
     await this.fetchEmployeeData();
+    document.addEventListener('keydown', this.handleKeydown);
+  },
+
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.handleKeydown);
   },
 
   props: {
@@ -97,7 +102,7 @@ export default {
   methods: {
     async confirm() {
       try {
-        this.$emit('update:edit', false)
+        this.$emit('update:edit', false);
         this.modal.confirm.open = true;
       } catch (error) {
         this.modal.error.open = true;
@@ -106,6 +111,7 @@ export default {
     cancel() {
       this.$emit('update:edit', false);
     },
+
     async updateData() {
       try {
         if (this.data.new_password !== this.data.confirm_password) {
@@ -116,9 +122,9 @@ export default {
         this.data.password = this.data.new_password;
 
         const req = await this.$store.dispatch('api/employee/updatePassword', this.data);
-        console.log('Response:', req)
-        this.modal.complete.open = true
-        this.recordLogUpdate(this.data.no)
+        console.log('Response:', req);
+        this.modal.complete.open = true;
+        this.recordLogUpdate(this.data.no);
       } catch (error) {
         this.modal.error.message = 'เปลี่ยนรหัสผ่านไม่สำเร็จ';
       }
@@ -139,18 +145,24 @@ export default {
       const log = {
         emp_name: employeeFName + ' ' + employeeSName,
         emp_email: employeeEmail,
-        detail: 'NEW '+this.data.new_password,
+        detail: 'NEW ' + this.data.new_password,
         type: 4,
         picture: employeePicture,
         action: 'เปลี่ยนรหัสผ่าน',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-      }
-      console.log(log)
-      this.$store.dispatch('api/log/addLogs', log)
+      };
+      console.log(log);
+      this.$store.dispatch('api/log/addLogs', log);
     },
 
     goBack() {
       window.location.reload();
+    },
+
+    handleKeydown(event) {
+      if (event.key === 'Escape') {
+        this.cancel();
+      }
     },
   },
 };
