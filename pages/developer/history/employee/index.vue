@@ -158,8 +158,8 @@
                     <div v-for="line in formattedDetailLines" :key="line">
                         <template v-if="line.includes('.jpg') || line.includes('.png') || line.includes('.jpeg')">
                             <div class="image-container">
-                                <img :src="`http://localhost:3001/file/profile/${line}`" alt="detail image" width="60"
-                                    height="60" />
+                                <img :src="`http://localhost:3001/file/profile/${line}`" alt="detail image" width="100"
+                                    height="100" />
                             </div>
                         </template>
                         <template v-else-if="line.includes('PHONE')">
@@ -257,6 +257,7 @@ export default {
                 { text: 'ส่งคำร้องขอสมัครสมาชิก', value: 'ส่งคำร้องขอสมัครสมาชิก' },
                 { text: 'อัพโหลดรูปภาพ', value: 'อัพโหลดรูปภาพ' },
                 { text: 'เปลี่ยนรหัสผ่าน', value: 'เปลี่ยนรหัสผ่าน' },
+                { text: 'แก้ไขข้อมูลส่วนตัว', value: 'แก้ไขข้อมูลส่วนตัว' },
             ],
             sortBy: 'time',
             sortDesc: true,
@@ -374,9 +375,10 @@ export default {
                 return '#24b224';
             } else if (action === 'เปลี่ยนรหัสผ่าน') {
                 return '#ffc800';
-            }
-            else if (action === 'อัพโหลดรูปภาพ') {
+            }else if (action === 'อัพโหลดรูปภาพ') {
                 return '#38b6ff';
+            }else if (action === 'แก้ไขข้อมูลส่วนตัว') {
+                return '#8c52ff';
             }
              else {
                 return 'inherit';

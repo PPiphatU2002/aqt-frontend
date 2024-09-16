@@ -145,7 +145,7 @@ export default {
         detail: this.file.name,
         type: 4,
         picture: employeePicture,
-        action: 'แก้ไขข้อมูลส่วนตัว',
+        action: 'อัพโหลดรูปภาพ',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       }
       console.log(log)
