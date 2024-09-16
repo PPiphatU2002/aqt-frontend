@@ -174,6 +174,14 @@
                             <v-icon color="blue">mdi-gender-male-female</v-icon>
                             {{ line.replace('GENDER', '').trim() }}
                         </template>
+                        <template v-else-if="line.includes('NAME')">
+                            <v-icon color="white">mdi-pen</v-icon>
+                            {{ line.replace('NAME', '').trim() }}
+                        </template>
+                        <template v-else-if="line.includes('SUR')">
+                            <v-icon color="white">mdi-home-group</v-icon>
+                            {{ line.replace('SUR', '').trim() }}
+                        </template>
                         <template v-else-if="line.includes('LOCATION')">
                             <v-icon color="red">mdi-map-marker</v-icon>
                             {{ line.replace('LOCATION', '').trim() }}
