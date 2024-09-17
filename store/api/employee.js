@@ -29,7 +29,12 @@ export const actions = {
       .put(`employee/update-employee-all/${data.no}`, data)
       .then((res) => res.data)
   },
-  async deleteUser({ getters }, no) {
+  async updateEmployeeStatus({ getters }, data) {
+    return await this.$axios
+      .put(`employee/update-employee-status/${data.no}`, data)
+      .then((res) => res.data)
+  },
+  async deleteEmployee({ getters }, no) {
     return await this.$axios
       .delete(`employee/${no}`)
       .then((res) => res.data)
