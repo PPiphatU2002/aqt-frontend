@@ -432,9 +432,9 @@ export default {
 }
 
 .profile-card {
-  width: 125px;
+  width: 120px;
   /* ปรับขนาดตามต้องการ */
-  height: 100px;
+  height: 120px;
   /* ปรับขนาดตามต้องการ */
   padding: 0;
   margin: 0;

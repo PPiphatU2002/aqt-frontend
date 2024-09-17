@@ -396,8 +396,8 @@ export default {
 }
 
 .profile-card {
-  width: 125px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   padding: 0;
   margin: 0;
   display: flex;
