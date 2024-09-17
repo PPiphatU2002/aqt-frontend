@@ -39,6 +39,11 @@ export const actions = {
       .put(`employee/update-password/${data.no}`, data)
       .then((res) => res.data)
   },
+  async getEmployeesStatus({ getters }, no) {
+    return await this.$axios
+        .get(`employee/status/${no}`)
+        .then((res) => res.data)
+},
   async register({ getters }, data) {
     return await this.$axios
       .post('auth/register', data)
