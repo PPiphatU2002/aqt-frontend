@@ -125,7 +125,7 @@ export default {
                 lname: null,
                 phone: null,
                 gender: null,
-                picture: 'person-icon.jpg',
+                picture: 'unknown.jpg',
                 status: 2,
                 ranks_id: 2,
                 created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -208,7 +208,7 @@ export default {
             const log = {
                 emp_name: this.form.fname + ' ' + this.form.lname,
                 emp_email: this.form.email,
-                picture: 'person-icon.jpg',
+                picture: this.form.picture,
                 type: 4,
                 detail: 'PHONE ' + this.form.phone
                     + '\nGENDER ' + this.form.gender
@@ -240,10 +240,17 @@ export default {
 
         selectGender(gender) {
             this.form.gender = gender;
+            if (gender === 'หญิง') {
+                this.form.picture = 'woman.png';
+            } else if (gender === 'ชาย') {
+                this.form.picture = 'man.png';
+            } else {
+                this.form.picture = 'unknown.jpg';
+            }
             this.$nextTick(() => {
                 this.$refs.genderSelect.blur();
             });
-        }
+        },
     }
 };
 </script>
