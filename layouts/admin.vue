@@ -129,15 +129,6 @@
                   <v-list-item-title style="font-size: 0.8rem;">ประวัติลูกค้า</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
-  
-              <v-list-item @click="goToEmpsHist" class="custom-list-item">
-                <v-list-item-icon style="margin-right: 4px;">
-                  <v-icon class="icon-tab">mdi-home-clock-outline</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title style="font-size: 0.8rem;">ประวัติพนักงาน</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
             </v-list>
           </v-menu>
           <div class="d-flex align-center flex-grow-1"></div>
@@ -303,9 +294,6 @@
         this.$router.push('/admin/history/user');
       },
   
-      goToEmpsHist() {
-        this.$router.push('/admin/history/employee');
-      },
   
       goToNewStock() {
         this.$router.push('/admin/stock/new_stock');
