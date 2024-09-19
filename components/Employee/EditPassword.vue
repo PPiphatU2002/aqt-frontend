@@ -1,7 +1,6 @@
 <template>
   <div>
-    <ModalConfirm :open="modal.confirm.open" :message="modal.confirm.message" :confirm.sync="modal.confirm.open"
-      :method="updateData" />
+    <ModalConfirm :open="modal.confirm.open" :confirm.sync="modal.confirm.open" :method="updateData" />
     <ModalComplete :open="modal.complete.open" :message="modal.complete.message" :complete.sync="modal.complete.open"
       :method="goBack" />
     <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
@@ -170,9 +169,9 @@ export default {
 
 <style scoped>
 .card-title-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 </style>

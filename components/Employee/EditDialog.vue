@@ -158,7 +158,7 @@ export default {
       }
 
       const log = {
-        emp_name: `${this.data.fname} ${this.data.lname}`,
+        emp_name: this.$auth.user.fname+' '+this.$auth.user.lname,
         emp_email: this.$auth.user.email,
         detail: changes.join(''),
         type: 4,
