@@ -107,7 +107,6 @@ export default {
   },
 
   methods: {
-
     async confirm() {
       try {
         this.$emit('update:edit', false);

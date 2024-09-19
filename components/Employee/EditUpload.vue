@@ -97,7 +97,6 @@ export default {
   },
 
   methods: {
-
     async fetchEmployeeData() {
       this.employees = await this.$store.dispatch('api/employee/getEmployees');
     },
