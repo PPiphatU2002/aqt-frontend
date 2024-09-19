@@ -1,4 +1,5 @@
 <template>
+
   <v-dialog persistent :retain-focus="false" v-model="open" max-width="350" max-height="300" content-class="rounded-xl"
     @keydown.enter="confirm">
     <v-card>
@@ -6,6 +7,7 @@
         <v-icon class="mr-3" size="40" color="#e50211">mdi-account-alert</v-icon>
         คำเตือน
       </v-card-title>
+
       <v-divider class="mb-3"></v-divider>
       <v-card-text class="text-center">
         {{ message }}
@@ -18,9 +20,11 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
 </template>
 
 <script>
+
 export default {
   props: {
     method: { type: Function, default: null },
@@ -31,6 +35,7 @@ export default {
       type: String,
     },
   },
+
   watch: {
     open(val) {
       if (val) {
@@ -40,9 +45,11 @@ export default {
       }
     },
   },
+
   data() {
     return {}
   },
+
   methods: {
     confirm() {
       if (this.method === null) {
@@ -52,6 +59,7 @@ export default {
         this.$emit('update:warning', false)
       }
     },
+
     handleKeydown(e) {
       if (e.key === 'Enter') {
         this.confirm();
@@ -59,4 +67,5 @@ export default {
     },
   },
 }
+
 </script>

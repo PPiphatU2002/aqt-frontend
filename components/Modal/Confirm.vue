@@ -1,4 +1,5 @@
 <template>
+
   <v-dialog persistent :retain-focus="false" v-model="open" max-width="200" max-height="300" content-class="rounded-xl"
     @keydown.esc="cancel" @keydown.enter="confirm">
     <v-card>
@@ -18,16 +19,20 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
 </template>
 
 <script>
+
 export default {
+
   props: {
     method: { type: Function },
     open: {
       required: true,
     },
   },
+
   watch: {
     open(val) {
       if (val) {
@@ -37,14 +42,17 @@ export default {
       }
     },
   },
+
   methods: {
     confirm() {
       this.method();
       this.$emit("update:confirm", false);
     },
+
     cancel() {
       this.$emit("update:confirm", false);
     },
+
     handleKeydown(e) {
       if (e.key === 'Escape') {
         this.cancel();
@@ -54,4 +62,5 @@ export default {
     },
   },
 };
+
 </script>
