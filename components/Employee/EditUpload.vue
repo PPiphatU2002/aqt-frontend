@@ -1,4 +1,5 @@
 <template>
+  
   <div>
     <ModalConfirm :open="modal.confirm.open" :message="modal.confirm.message" :confirm.sync="modal.confirm.open"
       :method="UploadFile" />
@@ -16,12 +17,13 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row dense>
               <v-col cols="12" class="pa-0">
-                <v-file-input v-model="file" :rules="[ 
+                <v-file-input v-model="file" :rules="[
                   (v) => !!v || 'โปรดเลือกไฟล์',
                   (v) => (v && v.size < 15000000) || 'ไฟล์ต้องมีขนาดไม่เกิน 15 MB',
                   (v) => (v && ['image/jpeg', 'image/png'].includes(v.type)) || 'ไฟล์ต้องเป็นรูปภาพเท่านั้น',
                 ]" accept="image/*" label="เลือกไฟล์" outlined required class="file-input"></v-file-input>
               </v-col>
+
               <v-col cols="12" class="pa-0">
                 <v-card-actions class="card-title-center pa-0">
                   <v-btn color="#24b224" @click="confirm" :disabled="!valid || file === null || file === undefined"
@@ -39,21 +41,15 @@
       </v-card>
     </v-dialog>
   </div>
+
 </template>
 
 <script>
+
 import moment from 'moment'
 moment.locale('th')
 
 export default {
-  async mounted() {
-    await this.fetchEmployeeData();
-    document.addEventListener('keydown', this.handleKeydown); // Add event listener for ESC key
-  },
-
-  beforeDestroy() {
-    document.removeEventListener('keydown', this.handleKeydown); // Remove the event listener on component destruction
-  },
 
   props: {
     method: { type: Function },
@@ -67,10 +63,6 @@ export default {
 
   data() {
     return {
-      employees: [],
-      valid: false,
-      date: new Date().toISOString().substr(0, 10),
-      file: null,
 
       modal: {
         confirm: {
@@ -86,14 +78,28 @@ export default {
           message: 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ',
         },
       },
+
+      valid: false,
+      file: null,
+      date: new Date().toISOString().substr(0, 10),
+      employees: [],
+      
     }
   },
 
+  async mounted() {
+    await this.fetchEmployeeData();
+    document.addEventListener('keydown', this.handleKeydown);
+  },
+
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.handleKeydown);
+  },
+
   methods: {
-    handleKeydown(event) {
-      if (event.key === 'Escape') {
-        this.cancel(); // Call cancel function when Escape is pressed
-      }
+
+    async fetchEmployeeData() {
+      this.employees = await this.$store.dispatch('api/employee/getEmployees');
     },
 
     async confirm() {
@@ -104,31 +110,37 @@ export default {
         this.modal.error.open = true
       }
     },
-    
-    cancel() {
-      this.$emit('update:edit', false)
-    },
 
     async UploadFile() {
       try {
         const formData = new FormData();
         formData.append('file', this.file);
         const uploadResponse = await this.$store.dispatch('api/file/uploadProfile', formData);
-        console.log('Upload response:', uploadResponse);
         const data = {
           no: this.data.no,
           picture: this.file.name,
         };
-        console.log('Data:', data);
         const updateResponse = await this.$store.dispatch('api/file/updateProfile', data);
-        console.log('Update response:', updateResponse);
         this.modal.complete.open = true;
         this.recordLogUpdate(this.data.no);
       } catch (error) {
-        console.error('Error:', error);
         this.modal.error.message = 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ โปรดลองอีกครั้ง';
         this.modal.error.open = true;
       }
+    },
+
+    handleKeydown(event) {
+      if (event.key === 'Escape') {
+        this.cancel();
+      }
+    },
+
+    cancel() {
+      this.$emit('update:edit', false)
+    },
+
+    goBack() {
+      window.location.reload();
     },
 
     recordLogUpdate() {
@@ -148,37 +160,30 @@ export default {
         action: 'อัพโหลดรูปภาพ',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       }
-      console.log(log)
       this.$store.dispatch('api/log/addLogs', log)
-    },
-
-    async fetchEmployeeData() {
-      this.employees = await this.$store.dispatch('api/employee/getEmployees');
-    },
-
-    goBack() {
-      window.location.reload();
     },
   },
 }
+
 </script>
 
 <style scoped>
 .card-title-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
+
 .file-input {
-    margin-bottom: 0px !important;
+  margin-bottom: 0px !important;
 }
 
 .v-card-actions {
-    padding: 0 !important;
+  padding: 0 !important;
 }
 
 .v-btn {
-    margin-top: 0px !important;
+  margin-top: 0px !important;
 }
 </style>

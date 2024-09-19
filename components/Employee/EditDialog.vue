@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <ModalConfirm :open="modal.confirm.open" :message="modal.confirm.message" :confirm.sync="modal.confirm.open"
       :method="handleConfirmMethod" />
@@ -14,28 +15,43 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
               <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
-                <v-text-field v-model="data.fname" :rules="[(v) => !!v || 'โปรดกรอกชื่อ']" label="ชื่อ" outlined
-                  required>
-                </v-text-field>
+                <v-text-field v-model="data.fname" :rules="[
+                  (v) => !!v || 'โปรดกรอกชื่อ',
+                  (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ชื่อต้องเป็นภาษาไทยเท่านั้น'
+                ]" label="ชื่อ" outlined required />
               </v-col>
+
               <v-col cols="6" sm="5" class="pa-0">
-                <v-text-field v-model="data.lname" :rules="[(v) => !!v || 'โปรดกรอกนามสกุล']" label="นามสกุล" outlined
-                  required>
-                </v-text-field>
+                <v-text-field v-model="data.lname" :rules="[
+                  (v) => !!v || 'โปรดกรอกนามสกุล',
+                  (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'นามสกุลต้องเป็นภาษาไทยเท่านั้น'
+                ]" label="นามสกุล" outlined required />
               </v-col>
+
               <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
-                <v-text-field v-model="data.phone"
-                  :rules="[(v) => !!v || 'โปรดกรอกเบอร์โทรศัพท์', (v) => (v && v.length === 10) || 'เบอร์โทรศัพท์ต้องมี 10 หลัก',]"
-                  label="เบอร์โทรศัพท์" outlined required>
-                </v-text-field>
+                <v-text-field v-model="data.phone" :rules="[
+                  (v) => !!v || 'โปรดกรอกเบอร์โทรศัพท์',
+                  (v) => (v && v.length === 10) || 'เบอร์โทรศัพท์ต้องมี 10 หลัก',
+                  (v) => /^0/.test(v) || 'เบอร์โทรศัพท์ต้องมี 10 หลัก'
+                ]" label="เบอร์โทรศัพท์" outlined required />
               </v-col>
+
               <v-col cols="6" sm="5" class="pa-0">
-                <v-select v-model="data.gender" :items="genderOptions" :rules="[(v) => !!v || 'โปรดเลือกเพศ']"
-                  label="เพศ" outlined required></v-select>
+                <v-select v-model="data.gender" :items="genderOptions" :item-text="item => item.text"
+                  :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกเพศ']" label="เพศ" outlined
+                  required>
+                  <template v-slot:item="data">
+                    <v-icon left>
+                      {{ data.item.icon }}
+                    </v-icon>
+                    {{ data.item.text }}
+                  </template>
+                </v-select>
               </v-col>
             </v-row>
           </v-form>
         </v-card-text>
+
         <v-card-actions class="card-title-center pa-0">
           <v-btn @click="confirm" :disabled="!valid || !data.fname || !data.lname || !data.phone" depressed
             color="#24b224" class="font-weight-medium mr-2 mb-5">
@@ -47,13 +63,16 @@
       </v-card>
     </v-dialog>
   </div>
+
 </template>
 
 <script>
+
 import moment from 'moment';
 moment.locale('th');
 
 export default {
+
   props: {
     method: { type: Function },
     open: {
@@ -66,9 +85,6 @@ export default {
 
   data() {
     return {
-      valid: false,
-      genderOptions: [],
-      originalData: {},
 
       modal: {
         confirm: {
@@ -84,13 +100,18 @@ export default {
           message: 'โปรดกรอกข้อมูลให้ครบถ้วน',
         },
       },
+
+      valid: false,
+      genderOptions: [],
+      originalData: {},
+
     }
   },
 
   mounted() {
     this.setGenderOptions();
     this.originalData = { ...this.data };
-    document.addEventListener('keydown', this.handleKeydown); // ESC only
+    document.addEventListener('keydown', this.handleKeydown);
   },
 
   beforeDestroy() {
@@ -98,21 +119,6 @@ export default {
   },
 
   methods: {
-    setGenderOptions() {
-      const allGenders = ['ชาย', 'หญิง', 'ไม่ระบุ'];
-      if (this.data && this.data.gender) {
-        this.genderOptions = [this.data.gender, ...allGenders.filter(g => g !== this.data.gender)];
-      } else {
-        this.genderOptions = allGenders;
-      }
-    },
-
-    handleKeydown(event) {
-      if (event.key === 'Escape') {
-        this.cancel(); // Only trigger cancel on ESC key, disable Enter key functionality
-      }
-    },
-
     async confirm() {
       this.modal.confirm.open = true;
       await new Promise((resolve) => {
@@ -129,7 +135,6 @@ export default {
     async updateData() {
       try {
         const req = await this.$store.dispatch('api/employee/updateEmployee', this.data);
-        console.log('Response:', req);
         this.recordLogUpdate();
         this.modal.complete.open = true;
       } catch (error) {
@@ -137,9 +142,54 @@ export default {
       }
     },
 
+    setGenderOptions() {
+      const allGenders = [
+        { text: 'ชาย', value: 'ชาย', icon: 'mdi-face-man' },
+        { text: 'หญิง', value: 'หญิง', icon: 'mdi-face-woman' },
+        { text: 'ไม่ระบุ', value: 'ไม่ระบุ', icon: 'mdi-not-equal-variant' }
+      ];
+
+      if (this.data && this.data.gender) {
+        this.genderOptions = [
+          { text: this.data.gender, value: this.data.gender, icon: this.getGenderIcon(this.data.gender) },
+          ...allGenders.filter(g => g.value !== this.data.gender)
+        ];
+      } else {
+        this.genderOptions = allGenders;
+      }
+    },
+
+    getGenderIcon(gender) {
+      switch (gender) {
+        case 'ชาย':
+          return 'mdi-face-man';
+        case 'หญิง':
+          return 'mdi-face-woman';
+        case 'ไม่ระบุ':
+          return 'mdi-not-equal-variant';
+        default:
+          return '';
+      }
+    },
+
+    handleKeydown(event) {
+      if (event.key === 'Escape') {
+        this.cancel();
+      }
+    },
+
     cancel() {
       this.modal.confirm.open = false;
       this.$emit('update:edit', false);
+    },
+
+    goBack() {
+      window.location.reload();
+    },
+
+    handleConfirmMethod() {
+      this.modal.confirm.open = false;
+      this.updateData();
     },
 
     recordLogUpdate() {
@@ -158,31 +208,23 @@ export default {
       }
 
       const log = {
-        emp_name: this.$auth.user.fname+' '+this.$auth.user.lname,
+        emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
         emp_email: this.$auth.user.email,
         detail: changes.join(''),
         type: 4,
-        picture: this.data.picture || 'Unknown',
+        picture: this.$auth.user.picture || 'Unknown',
         action: 'แก้ไขข้อมูลส่วนตัว',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       }
-      console.log(log);
       this.$store.dispatch('api/log/addLogs', log);
-    },
-
-    goBack() {
-      window.location.reload();
-    },
-
-    handleConfirmMethod() {
-      this.modal.confirm.open = false;
-      this.updateData();
     },
   },
 };
+
 </script>
 
 <style scoped>
+
 .card-title-center {
   display: flex;
   justify-content: center;
@@ -201,4 +243,5 @@ export default {
 .v-btn {
   margin-top: 0px !important;
 }
+
 </style>

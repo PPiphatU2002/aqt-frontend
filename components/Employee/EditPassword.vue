@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <ModalConfirm :open="modal.confirm.open" :confirm.sync="modal.confirm.open" :method="updateData" />
     <ModalComplete :open="modal.complete.open" :message="modal.complete.message" :complete.sync="modal.complete.open"
@@ -20,6 +21,7 @@
                   ]" @click:append="show2 = !show2" label="รหัสผ่านใหม่" required>
                 </v-text-field>
               </v-col>
+
               <v-col cols="6" sm="5" class="pa-0">
                 <v-text-field :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
                   v-model="data.confirm_password" :rules="[
@@ -32,6 +34,7 @@
             </v-row>
           </v-form>
         </v-card-text>
+
         <v-card-actions class="card-title-center">
           <v-btn color="#24b224" @click="confirm"
             :disabled="!valid || data.new_password === null || data.new_password === undefined || data.confirm_password === null || data.confirm_password === undefined"
@@ -45,21 +48,15 @@
       </v-card>
     </v-dialog>
   </div>
+
 </template>
 
 <script>
+
 import moment from 'moment'
 moment.locale('th')
 
 export default {
-  async mounted() {
-    await this.fetchEmployeeData();
-    document.addEventListener('keydown', this.handleKeydown);
-  },
-
-  beforeDestroy() {
-    document.removeEventListener('keydown', this.handleKeydown);
-  },
 
   props: {
     method: { type: Function },
@@ -73,13 +70,6 @@ export default {
 
   data() {
     return {
-      employees: [],
-      valid: false,
-      confirm_password: '',
-      password: '',
-      new_password: '',
-      show1: false,
-      show2: false,
 
       modal: {
         confirm: {
@@ -95,10 +85,29 @@ export default {
           message: 'โปรดกรอกข้อมูลให้ครบถ้วน',
         },
       },
+
+      confirm_password: '',
+      password: '',
+      new_password: '',
+      valid: false,
+      show1: false,
+      show2: false,
+      employees: [],
+
     };
   },
 
+  async mounted() {
+    await this.fetchEmployeeData();
+    document.addEventListener('keydown', this.handleKeydown);
+  },
+
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.handleKeydown);
+  },
+
   methods: {
+
     async confirm() {
       try {
         this.$emit('update:edit', false);
@@ -106,9 +115,6 @@ export default {
       } catch (error) {
         this.modal.error.open = true;
       }
-    },
-    cancel() {
-      this.$emit('update:edit', false);
     },
 
     async updateData() {
@@ -121,7 +127,6 @@ export default {
         this.data.password = this.data.new_password;
 
         const req = await this.$store.dispatch('api/employee/updatePassword', this.data);
-        console.log('Response:', req);
         this.modal.complete.open = true;
         this.recordLogUpdate(this.data.no);
       } catch (error) {
@@ -131,6 +136,20 @@ export default {
 
     async fetchEmployeeData() {
       this.employees = await this.$store.dispatch('api/employee/getEmployees');
+    },
+
+    cancel() {
+      this.$emit('update:edit', false);
+    },
+
+    goBack() {
+      window.location.reload();
+    },
+
+    handleKeydown(event) {
+      if (event.key === 'Escape') {
+        this.cancel();
+      }
     },
 
     recordLogUpdate(no) {
@@ -150,28 +169,20 @@ export default {
         action: 'เปลี่ยนรหัสผ่าน',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };
-      console.log(log);
       this.$store.dispatch('api/log/addLogs', log);
-    },
-
-    goBack() {
-      window.location.reload();
-    },
-
-    handleKeydown(event) {
-      if (event.key === 'Escape') {
-        this.cancel();
-      }
     },
   },
 };
+
 </script>
 
 <style scoped>
+
 .card-title-center {
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
+
 </style>
