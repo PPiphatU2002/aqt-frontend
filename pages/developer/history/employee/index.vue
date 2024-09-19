@@ -373,13 +373,13 @@ export default {
                 }
                 else {
                     if (RankID === '1') {
-                        this.$router.push('/auth');
+                        this.$router.push('/developer/history/employee');
                     } else if (RankID === '2') {
-                        this.$router.push('/auth');
+                        this.$router.push('/employee/home');
                     } else if (RankID === '3') {
-                        this.$router.push('/auth');
+                        this.$router.push('/admin/history/employee');
                     } else {
-                        this.$router.push('/');
+                        this.$router.push('/auth');
                     }
                 }
             } else {

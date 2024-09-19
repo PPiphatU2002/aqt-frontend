@@ -1,9 +1,11 @@
 <template>
+
     <div>
         <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
-        <ModalConfirm :open="modalConfirmOpen" @update:confirm="handleConfirm" :method="handleConfirm" />
+        <ModalConfirm :method="handleConfirm" :open="modalConfirmOpen" @update:confirm="modalConfirmOpen = false" />
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
+            
         <v-card flat>
             <v-container>
                 <v-row justify="center" align="center">
@@ -118,14 +120,14 @@
                         color="#85d7df">mdi-playlist-check</v-icon>
                 </template>
                 <v-list class="header-list">
-                    <v-list-item v-for="header in headers" :key="header.value" class="header-item">
+                    <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
+                        :key="header.value" class="header-item">
                         <v-list-item-content>
                             <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
                         </v-list-item-content>
                     </v-list-item>
                 </v-list>
             </v-menu>
-
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 item-key="no" :items-per-page="10">
@@ -179,7 +181,7 @@
                                     <v-list-item-icon style="margin-right: 4px;">
                                         <v-icon class="icon-tab" color="#ffc800">mdi-pencil</v-icon>
                                     </v-list-item-icon>
-                                    <v-list-item-content style="font-size: 0.8rem;">แก้ไขข้อมูล</v-list-item-content>
+                                    <v-list-item-content style="font-size: 0.8rem;">ให้ผู้ใช้งานแก้ไขข้อมูล</v-list-item-content>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
@@ -216,7 +218,7 @@ export default {
     layout: 'developer',
     middleware: 'auth',
     async mounted() {
-        await this.checkRole();
+        await this.checkRank();
         await this.fetchEmployeeData();
     },
 
@@ -396,22 +398,32 @@ export default {
                 }
 
                 this.modal.complete.open = true;
-                console.log('Update successful');
             } catch (error) {
-                console.error('Update failed:', error);
                 this.modal.complete.message = 'เกิดข้อผิดพลาดในการดำเนินการ';
                 this.modal.complete.open = true;
             }
 
             this.modalConfirmOpen = false;
         },
-        async checkRole() {
+
+        async checkRank() {
             if (this.$auth.loggedIn) {
-                const roleId = this.$auth.user.ranks_id.toString();
-                if (roleId === '1') {
-                    this.$router.push('/developer/user/new_employee');
-                } else {
-                    this.$router.push('/auth');
+                const Status = this.$auth.user.status.toString();
+                const RankID = this.$auth.user.ranks_id.toString();
+                if (Status === '2') {
+                    this.$router.push('/');
+                    await this.$auth.logout();
+                }
+                else {
+                    if (RankID === '1') {
+                        this.$router.push('/developer/user/new_employee');
+                    } else if (RankID === '2') {
+                        this.$router.push('/employee/home');
+                    } else if (RankID === '3') {
+                        this.$router.push('/admin/user/new_employee');
+                    } else {
+                        this.$router.push('/auth');
+                    }
                 }
             } else {
                 this.$router.push('/');
@@ -436,17 +448,13 @@ export default {
                     2: 'รอการยืนยันผู้ใช้งาน',
                     3: 'รอการแก้ไขข้อมูล'
                 };
-
                 this.employees = [...status2, ...status3].map(employee => {
                     return {
                         ...employee,
                         status: statusMap[employee.status] || 'สถานะไม่ทราบ'
                     };
                 });
-
-                console.log('Fetched employees:', this.employees);
             } catch (error) {
-                console.error('Error fetching employee data:', error);
             }
         },
 
@@ -531,7 +539,6 @@ export default {
         applySearchFilter(employee, search) {
             const field = employee[search.type] ? employee[search.type].toLowerCase() : '';
             let queryMatched = true;
-
             if (search.type === 'email' || search.type === 'phone') {
                 queryMatched = this.searchQueries[search.type].some(query =>
                     field.includes(query.toLowerCase())
@@ -545,14 +552,13 @@ export default {
                 const searchQuery = search.query.toLowerCase();
                 queryMatched = field.includes(searchQuery);
             }
-
             const timeMatched = search.type === 'time' ? this.checkTimeRange(employee, search) : true;
             const topicMatched = search.topics ? search.topics.some(topic => topic === employee.status) : true;
             return queryMatched && timeMatched && topicMatched;
         },
 
         checkTimeRange(employee, search) {
-            const employeeTime = moment(employee.time);
+            const employeeTime = moment(employee.updated_date);
             const startTime = moment(search.start);
             const endTime = moment(search.end);
             return (!startTime.isValid() || employeeTime.isSameOrAfter(startTime)) &&
@@ -584,11 +590,9 @@ export default {
                 });
                 return dataItem;
             });
-
             const csv = Papa.unparse(filteredData);
             const bom = '\uFEFF';
             const csvWithBom = bom + csv;
-
             const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const currentDate = moment().format('YYYY-MM-DD');
@@ -601,7 +605,6 @@ export default {
 
         convertToCSV(objArray) {
             const array = [Object.keys(objArray[0])].concat(objArray);
-
             return array.map(row => {
                 return Object.values(row).map(value => `"${value}"`).join(',');
             }).join('\n');
@@ -609,24 +612,24 @@ export default {
 
         maskNewData(data) {
             if (!data) return '';
-
             const length = data.length;
             if (length <= 4) return data;
-
             const firstPart = data.slice(0, 1);
             const lastPart = data.slice(-1);
             const maskedPart = '*'.repeat(length - 4)
-
             return `${firstPart}${maskedPart}${lastPart}`;
         },
+
         goBack() {
             window.location.reload();
         },
     },
 };
+
 </script>
 
 <style scoped>
+
 .small-font {
     font-size: 0.8rem;
 }
@@ -735,7 +738,7 @@ export default {
 }
 
 .header-item {
-    flex: 1 0 20%;
+    flex: 1 0 0%;
     box-sizing: border-box;
 }
 
@@ -767,4 +770,5 @@ export default {
 .custom-list {
     padding: 0.4px 2px;
 }
+
 </style>
