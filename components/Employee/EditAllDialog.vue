@@ -188,6 +188,13 @@ export default {
       const currentRank = this.getRankName(this.$auth.user.ranks_id);
       const targetRank = this.getRankName(this.data.ranks_id);
       const isSelfEdit = this.$auth.user.email === this.data.email;
+
+      if (currentRank === 'แอดมิน' && isSelfEdit) {
+        this.modal.warning.open = true;
+        this.modal.warning.message = 'ไม่สามารถแก้ไขตำแหน่งของตัวเองได้';
+        return;
+      }
+
       if (currentRank === 'ผู้พัฒนา' && targetRank === 'ผู้พัฒนา' && !isSelfEdit) {
         this.modal.warning.open = true;
         this.modal.warning.message = 'ไม่สามารถแก้ไขผู้ใช้งานที่มีตำแหน่งผู้พัฒนาได้';
@@ -214,7 +221,8 @@ export default {
       }
 
       await this.updateData();
-    },
+    }
+    ,
 
     async updateData() {
       try {
@@ -339,7 +347,6 @@ export default {
 </script>
 
 <style scoped>
-
 .card-title-center {
   display: flex;
   justify-content: center;
@@ -358,5 +365,4 @@ export default {
 .v-btn {
   margin-top: 0px !important;
 }
-
 </style>
