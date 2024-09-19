@@ -105,11 +105,11 @@ export default {
         }
         else {
           if (RankID === '1') {
-            this.$router.push('/auth/home');
+            this.$router.push('/developer/home');
           } else if (RankID === '2') {
-            this.$router.push('/auth/home');
+            this.$router.push('/employee/home');
           } else if (RankID === '3') {
-            this.$router.push('/auth/home');
+            this.$router.push('/admin/home');
           } else {
             this.$router.push('/');
           }

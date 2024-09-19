@@ -1,4 +1,5 @@
 <template>
+
     <div>
         <ModalWarning :open="modal.warning.open" :message="modal.warning.message" :warning.sync="modal.warning.open" />
         <v-container class="fill-height" fluid justify="center" align="center">
@@ -30,13 +31,17 @@
             </v-row>
         </v-container>
     </div>
+    
 </template>
 
 
 <script>
+
 export default {
+
     layout: 'developer',
     middleware: 'auth',
+
     async mounted() {
         await this.checkRank();
     },
@@ -59,21 +64,20 @@ export default {
                 const RankID = this.$auth.user.ranks_id.toString();
                 if (Status === '2') {
                     this.$router.push('/');
+                    await this.$auth.logout();
                 }
                 else {
                     if (RankID === '1') {
-                        console.log('Welcome Back Developer!');
                         this.$router.push('/developer/home');
                     } else if (RankID === '2') {
-                        console.log('Welcome Back Employee!');
                         this.$router.push('/employee/home');
+                    } else if (RankID === '3') {
+                        this.$router.push('/admin/home');
                     } else {
-                        console.log('You Can Not Access This Page!');
                         this.$router.push('/auth');
                     }
                 }
             } else {
-                console.log('User Is Not Logged In!');
                 this.$router.push('/auth');
             }
         },
@@ -81,12 +85,15 @@ export default {
         fixport() {
             this.$router.push('/developer/transaction/customer_stock');
         },
+
         transaction() {
             this.$router.push('/developer/transaction/buy');
         },
+
         management() {
             this.$router.push('/developer/transaction/sale');
         },
     }
 }
+
 </script>
