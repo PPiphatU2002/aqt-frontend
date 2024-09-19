@@ -105,17 +105,17 @@ export default {
         }
         else {
           if (RankID === '1') {
-            this.$router.push('/auth');
+            this.$router.push('/auth/home');
           } else if (RankID === '2') {
-            this.$router.push('/auth');
+            this.$router.push('/auth/home');
           } else if (RankID === '3') {
-            this.$router.push('/auth');
+            this.$router.push('/auth/home');
           } else {
             this.$router.push('/');
           }
         }
       } else {
-        this.$router.push('/');
+        this.$router.push('/auth');
       }
     },
 
