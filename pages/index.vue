@@ -1,14 +1,18 @@
 <template>
+
     <div>
         <ModalWarning :open="modal.warning.open" :message="modal.warning.message" :warning.sync="modal.warning.open" />
     </div>
+
 </template>
 
 <script>
+
 import moment from 'moment';
 moment.locale('th');
 
 export default {
+
     layout: 'default',
 
     async mounted() {
@@ -38,22 +42,21 @@ export default {
                 }
                 else {
                     if (RankID === '1') {
-                        console.log('Welcome Back Developer!');
                         this.$router.push('/auth');
                     } else if (RankID === '2') {
-                        console.log('Welcome Back Employee!');
+                        this.$router.push('/auth');
+                    } else if (RankID === '3') {
                         this.$router.push('/auth');
                     } else {
-                        console.log('You Can Not Access This Page!');
                         this.$router.push('/');
                     }
                 }
 
             } else {
-                console.log('User Is Not Logged In!');
                 this.$router.push('/');
             }
         },
     },
 }
+
 </script>
