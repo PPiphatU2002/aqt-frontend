@@ -101,7 +101,6 @@ export default {
         const RankID = this.$auth.user.ranks_id.toString();
         if (Status === '2') {
           this.$router.push('/');
-          this.modal.warning.open = true;
           await this.$auth.logout();
         }
         else {
