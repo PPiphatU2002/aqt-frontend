@@ -1,4 +1,5 @@
 <template>
+  
   <div>
     <v-app :class="appBackground">
       <v-app-bar :clipped-left="clipped" fixed app :color="navBarColor" dark>
@@ -28,9 +29,11 @@
       </v-main>
     </v-app>
   </div>
+
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -38,6 +41,7 @@ export default {
       fixed: false,
     };
   },
+
   methods: {
     gotoRegister() {
       this.$router.push('/auth/register');
@@ -51,24 +55,30 @@ export default {
       this.$router.push('/');
     },
   },
+
   computed: {
     iconColor() {
       return this.$vuetify.theme.dark ? 'night-icon' : 'day-icon';
     },
+
     loginBtnClass() {
       return this.$vuetify.theme.dark ? 'login-btn-night' : 'login-btn-day';
     },
+
     appBackground() {
       return this.$vuetify.theme.dark ? 'background-dark' : 'background-light';
     },
+
     navBarColor() {
       return this.$vuetify.theme.dark ? '#545454' : '#fff6ea';
     }
   }
 };
+
 </script>
 
 <style scoped>
+
 .theme-toggle-btn {
   background-color: #000000 !important;
   margin-right: 8px;
@@ -107,4 +117,5 @@ export default {
   background-position: center;
   background-repeat: no-repeat;
 }
+
 </style>

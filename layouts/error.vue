@@ -1,17 +1,22 @@
 <template>
+
     <div class="error-page">
       <h1>404 - ไม่พบเพจนี้</h1>
       <p>หน้าที่คุณกำลังมองหาไม่มีอยู่</p>
       <router-link to="/" class="home-button">กลับไปที่หน้าหลัก</router-link>
     </div>
+
   </template>
   
   <script>
+
   export default {
   }
+
   </script>
   
   <style scoped>
+
   .error-page {
     display: flex;
     flex-direction: column;
@@ -53,4 +58,5 @@
     background-color: #66b6c4;
     text-decoration: none;
   }
+  
   </style>

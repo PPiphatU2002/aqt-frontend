@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <ModalConfirmLogout :open="modal.confirmLogout.open" :message="modal.confirmLogout.message"
       @update:confirmLogout="(value) => (modal.confirmLogout.open = value)"
@@ -56,7 +57,6 @@
             </v-list-item>
           </v-list>
         </v-menu>
-
 
         <v-menu bottom right :offset-y="true" :nudge-top="8" :nudge-right="8" class="user-menu">
           <template v-slot:activator="{ on, attrs }">
@@ -191,9 +191,11 @@
       </v-main>
     </v-app>
   </div>
+
 </template>
 
 <script>
+
 import moment from 'moment';
 moment.locale('th');
 
@@ -201,6 +203,7 @@ export default {
   async mounted() {
     await this.fetchEmployeeData();
   },
+
   data() {
     return {
       employees: [],
@@ -214,26 +217,33 @@ export default {
       },
     };
   },
+
   methods: {
     gotoProfile() {
       this.$router.push('/developer/profile');
     },
+
     toggleTheme() {
       this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
     },
+
     home() {
       this.$router.push('/developer/home');
     },
+
     buttonSignOut() {
       this.modal.confirmLogout.open = true;
     },
+
     sign_out() {
       this.$auth.logout();
       this.recordLog();
     },
+
     async fetchEmployeeData() {
       this.employees = await this.$store.dispatch('api/employee/getEmployees');
     },
+
     async recordLog() {
       const empId = this.$auth.user.no;
       const employee = this.employees.find(employee => employee.no === empId);
@@ -251,7 +261,6 @@ export default {
         userLocation = `${data.city}, ${data.region}, ${data.country}`;
         userIP = data.ip;
       } catch (error) {
-        console.error('Error fetching IP information:', error);
       }
 
       const log = {
@@ -263,19 +272,21 @@ export default {
         detail: `LOCATION ${userLocation}\nIP ${userIP}`,
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };
-      console.log(log);
       this.$store.dispatch('api/log/addLogs', log);
     },
 
     goToNewUser() {
       this.$router.push('/developer/user/new');
     },
+
     goToManagement() {
       this.$router.push('/developer/user/management');
     },
+
     goToNewEmp() {
       this.$router.push('/developer/user/new_employee');
     },
+
     goToEmpManagement() {
       this.$router.push('/developer/user/employee_management');
     },
@@ -283,12 +294,15 @@ export default {
     goToTransHist() {
       this.$router.push('/developer/history/transaction');
     },
+
     goToStocksHist() {
       this.$router.push('/developer/history/stock');
     },
+
     goToUsersHist() {
       this.$router.push('/developer/history/user');
     },
+
     goToEmpsHist() {
       this.$router.push('/developer/history/employee');
     },
@@ -296,27 +310,34 @@ export default {
     goToNewStock() {
       this.$router.push('/developer/stock/new_stock');
     },
+
     goToStocksManagement() {
       this.$router.push('/developer/stock/management');
     },
+
     goToStocksUpdate() {
       this.$router.push('/developer/stock/update');
     },
 
   },
+
   computed: {
     iconColor() {
       return this.$vuetify.theme.dark ? 'night-icon' : 'day-icon';
     },
+
     loginBtnClass() {
       return this.$vuetify.theme.dark ? 'login-btn-night' : 'login-btn-day';
     },
+
     appBackground() {
       return this.$vuetify.theme.dark ? 'background-dark' : 'background-light';
     },
+
     navBarColor() {
       return this.$vuetify.theme.dark ? '#545454' : '#fff6ea';
     },
+
     userProfilePicture() {
       const defaultPicture = 'http://localhost:3001/file/profile/person-icon.jpg';
       return this.$auth.user && this.$auth.user.picture
@@ -325,9 +346,11 @@ export default {
     }
   }
 };
+
 </script>
 
 <style scoped>
+
 .logo-img {
   cursor: pointer;
 }
@@ -450,4 +473,5 @@ export default {
 .non-clickable {
   pointer-events: none;
 }
+
 </style>
