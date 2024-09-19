@@ -1,6 +1,8 @@
 <template>
+
     <div>
         <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
+
         <v-card flat>
             <v-container>
                 <v-row justify="center" align="center">
@@ -67,7 +69,7 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                                <v-autocomplete v-if="searchType !== 'action' && searchType !== 'time'"
+                            <v-autocomplete v-if="searchType !== 'action' && searchType !== 'time'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
                                 hide-details></v-autocomplete>
@@ -123,7 +125,6 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
-
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 item-key="no" :items-per-page="10">
@@ -207,9 +208,11 @@
             </v-card>
         </v-dialog>
     </div>
+
 </template>
 
 <script>
+
 import * as XLSX from 'xlsx';
 import moment from 'moment';
 import 'moment/locale/th'
@@ -218,10 +221,12 @@ import 'vue2-datepicker/index.css';
 import Papa from 'papaparse';
 
 export default {
+
     layout: 'developer',
     middleware: 'auth',
+
     async mounted() {
-        await this.checkRole();
+        await this.checkRank();
         await this.fetchLogData();
     },
 
@@ -239,20 +244,36 @@ export default {
             },
 
             logs: [],
+
+            startDateTime: '',
+            endDateTime: '',
+            selectedItemDetail: '',
             searchQuery: '',
             searchType: 'emp_name',
+            sortBy: 'time',
+            sortDesc: true,
+            dialog: false,
+            isSearchFieldVisible: false,
+            datePickerMenu: false,
+            endDatePickerMenu: false,
+            showSavedSearchesDialog: false,
+            showColumnSelector: false,
             selectedTopics: [],
             savedSearches: [],
+            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'detail'],
+
             searchQueries: {
                 'emp_name': [],
                 'emp_email': [],
             },
+
             searchTypes: [
                 { text: 'ชื่อ-นามสกุล', value: 'emp_name' },
                 { text: 'อีเมล', value: 'emp_email' },
                 { text: 'การกระทำ', value: 'action' },
                 { text: 'เวลา', value: 'time' }
             ],
+
             actionTopics: [
                 { text: 'เข้าสู่ระบบ', value: 'เข้าสู่ระบบ' },
                 { text: 'ออกจากระบบ', value: 'ออกจากระบบ' },
@@ -260,19 +281,7 @@ export default {
                 { text: 'เปลี่ยนรหัสผ่าน', value: 'เปลี่ยนรหัสผ่าน' },
                 { text: 'แก้ไขข้อมูลส่วนตัว', value: 'แก้ไขข้อมูลส่วนตัว' },
             ],
-            sortBy: 'time',
-            sortDesc: true,
-            dialog: false,
-            selectedItemDetail: '',
-            isSearchFieldVisible: false,
-            datePickerMenu: false,
-            endDatePickerMenu: false,
-            startDateTime: '',
-            endDateTime: '',
-            showSavedSearchesDialog: false,
 
-            showColumnSelector: false,
-            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'detail'],
             headers: [
                 {
                     text: 'เวลา',
@@ -280,6 +289,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'โปรไฟล์',
                     value: 'picture',
@@ -287,6 +297,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'การกระทำ',
                     value: 'action',
@@ -294,6 +305,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'อีเมล',
                     value: 'emp_email',
@@ -301,6 +313,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'ชื่อ-นามสกุล',
                     value: 'emp_name',
@@ -308,6 +321,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'หมายเหตุ',
                     value: 'detail',
@@ -327,7 +341,6 @@ export default {
                     return this.applySearchFilter(log, search);
                 });
             });
-
             return filteredLogs;
         },
 
@@ -349,13 +362,25 @@ export default {
             }
             return [];
         },
-        async checkRole() {
+
+        async checkRank() {
             if (this.$auth.loggedIn) {
-                const roleId = this.$auth.user.ranks_id.toString();
-                if (roleId === '1') {
-                    this.$router.push('/developer/history/employee');
-                } else {
-                    this.$router.push('/auth');
+                const Status = this.$auth.user.status.toString();
+                const RankID = this.$auth.user.ranks_id.toString();
+                if (Status === '2') {
+                    this.$router.push('/');
+                    await this.$auth.logout();
+                }
+                else {
+                    if (RankID === '1') {
+                        this.$router.push('/auth');
+                    } else if (RankID === '2') {
+                        this.$router.push('/auth');
+                    } else if (RankID === '3') {
+                        this.$router.push('/auth');
+                    } else {
+                        this.$router.push('/');
+                    }
                 }
             } else {
                 this.$router.push('/');
@@ -550,6 +575,7 @@ export default {
 </script>
 
 <style scoped>
+
 .small-font {
     font-size: 0.8rem;
 }
@@ -658,7 +684,7 @@ export default {
 }
 
 .header-item {
-    flex: 1 0 20%;
+    flex: 1 0 0%;
     box-sizing: border-box;
 }
 
@@ -678,4 +704,5 @@ export default {
     max-width: 100%;
     max-height: 60px;
 }
+
 </style>
