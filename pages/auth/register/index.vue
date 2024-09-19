@@ -197,28 +197,11 @@ export default {
         async create() {
             try {
                 const req = await this.$store.dispatch('api/employee/register', this.form)
-                this.recordLog()
                 this.modal.complete.open = true
             } catch (error) {
                 this.modal.error.open = true
                 this.modal.error.message = "มีอีเมลนี้อยู่แล้ว";
             }
-        },
-        recordLog() {
-            const log = {
-                emp_name: this.form.fname + ' ' + this.form.lname,
-                emp_email: this.form.email,
-                picture: this.form.picture,
-                type: 4,
-                detail: 'PHONE ' + this.form.phone
-                    + '\nGENDER ' + this.form.gender
-                    + '\nNEW ' + this.form.password,
-                action: 'ส่งคำร้องขอสมัครสมาชิก',
-                time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-            }
-            console.log(log);
-
-            this.$store.dispatch('api/log/addLogs', log);
         },
 
         goBack() {
@@ -233,8 +216,6 @@ export default {
             this.form.lname = null;
             this.form.phone = null;
             this.form.gender = null;
-
-            // Reset form validation
             this.$refs.form.resetValidation();
         },
 
