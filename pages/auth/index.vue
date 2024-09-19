@@ -1,8 +1,10 @@
 <template>
+
   <div @keyup.enter="login" class="login-container">
     <ModalComplete :open="modal.complete.open" :message="modal.complete.message" :complete.sync="modal.complete.open" />
     <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
     <ModalWarning :open="modal.warning.open" :message="modal.warning.message" :warning.sync="modal.warning.open" />
+
     <v-container fluid fill-height class="d-flex align-center justify-center">
       <v-row align="center" justify="center">
         <v-col cols="12" sm="8" md="6">
@@ -18,6 +20,7 @@
               <v-text-field v-model="form.password" prepend-icon="mdi-lock" label="รหัสผ่าน"
                 :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
                 @click:append="show1 = !show1" outlined dense class="small-text-field"></v-text-field>
+
               <v-btn @click="login" :disabled="!form.email || !form.password" color="#24b224" block>
                 เข้าสู่ระบบ
               </v-btn>
@@ -30,13 +33,16 @@
       </v-row>
     </v-container>
   </div>
+
 </template>
 
 <script>
+
 import moment from 'moment';
 moment.locale('th');
 
 export default {
+
   layout: 'blank',
 
   async mounted() {
@@ -56,16 +62,6 @@ export default {
 
   data() {
     return {
-      employees: [],
-
-      valid: false,
-      show1: false,
-      show2: false,
-
-      form: {
-        email: '',
-        password: '',
-      },
       modal: {
         complete: {
           open: false,
@@ -80,6 +76,16 @@ export default {
           message: 'ผู้ใช้นี้ยังไม่ได้รับการอนุมัติ',
         },
       },
+
+      valid: false,
+      show1: false,
+      show2: false,
+      employees: [],
+      
+      form: {
+        email: '',
+        password: '',
+      },
     }
   },
 
@@ -91,31 +97,26 @@ export default {
 
     async checkRank() {
       if (this.$auth.loggedIn) {
-
         const Status = this.$auth.user.status.toString();
         const RankID = this.$auth.user.ranks_id.toString();
-
         if (Status === '2') {
+          this.$router.push('/');
           this.modal.warning.open = true;
           await this.$auth.logout();
-          this.$router.push('/');
         }
         else {
           if (RankID === '1') {
-            console.log('Welcome Back Developer!');
-            this.$router.push('/developer/home');
-          } else if (RankID === '2') {
-            console.log('Welcome Back Employee!');
-            this.$router.push('/employee/home');
-          } else {
-            console.log('You Can Not Access This Page!');
             this.$router.push('/auth');
+          } else if (RankID === '2') {
+            this.$router.push('/auth');
+          } else if (RankID === '3') {
+            this.$router.push('/auth');
+          } else {
+            this.$router.push('/');
           }
         }
-
       } else {
-        console.log('User Is Not Logged In!');
-        this.$router.push('/auth');
+        this.$router.push('/');
       }
     },
 
@@ -127,12 +128,9 @@ export default {
             password: this.form.password,
           }
         });
-
-
         if (this.$auth.user.status.toString() !== '2') {
           this.recordLog();
         }
-
         this.modal.complete.open = true;
       } catch (error) {
         this.modal.error.open = true;
@@ -166,7 +164,6 @@ export default {
         userLocation = `${data.city}, ${data.region}, ${data.country}`;
         userIP = data.ip;
       } catch (error) {
-        console.error('Error fetching IP information:', error);
       }
 
       const log = {
@@ -178,7 +175,6 @@ export default {
         detail: `LOCATION ${userLocation}\nIP ${userIP}`,
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };
-      console.log(log);
       this.$store.dispatch('api/log/addLogs', log);
     },
   },

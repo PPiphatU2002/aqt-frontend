@@ -1,9 +1,11 @@
 <template>
+
     <div @keyup.enter="register" class="register-container">
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
         <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
         <ModalConfirm :open="modal.confirm.open" :confirm.sync="modal.confirm.open" :method="create" />
+
         <v-container fluid fill-height class="d-flex align-center justify-center">
             <v-row align="center" justify="center">
                 <v-col cols="12" sm="8" md="6">
@@ -94,20 +96,23 @@
                                 </v-row>
                             </v-card-text>
                         </v-form>
-
                     </v-card>
                 </v-col>
             </v-row>
         </v-container>
     </div>
+
 </template>
 
 <script>
+
 import moment from 'moment';
 moment.locale('th');
 
 export default {
+
     layout: 'default',
+
     async mounted() {
         await this.checkRank();
     },
@@ -117,6 +122,7 @@ export default {
             show1: false,
             show2: false,
             valid: false,
+
             form: {
                 email: null,
                 password: null,
@@ -137,6 +143,7 @@ export default {
                 complete: { open: false, message: 'การลงทะเบียนสมาชิกเสร็จสมบูรณ์ กรุณารอการอนุมัติผู้ใช้งาน' },
                 error: { open: false, message: 'มีบางอย่างผิดปกติ' }
             },
+
             rules: {
                 required: value => !!value || 'กรุณากรอกข้อมูล',
                 email: value => /.+@.+\..+/.test(value) || 'กรุณากรอกอีเมลให้ถูกต้อง',
@@ -145,6 +152,7 @@ export default {
                 phoneNumber: value => /^0[0-9]{9}$/.test(value) || 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง',
                 thaiOnly: value => /^[ก-๙]+$/.test(value) || 'กรุณาใช้ชื่อเป็นภาษาไทย'
             },
+
             genderOptions: [
                 { text: 'ชาย', value: 'ชาย', icon: 'mdi-face-man' },
                 { text: 'หญิง', value: 'หญิง', icon: 'mdi-face-woman' },
@@ -157,7 +165,6 @@ export default {
             if (this.$auth.loggedIn) {
                 const Status = this.$auth.user.status.toString();
                 const RankID = this.$auth.user.ranks_id.toString();
-
                 if (Status === '2') {
                     this.$router.push('/');
                     this.modal.warning.open = true;
@@ -165,20 +172,17 @@ export default {
                 }
                 else {
                     if (RankID === '1') {
-                        console.log('Welcome Back Developer!');
-                        this.$router.push('/developer/home');
-                    } else if (RankID === '2') {
-                        console.log('Welcome Back Employee!');
-                        this.$router.push('/employee/home');
-                    } else {
-                        console.log('You Can Not Access This Page!');
                         this.$router.push('/auth');
+                    } else if (RankID === '2') {
+                        this.$router.push('/auth');
+                    } else if (RankID === '3') {
+                        this.$router.push('/auth');
+                    } else {
+                        this.$router.push('/');
                     }
                 }
-
             } else {
-                console.log('User Is Not Logged In!');
-                this.$router.push('/auth/register');
+                this.$router.push('/');
             }
         },
 
@@ -194,6 +198,7 @@ export default {
                 this.modal.error.message = "กรุณากรอกข้อมูลให้ครบถ้วน";
             }
         },
+
         async create() {
             try {
                 const req = await this.$store.dispatch('api/employee/register', this.form)
@@ -234,9 +239,11 @@ export default {
         },
     }
 };
+
 </script>
 
 <style scoped>
+
 .register-container {
     display: flex;
     align-items: center;
@@ -253,4 +260,5 @@ export default {
 .last-text-field {
     margin-bottom: 2px;
 }
+
 </style>
