@@ -30,6 +30,9 @@
                                                             <strong>ประเภท :</strong>
                                                             {{ getSearchTypeText(search.type) }}
                                                         </v-list-item-title>
+                                                        <v-list-item-subtitle v-if="search.query">
+                                                            <strong>รายละเอียด :</strong> {{ search.query }}
+                                                        </v-list-item-subtitle>
                                                         <v-list-item-subtitle v-if="search.start && search.end">
                                                             <strong>ระยะเวลา :</strong> {{
                                                                 formatDateTime(search.start)
@@ -64,10 +67,11 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-text-field v-if="searchType !== 'action' && searchType !== 'time'" v-model="searchQuery"
-                                label="ค้นหา" dense outlined append-icon="mdi-magnify"
-                                class="mx-2 same-size small-font">
-                            </v-text-field>
+                                <v-autocomplete v-if="searchType !== 'action' && searchType !== 'time'"
+                                v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
+                                append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
+                                hide-details></v-autocomplete>
+
 
                             <v-select v-if="searchType === 'action'" v-model="selectedTopics" :items="actionTopics"
                                 dense outlined multiple class="mx-2 search-size small-font"></v-select>
@@ -219,7 +223,6 @@ export default {
     async mounted() {
         await this.checkRole();
         await this.fetchLogData();
-        await this.fetchEmployeeData();
     },
 
     components: {
@@ -236,9 +239,8 @@ export default {
             },
 
             logs: [],
-            employees: [],
             searchQuery: '',
-            searchType: '',
+            searchType: 'emp_name',
             selectedTopics: [],
             savedSearches: [],
             searchQueries: {
@@ -246,7 +248,7 @@ export default {
                 'emp_email': [],
             },
             searchTypes: [
-                { text: 'ชื่อ', value: 'emp_name' },
+                { text: 'ชื่อ-นามสกุล', value: 'emp_name' },
                 { text: 'อีเมล', value: 'emp_email' },
                 { text: 'การกระทำ', value: 'action' },
                 { text: 'เวลา', value: 'time' }
@@ -254,7 +256,6 @@ export default {
             actionTopics: [
                 { text: 'เข้าสู่ระบบ', value: 'เข้าสู่ระบบ' },
                 { text: 'ออกจากระบบ', value: 'ออกจากระบบ' },
-                { text: 'ส่งคำร้องขอสมัครสมาชิก', value: 'ส่งคำร้องขอสมัครสมาชิก' },
                 { text: 'อัพโหลดรูปภาพ', value: 'อัพโหลดรูปภาพ' },
                 { text: 'เปลี่ยนรหัสผ่าน', value: 'เปลี่ยนรหัสผ่าน' },
                 { text: 'แก้ไขข้อมูลส่วนตัว', value: 'แก้ไขข้อมูลส่วนตัว' },
@@ -340,6 +341,14 @@ export default {
     },
 
     methods: {
+        getSearchItems(type) {
+            if (type === 'emp_name') {
+                return this.logs.map(log => log.emp_name);
+            } else if (type === 'emp_email') {
+                return this.logs.map(log => log.emp_email);
+            }
+            return [];
+        },
         async checkRole() {
             if (this.$auth.loggedIn) {
                 const roleId = this.$auth.user.ranks_id.toString();
@@ -349,23 +358,12 @@ export default {
                     this.$router.push('/auth');
                 }
             } else {
-                this.$router.push('/developer/history/employee');
+                this.$router.push('/');
             }
         },
 
         async fetchLogData() {
             this.logs = await this.$store.dispatch('api/log/getLogsType', '4');
-        },
-
-        async fetchEmployeeData() {
-            this.employees = await this.$store.dispatch('api/employee/getEmployees');
-        },
-
-        getEmployeeProfile(employeeID) {
-            const employee = this.employees.find(employee => employee.no === employeeID);
-            const picture = employee ? employee.picture : 'person-icon.jpg';
-            console.log(`Employee ID: ${employeeID}, Picture: ${picture}`);
-            return picture;
         },
 
         getActionColor(action) {
@@ -375,12 +373,12 @@ export default {
                 return '#24b224';
             } else if (action === 'เปลี่ยนรหัสผ่าน') {
                 return '#ffc800';
-            }else if (action === 'อัพโหลดรูปภาพ') {
+            } else if (action === 'อัพโหลดรูปภาพ') {
                 return '#38b6ff';
-            }else if (action === 'แก้ไขข้อมูลส่วนตัว') {
+            } else if (action === 'แก้ไขข้อมูลส่วนตัว') {
                 return '#8c52ff';
             }
-             else {
+            else {
                 return 'inherit';
             }
         },
@@ -397,22 +395,9 @@ export default {
             this.dialog = true;
         },
 
-        exportExcel() {
-            const userLogs = this.logs.map(log => ({
-                'อีเมล': this.getUserEmail(log.emp_id),
-                'การจัดการ': log.action,
-                'เวลา': moment(log.time).format('LLL'),
-            }));
-            const worksheet = XLSX.utils.json_to_sheet(userLogs);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'User Logs');
-            XLSX.writeFile(workbook, 'user-logs.xlsx');
-        },
-
         onSearchTypeChange() {
             this.isSearchFieldVisible = this.searchType !== 'time' && this.searchType !== 'action';
-        }
-        ,
+        },
 
         validateDateRange() {
             const start = moment(this.startDateTime);
@@ -685,17 +670,12 @@ export default {
 .image-container {
     display: flex;
     justify-content: center;
-    /* Center the image horizontally */
     align-items: center;
-    /* Center the image vertically */
     margin: 10px 0;
-    /* Optional: Add some margin */
 }
 
 .image-container img {
     max-width: 100%;
-    /* Make sure image fits within container */
     max-height: 60px;
-    /* Set maximum height */
 }
 </style>
