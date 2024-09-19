@@ -42,7 +42,7 @@
                 <v-icon class="icon-tab">mdi-home-plus</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">พนักงานใหม่</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">คำร้องขอสมัครสมาชิก</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
