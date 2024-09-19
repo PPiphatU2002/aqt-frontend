@@ -5,7 +5,7 @@
         <ModalConfirm :method="handleConfirm" :open="modalConfirmOpen" @update:confirm="modalConfirmOpen = false" />
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
-            
+
         <v-card flat>
             <v-container>
                 <v-row justify="center" align="center">
@@ -207,6 +207,7 @@
 </template>
 
 <script>
+
 import * as XLSX from 'xlsx';
 import moment from 'moment';
 import 'moment/locale/th'
@@ -215,8 +216,10 @@ import 'vue2-datepicker/index.css';
 import Papa from 'papaparse';
 
 export default {
+
     layout: 'developer',
     middleware: 'auth',
+    
     async mounted() {
         await this.checkRank();
         await this.fetchEmployeeData();
@@ -228,12 +231,6 @@ export default {
 
     data() {
         return {
-
-            modalConfirmOpen: false,
-            currentAction: '',
-            currentItem: null,
-            employeeNo: null,
-            actionType: null,
             modal: {
                 error: {
                     open: false,
@@ -248,16 +245,35 @@ export default {
                 },
             },
 
-            employees: [],
             searchQuery: '',
             searchType: '',
+            currentAction: '',
+            selectedItemDetail: '',
+            startDateTime: '',
+            endDateTime: '',
+            sortBy: 'time',
+            modalConfirmOpen: false,
+            dialog: false,
+            isSearchFieldVisible: false,
+            datePickerMenu: false,
+            endDatePickerMenu: false,
+            showSavedSearchesDialog: false,
+            showColumnSelector: false,
+            sortDesc: true,
+            currentItem: null,
+            employeeNo: null,
+            actionType: null,
+            employees: [],
             selectedTopics: [],
             savedSearches: [],
+            visibleColumns: ['time', 'picture', 'status', 'email', 'fname', 'lname', 'phone', 'gender', 'detail'],
+
             searchQueries: {
                 'fname': [],
                 'email': [],
                 'phone': [],
             },
+
             searchTypes: [
                 { text: 'ชื่อ-นามสกุล', value: 'fname' },
                 { text: 'อีเมล', value: 'email' },
@@ -265,23 +281,12 @@ export default {
                 { text: 'สถานะ', value: 'status' },
                 { text: 'เวลา', value: 'time' }
             ],
+
             actionTopics: [
                 { text: 'รอการยืนยันผู้ใช้งาน', value: 'รอการยืนยันผู้ใช้งาน' },
                 { text: 'รอการแก้ไขข้อมูล', value: 'รอการแก้ไขข้อมูล' },
             ],
-            sortBy: 'time',
-            sortDesc: true,
-            dialog: false,
-            selectedItemDetail: '',
-            isSearchFieldVisible: false,
-            datePickerMenu: false,
-            endDatePickerMenu: false,
-            startDateTime: '',
-            endDateTime: '',
-            showSavedSearchesDialog: false,
 
-            showColumnSelector: false,
-            visibleColumns: ['time', 'picture', 'status', 'email', 'fname', 'lname', 'phone', 'gender', 'detail'],
             headers: [
                 {
                     text: 'เวลา',
@@ -289,6 +294,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'โปรไฟล์',
                     value: 'picture',
@@ -296,6 +302,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'สถานะ',
                     value: 'status',
@@ -303,6 +310,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'อีเมล',
                     value: 'email',
@@ -310,6 +318,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'เบอร์โทรศัพท์',
                     value: 'phone',
@@ -317,6 +326,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'ชื่อ-นามสกุล',
                     value: 'fname',
@@ -324,6 +334,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: 'เพศ',
                     value: 'gender',
@@ -331,6 +342,7 @@ export default {
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
                 {
                     text: '',
                     value: 'detail',
