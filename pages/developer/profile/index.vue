@@ -1,4 +1,5 @@
 <template>
+
     <div>
         <EmployeeEditDialog :open="editDialog" :edit.sync="editDialog" :data="editData" />
         <EmployeeEditPassword :open="editPasswordDialog" :edit.sync="editPasswordDialog" :data="editPasswordData" />
@@ -39,7 +40,8 @@
                         <v-icon left>mdi-pencil</v-icon>
                         แก้ไขข้อมูล
                     </v-btn>
-                    <v-btn class="mb-3" color="#24b224" @click="() => { editPasswordDialog = true; editPasswordData = employee }">
+                    <v-btn class="mb-3" color="#24b224"
+                        @click="() => { editPasswordDialog = true; editPasswordData = employee }">
                         <v-icon left>mdi-lock</v-icon>
                         เปลี่ยนรหัสผ่าน
                     </v-btn>
@@ -47,15 +49,19 @@
             </v-card>
         </v-col>
     </div>
+    
 </template>
 
 <script>
+
 import moment from 'moment'
 moment.locale('th')
 
 export default {
-    layout: 'developer',
+
+    layout: 'admin',
     middleware: 'auth',
+
     async mounted() {
         await this.checkRank()
         await this.fetchEmployeeData()
@@ -64,10 +70,6 @@ export default {
 
     data() {
         return {
-            employees: [],
-            ranks: [],
-            files: [],
-
             modal: {
                 confirm: {
                     open: false,
@@ -84,13 +86,14 @@ export default {
             },
 
             editDialog: false,
-            editData: null,
-
             editPasswordDialog: false,
-            editPasswordData: null,
-
             editUploadDialog: false,
+            editData: null,
+            editPasswordData: null,
             editUploadData: null,
+            employees: [],
+            ranks: [],
+            files: [],
         }
     },
 
@@ -101,22 +104,21 @@ export default {
                 const RankID = this.$auth.user.ranks_id.toString();
                 if (Status === '2') {
                     this.$router.push('/');
+                    await this.$auth.logout();
                 }
                 else {
                     if (RankID === '1') {
-                        console.log('Welcome Back Developer!');
                         this.$router.push('/developer/profile');
                     } else if (RankID === '2') {
-                        console.log('Welcome Back Employee!');
                         this.$router.push('/employee/profile');
+                    } else if (RankID === '3') {
+                        this.$router.push('/admin/profile');
                     } else {
-                        console.log('You Can Not Access This Page!');
                         this.$router.push('/auth');
                     }
                 }
             } else {
-                console.log('User Is Not Logged In!');
-                this.$router.push('/auth');
+                this.$router.push('/');
             }
         },
 
@@ -132,10 +134,12 @@ export default {
         async fetchFileData() {
             this.files = await this.$store.dispatch('api/file/viewProfile')
         },
+
         getRankName(rankId) {
             const rank = this.ranks.find(r => r.no === rankId);
             return rank ? rank.name : 'Unknown';
         },
+
         formatDateTime(date) {
             return moment(date).format('YYYY-MM-DD HH:mm');
         },
@@ -145,6 +149,7 @@ export default {
 </script>
 
 <style scoped>
+
 .card-title-center {
     display: flex;
     justify-content: center;
