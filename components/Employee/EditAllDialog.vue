@@ -302,7 +302,6 @@ export default {
       const allStatuses = [
         { value: 1, text: 'อนุมัติผู้ใช้งานแล้ว', color: '#24b224', icon: 'mdi-check-circle' },
         { value: 2, text: 'ยังไม่อนุมัติผู้ใช้งาน', color: '#e50211', icon: 'mdi-cancel' },
-        { value: 3, text: 'รอการแก้ไขข้อมูลของผู้ใช้งาน', color: '#ffc800', icon: 'mdi-pencil' }
       ];
 
       if (this.data && this.data.status) {
@@ -339,7 +338,6 @@ export default {
       const statuses = {
         1: 'อนุมัติผู้ใช้งานแล้ว',
         2: 'ยังไม่อนุมัติผู้ใช้งาน',
-        3: 'รอการแก้ไขข้อมูลของผู้ใช้งาน'
       };
       return statuses[statusId] || 'ไม่ทราบ';
     },
