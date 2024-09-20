@@ -46,9 +46,9 @@ export const actions = {
   },
   async getEmployeesStatus({ getters }, no) {
     return await this.$axios
-        .get(`employee/status/${no}`)
-        .then((res) => res.data)
-},
+      .get(`employee/status/${no}`)
+      .then((res) => res.data)
+  },
   async register({ getters }, data) {
     return await this.$axios
       .post('auth/register', data)
