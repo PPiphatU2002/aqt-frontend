@@ -105,10 +105,6 @@
                             <v-btn icon @click="addSearch">
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
                             </v-btn>
-
-                            <v-btn color="success" @click="exportCSV" icon>
-                                <v-icon>mdi-file-excel</v-icon>
-                            </v-btn>
                         </div>
                     </v-col>
                 </v-row>
@@ -176,13 +172,6 @@
                                     </v-list-item-icon>
                                     <v-list-item-content style="font-size: 0.8rem;">ไม่อนุมัติ</v-list-item-content>
                                 </v-list-item>
-
-                                <v-list-item @click="showConfirmDialog('edit', item)" class="custom-list-item">
-                                    <v-list-item-icon style="margin-right: 4px;">
-                                        <v-icon class="icon-tab" color="#ffc800">mdi-pencil</v-icon>
-                                    </v-list-item-icon>
-                                    <v-list-item-content style="font-size: 0.8rem;">ให้ผู้ใช้งานแก้ไขข้อมูล</v-list-item-content>
-                                </v-list-item>
                             </v-list>
                         </v-menu>
                     </div>
@@ -246,7 +235,7 @@ export default {
             },
 
             searchQuery: '',
-            searchType: '',
+            searchType: 'fname',
             currentAction: '',
             selectedItemDetail: '',
             startDateTime: '',
@@ -278,7 +267,6 @@ export default {
                 { text: 'ชื่อ-นามสกุล', value: 'fname' },
                 { text: 'อีเมล', value: 'email' },
                 { text: 'เบอร์โทรศัพท์', value: 'phone' },
-                { text: 'สถานะ', value: 'status' },
                 { text: 'เวลา', value: 'time' }
             ],
 
@@ -398,12 +386,6 @@ export default {
                         status: 1
                     });
                     this.modal.complete.message = 'อนุมัติผู้ใช้งานเรียบร้อยแล้ว';
-                } else if (this.currentAction === 'edit') {
-                    await this.$store.dispatch('api/employee/updateEmployeeStatus', {
-                        no: this.currentItem.no,
-                        status: 3
-                    });
-                    this.modal.complete.message = 'ส่งข้อมูลกลับไปให้ผู้ใช้งานแก้ไขเรียบร้อยแล้ว';
                 } else if (this.currentAction === 'reject') {
                     await this.$store.dispatch('api/employee/deleteEmployee', this.currentItem.no);
                     this.modal.complete.message = 'ลบผู้ใช้งานนี้เรียบร้อยแล้ว';
@@ -588,38 +570,6 @@ export default {
         getSearchTypeText(type) {
             const found = this.searchTypes.find(item => item.value === type);
             return found ? found.text : type;
-        },
-
-        exportCSV() {
-            const filteredData = this.filtered.map(item => {
-                const dataItem = {};
-                this.filteredHeaders.forEach(header => {
-                    if (header.value === 'fname') {
-                        dataItem['ชื่อ-นามสกุล'] = `${item.fname} ${item.lname}`;
-                    } else if (header.value !== 'picture') {
-                        dataItem[header.text] = item[header.value];
-                    }
-                });
-                return dataItem;
-            });
-            const csv = Papa.unparse(filteredData);
-            const bom = '\uFEFF';
-            const csvWithBom = bom + csv;
-            const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const currentDate = moment().format('YYYY-MM-DD');
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `ข้อมูลการส่งคำร้องขอสมัครสมาชิก-${currentDate}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        },
-
-        convertToCSV(objArray) {
-            const array = [Object.keys(objArray[0])].concat(objArray);
-            return array.map(row => {
-                return Object.values(row).map(value => `"${value}"`).join(',');
-            }).join('\n');
         },
 
         maskNewData(data) {

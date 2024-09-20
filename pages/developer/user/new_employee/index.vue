@@ -176,13 +176,6 @@
                                     </v-list-item-icon>
                                     <v-list-item-content style="font-size: 0.8rem;">ไม่อนุมัติ</v-list-item-content>
                                 </v-list-item>
-
-                                <v-list-item @click="showConfirmDialog('edit', item)" class="custom-list-item">
-                                    <v-list-item-icon style="margin-right: 4px;">
-                                        <v-icon class="icon-tab" color="#ffc800">mdi-pencil</v-icon>
-                                    </v-list-item-icon>
-                                    <v-list-item-content style="font-size: 0.8rem;">ให้ผู้ใช้งานแก้ไขข้อมูล</v-list-item-content>
-                                </v-list-item>
                             </v-list>
                         </v-menu>
                     </div>
@@ -246,7 +239,7 @@ export default {
             },
 
             searchQuery: '',
-            searchType: '',
+            searchType: 'fname',
             currentAction: '',
             selectedItemDetail: '',
             startDateTime: '',
@@ -278,7 +271,6 @@ export default {
                 { text: 'ชื่อ-นามสกุล', value: 'fname' },
                 { text: 'อีเมล', value: 'email' },
                 { text: 'เบอร์โทรศัพท์', value: 'phone' },
-                { text: 'สถานะ', value: 'status' },
                 { text: 'เวลา', value: 'time' }
             ],
 
@@ -398,12 +390,6 @@ export default {
                         status: 1
                     });
                     this.modal.complete.message = 'อนุมัติผู้ใช้งานเรียบร้อยแล้ว';
-                } else if (this.currentAction === 'edit') {
-                    await this.$store.dispatch('api/employee/updateEmployeeStatus', {
-                        no: this.currentItem.no,
-                        status: 3
-                    });
-                    this.modal.complete.message = 'ส่งข้อมูลกลับไปให้ผู้ใช้งานแก้ไขเรียบร้อยแล้ว';
                 } else if (this.currentAction === 'reject') {
                     await this.$store.dispatch('api/employee/deleteEmployee', this.currentItem.no);
                     this.modal.complete.message = 'ลบผู้ใช้งานนี้เรียบร้อยแล้ว';
