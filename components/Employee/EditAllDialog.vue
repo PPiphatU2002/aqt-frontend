@@ -15,31 +15,31 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
               <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
-                <v-text-field v-model="data.fname"
+                <v-text-field v-model="formData.fname"
                   :rules="[(v) => !!v || 'โปรดกรอกชื่อ', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ชื่อต้องเป็นภาษาไทยเท่านั้น']"
                   label="ชื่อ" outlined required />
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0">
-                <v-text-field v-model="data.lname"
+                <v-text-field v-model="formData.lname"
                   :rules="[(v) => !!v || 'โปรดกรอกนามสกุล', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'นามสกุลต้องเป็นภาษาไทยเท่านั้น']"
                   label="นามสกุล" outlined required />
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
-                <v-text-field v-model="data.email"
+                <v-text-field v-model="formData.email"
                   :rules="[(v) => !!v || 'โปรดกรอกอีเมล', (v) => /.+@.+\..+/.test(v) || 'โปรดกรอกอีเมลที่ถูกต้อง']"
                   label="อีเมล" outlined required />
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0">
-                <v-text-field v-model="data.phone"
+                <v-text-field v-model="formData.phone"
                   :rules="[(v) => !!v || 'โปรดกรอกเบอร์โทรศัพท์', (v) => (v && v.length === 10) || 'เบอร์โทรศัพท์ต้องมี 10 หลัก', (v) => /^0/.test(v) || 'เบอร์โทรศัพท์ต้องมี 10 หลัก']"
                   label="เบอร์โทรศัพท์" outlined required />
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
-                <v-select v-model="data.ranks_id" :items="rankOptions" :item-text="item => item.text"
+                <v-select v-model="formData.ranks_id" :items="rankOptions" :item-text="item => item.text"
                   :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกตำแหน่ง']" label="ตำแหน่ง" outlined
                   required>
                   <template v-slot:item="data">
@@ -52,7 +52,7 @@
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0">
-                <v-select v-model="data.gender" :items="genderOptions" :item-text="item => item.text"
+                <v-select v-model="formData.gender" :items="genderOptions" :item-text="item => item.text"
                   :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกเพศ']" label="เพศ" outlined
                   required>
                   <template v-slot:item="data">
@@ -65,7 +65,7 @@
 
               </v-col>
               <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
-                <v-select v-model="data.status" :items="statusOptions" :rules="[(v) => !!v || 'โปรดเลือกสถานะ']"
+                <v-select v-model="formData.status" :items="statusOptions" :rules="[(v) => !!v || 'โปรดเลือกสถานะ']"
                   label="สถานะ" outlined required>
                   <template v-slot:item="data">
                     <v-icon left :style="{ color: data.item.color }">
@@ -129,6 +129,7 @@ export default {
         },
       },
 
+      formData: { ...this.data },
       valid: false,
       genderOptions: [],
       rankOptions: [],
@@ -142,8 +143,15 @@ export default {
     this.setGenderOptions();
     this.setRankOptions();
     this.setStatusOptions();
+    this.formData = { ...this.data };
     this.originalData = { ...this.data };
     document.addEventListener('keydown', this.handleKeydown);
+  },
+
+  watch: {
+    data(newData) {
+      this.formData = { ...newData };
+    }
   },
 
   beforeDestroy() {
@@ -189,21 +197,42 @@ export default {
       const targetRank = this.getRankName(this.data.ranks_id);
       const isSelfEdit = this.$auth.user.email === this.data.email;
 
-      if (currentRank === 'แอดมิน' && isSelfEdit) {
-        this.modal.warning.open = true;
-        this.modal.warning.message = 'ไม่สามารถแก้ไขตำแหน่งของตัวเองได้';
-        return;
+      if (currentRank === 'ผู้พัฒนา') {
+        if (targetRank === 'ผู้พัฒนา' && !isSelfEdit) {
+          this.modal.warning.open = true;
+          this.modal.warning.message = 'ไม่สามารถแก้ไขข้อมูลของผู้พัฒนาคนอื่นได้';
+          return;
+        }
       }
 
-      if (currentRank === 'ผู้พัฒนา' && targetRank === 'ผู้พัฒนา' && !isSelfEdit) {
-        this.modal.warning.open = true;
-        this.modal.warning.message = 'ไม่สามารถแก้ไขผู้ใช้งานที่มีตำแหน่งผู้พัฒนาได้';
-        return;
+      if (currentRank === 'แอดมิน') {
+        if (targetRank === 'ผู้พัฒนา') {
+          this.modal.warning.open = true;
+          this.modal.warning.message = 'ไม่สามารถแก้ไขข้อมูลของผู้พัฒนาได้';
+          return;
+        }
+
+        if (isSelfEdit) {
+        } else {
+          if (targetRank === 'แอดมิน') {
+            this.modal.warning.open = true;
+            this.modal.warning.message = 'ไม่สามารถแก้ไขข้อมูลของแอดมินคนอื่นได้';
+            return;
+          }
+
+          if (targetRank === 'พนักงานทั่วไป') {
+            if (this.data.ranks_id !== this.formData.ranks_id) {
+              this.modal.warning.open = true;
+              this.modal.warning.message = 'ไม่สามารถเปลี่ยนตำแหน่งของพนักงานทั่วไปได้';
+              return;
+            }
+          }
+        }
       }
 
-      if (currentRank === 'แอดมิน' && targetRank !== 'พนักงานทั่วไป' && !isSelfEdit) {
+      if (isSelfEdit && this.data.ranks_id !== this.formData.ranks_id) {
         this.modal.warning.open = true;
-        this.modal.warning.message = 'ไม่สามารถแก้ไขผู้ใช้งานที่มีตำแหน่งผู้พัฒนาหรือแอดมินได้';
+        this.modal.warning.message = 'ไม่สามารถเปลี่ยนตำแหน่งของตัวเองได้';
         return;
       }
 
@@ -221,13 +250,13 @@ export default {
       }
 
       await this.updateData();
-    }
-    ,
+    },
 
     async updateData() {
       try {
-        const req = await this.$store.dispatch('api/employee/updateEmployeeAll', this.data);
+        const req = await this.$store.dispatch('api/employee/updateEmployeeAll', this.formData);
         this.modal.complete.open = true;
+        this.data = { ...this.formData };
         this.recordLogUpdate();
       } catch (warning) {
         this.modal.warning.open = true;
@@ -306,6 +335,15 @@ export default {
       this.updateData();
     },
 
+    getStatusText(statusId) {
+      const statuses = {
+        1: 'อนุมัติผู้ใช้งานแล้ว',
+        2: 'ยังไม่อนุมัติผู้ใช้งาน',
+        3: 'รอการแก้ไขข้อมูลของผู้ใช้งาน'
+      };
+      return statuses[statusId] || 'ไม่ทราบ';
+    },
+
     recordLogUpdate() {
       const changes = [];
       if (this.data.fname !== this.originalData.fname) {
@@ -323,11 +361,17 @@ export default {
       if (this.data.email !== this.originalData.email) {
         changes.push('EMAIL ' + this.data.email + '\n');
       }
-      if (this.data.ranks_id !== this.originalData.ranks_id) {
-        changes.push('RANK ' + this.data.ranks_id + '\n');
+
+      const rankText = this.getRankName(this.data.ranks_id);
+      const originalRankText = this.getRankName(this.originalData.ranks_id);
+      if (rankText !== originalRankText) {
+        changes.push('RANK ' + rankText + '\n');
       }
-      if (this.data.status !== this.originalData.status) {
-        changes.push('STATUS ' + this.data.status + '\n');
+
+      const statusText = this.getStatusText(this.data.status);
+      const originalStatusText = this.getStatusText(this.originalData.status);
+      if (statusText !== originalStatusText) {
+        changes.push('STATUS ' + statusText + '\n');
       }
 
       const log = {

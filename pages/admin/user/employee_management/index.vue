@@ -377,7 +377,6 @@ export default {
     },
 
     methods: {
-
         openEditAllDialog(employee) {
             this.editAllData = employee;
             this.editAllDialog = true;
@@ -415,9 +414,9 @@ export default {
         },
 
         async handleConfirm() {
+            const currentRank = this.getRankName(this.$auth.user.ranks_id);
+            const targetRank = this.getRankName(this.currentItem.ranks_id);
             if (this.currentAction === 'delete') {
-                const currentRank = this.getRankName(this.$auth.user.ranks_id);
-                const targetRank = this.getRankName(this.currentItem.ranks_id);
                 if (currentRank === 'ผู้พัฒนา' && targetRank === 'ผู้พัฒนา') {
                     this.modal.warning.open = true;
                     this.modal.warning.message = 'ไม่สามารถลบผู้ใช้งานที่มีตำแหน่งผู้พัฒนาได้';
@@ -653,7 +652,6 @@ export default {
 </script>
 
 <style scoped>
-
 .small-font {
     font-size: 0.8rem;
 }
@@ -794,5 +792,4 @@ export default {
 .custom-list {
     padding: 0.4px 2px;
 }
-
 </style>

@@ -59,7 +59,7 @@ moment.locale('th')
 
 export default {
 
-    layout: 'admin',
+    layout: 'developer',
     middleware: 'auth',
 
     async mounted() {

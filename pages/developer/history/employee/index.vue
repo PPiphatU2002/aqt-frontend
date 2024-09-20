@@ -184,8 +184,20 @@
                             {{ line.replace('NAME', '').trim() }}
                         </template>
                         <template v-else-if="line.includes('SUR')">
-                            <v-icon color="white">mdi-home-group</v-icon>
+                            <v-icon color="yellow">mdi-home-group</v-icon>
                             {{ line.replace('SUR', '').trim() }}
+                        </template>
+                        <template v-else-if="line.includes('EMAIL')">
+                            <v-icon color="red">mdi-email</v-icon>
+                            {{ line.replace('EMAIL', '').trim() }}
+                        </template>
+                        <template v-else-if="line.includes('STATUS')">
+                            <v-icon color="orange">mdi-information-symbol</v-icon>
+                            {{ line.replace('STATUS', '').trim() }}
+                        </template>
+                        <template v-else-if="line.includes('RANK')">
+                            <v-icon color="purple">mdi-chair-rolling</v-icon>
+                            {{ line.replace('RANK', '').trim() }}
                         </template>
                         <template v-else-if="line.includes('LOCATION')">
                             <v-icon color="red">mdi-map-marker</v-icon>
@@ -280,6 +292,7 @@ export default {
                 { text: 'อัพโหลดรูปภาพ', value: 'อัพโหลดรูปภาพ' },
                 { text: 'เปลี่ยนรหัสผ่าน', value: 'เปลี่ยนรหัสผ่าน' },
                 { text: 'แก้ไขข้อมูลส่วนตัว', value: 'แก้ไขข้อมูลส่วนตัว' },
+                { text: 'แก้ไขข้อมูลพนักงาน', value: 'แก้ไขข้อมูลพนักงาน' },
             ],
 
             headers: [
@@ -402,7 +415,10 @@ export default {
                 return '#38b6ff';
             } else if (action === 'แก้ไขข้อมูลส่วนตัว') {
                 return '#8c52ff';
+            } else if (action === 'แก้ไขข้อมูลพนักงาน') {
+                return '#ff914d';
             }
+            
             else {
                 return 'inherit';
             }
