@@ -193,6 +193,7 @@
             </v-card>
         </v-dialog>
     </div>
+
 </template>
 
 <script>
@@ -208,7 +209,7 @@ export default {
 
     layout: 'admin',
     middleware: 'auth',
-    
+
     async mounted() {
         await this.checkRank();
         await this.fetchEmployeeData();
@@ -272,7 +273,6 @@ export default {
 
             actionTopics: [
                 { text: 'รอการยืนยันผู้ใช้งาน', value: 'รอการยืนยันผู้ใช้งาน' },
-                { text: 'รอการแก้ไขข้อมูล', value: 'รอการแก้ไขข้อมูล' },
             ],
 
             headers: [
@@ -385,9 +385,11 @@ export default {
                         no: this.currentItem.no,
                         status: 1
                     });
+                    this.recordLog();
                     this.modal.complete.message = 'อนุมัติผู้ใช้งานเรียบร้อยแล้ว';
                 } else if (this.currentAction === 'reject') {
                     await this.$store.dispatch('api/employee/deleteEmployee', this.currentItem.no);
+                    this.recordLog();
                     this.modal.complete.message = 'ลบผู้ใช้งานนี้เรียบร้อยแล้ว';
                 }
 
@@ -427,8 +429,6 @@ export default {
         getStatusText(status) {
             if (status === 'รอการยืนยันผู้ใช้งาน') {
                 return { text: 'รอการยืนยันผู้ใช้งาน', color: '#e50211' };
-            } else if (status === 'รอการแก้ไขข้อมูล') {
-                return { text: 'รอการแก้ไขข้อมูล', color: '#ffc800' };
             } else {
                 return { text: 'สถานะไม่ทราบ', color: 'inherit' };
             }
@@ -439,8 +439,7 @@ export default {
                 const status2 = await this.$store.dispatch('api/employee/getEmployeesStatus', '2');
                 const status3 = await this.$store.dispatch('api/employee/getEmployeesStatus', '3');
                 const statusMap = {
-                    2: 'รอการยืนยันผู้ใช้งาน',
-                    3: 'รอการแก้ไขข้อมูล'
+                    2: 'รอการยืนยันผู้ใช้งาน'
                 };
                 this.employees = [...status2, ...status3].map(employee => {
                     return {
@@ -585,13 +584,29 @@ export default {
         goBack() {
             window.location.reload();
         },
+
+        recordLog() {
+            const log = {
+                emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
+                emp_email: this.$auth.user.email,
+                detail: this.currentAction === 'approve'
+                    ? `NAME ${this.currentItem.fname}\nSUR ${this.currentItem.lname}\nEMAIL ${this.currentItem.email}\nPHONE ${this.currentItem.phone}\nGENDER ${this.currentItem.gender}`
+                    : `NAME ${this.currentItem.fname}\nSUR ${this.currentItem.lname}\nEMAIL ${this.currentItem.email}\nPHONE ${this.currentItem.phone}\nGENDER ${this.currentItem.gender}`,
+                type: 4,
+                picture: this.$auth.user.picture || 'Unknown',
+                action: this.currentAction === 'approve'
+                    ? 'อนุมัติผู้ใช้งาน'
+                    : 'ไม่อนุมัติผู้ใช้งาน',
+                time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            };
+            this.$store.dispatch('api/log/addLogs', log);
+        }
     },
 };
 
 </script>
 
 <style scoped>
-
 .small-font {
     font-size: 0.8rem;
 }
@@ -732,5 +747,4 @@ export default {
 .custom-list {
     padding: 0.4px 2px;
 }
-
 </style>

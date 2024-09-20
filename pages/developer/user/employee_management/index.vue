@@ -431,6 +431,7 @@ export default {
                 try {
                     await this.$store.dispatch('api/employee/deleteEmployee', this.currentItem.no);
                     this.modal.complete.message = 'ลบผู้ใช้งานนี้เรียบร้อยแล้ว';
+                    this.recordLog();
                     this.modal.complete.open = true;
                 } catch (warning) {
                     this.modal.complete.message = 'เกิดข้อผิดพลาดในการดำเนินการ';
@@ -647,6 +648,23 @@ export default {
         goBack() {
             window.location.reload();
         },
+
+        recordLog() {
+            const log = {
+                emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
+                emp_email: this.$auth.user.email,
+                detail: this.currentAction === 'delete'
+                    ? `NAME ${this.currentItem.fname}\nSUR ${this.currentItem.lname}\nEMAIL ${this.currentItem.email}\nPHONE ${this.currentItem.phone}\nGENDER ${this.currentItem.gender}`
+                    : `NAME ${this.currentItem.fname}\nSUR ${this.currentItem.lname}\nEMAIL ${this.currentItem.email}\nPHONE ${this.currentItem.phone}\nGENDER ${this.currentItem.gender}`,
+                type: 4,
+                picture: this.$auth.user.picture || 'Unknown',
+                action: this.currentAction === 'delete'
+                    ? 'ลบผู้ใช้งาน'
+                    : 'ไม่ลบผู้ใช้งาน',
+                time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            };
+            this.$store.dispatch('api/log/addLogs', log);
+        }
     },
 };
 

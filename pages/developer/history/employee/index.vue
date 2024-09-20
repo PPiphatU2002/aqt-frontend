@@ -292,7 +292,10 @@ export default {
                 { text: 'อัพโหลดรูปภาพ', value: 'อัพโหลดรูปภาพ' },
                 { text: 'เปลี่ยนรหัสผ่าน', value: 'เปลี่ยนรหัสผ่าน' },
                 { text: 'แก้ไขข้อมูลส่วนตัว', value: 'แก้ไขข้อมูลส่วนตัว' },
-                { text: 'แก้ไขข้อมูลพนักงาน', value: 'แก้ไขข้อมูลพนักงาน' },
+                { text: 'แก้ไขข้อมูลผู้ใช้งาน', value: 'แก้ไขข้อมูลผู้ใช้งาน' },
+                { text: 'อนุมัติผู้ใช้งาน', value: 'อนุมัติผู้ใช้งาน' },
+                { text: 'ไม่อนุมัติผู้ใช้งาน', value: 'ไม่อนุมัติผู้ใช้งาน' },
+                { text: 'ลบผู้ใช้งาน', value: 'ลบผู้ใช้งาน' },
             ],
 
             headers: [
@@ -415,10 +418,15 @@ export default {
                 return '#38b6ff';
             } else if (action === 'แก้ไขข้อมูลส่วนตัว') {
                 return '#8c52ff';
-            } else if (action === 'แก้ไขข้อมูลพนักงาน') {
+            } else if (action === 'แก้ไขข้อมูลผู้ใช้งาน') {
                 return '#ff914d';
+            } else if (action === 'อนุมัติผู้ใช้งาน') {
+                return '#c1ff72';
+            } else if (action === 'ไม่อนุมัติผู้ใช้งาน') {
+                return '#ff5757';
+            } else if (action === 'ลบผู้ใช้งาน') {
+                return '#ff66c4';
             }
-            
             else {
                 return 'inherit';
             }
@@ -591,7 +599,6 @@ export default {
 </script>
 
 <style scoped>
-
 .small-font {
     font-size: 0.8rem;
 }
@@ -720,5 +727,4 @@ export default {
     max-width: 100%;
     max-height: 60px;
 }
-
 </style>
