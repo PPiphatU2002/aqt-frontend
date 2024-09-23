@@ -181,7 +181,7 @@ export default {
                     }
                 }
             } else {
-                this.$router.push('/');
+                this.$router.push('/auth/register');
             }
         },
 
