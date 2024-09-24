@@ -378,7 +378,7 @@ export default {
         detail: changes.join(''),
         type: 4,
         picture: this.$auth.user.picture || 'Unknown',
-        action: 'แก้ไขข้อมูลพนักงาน',
+        action: 'แก้ไขข้อมูลผู้ใช้งาน',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };
       this.$store.dispatch('api/log/addLogs', log);
