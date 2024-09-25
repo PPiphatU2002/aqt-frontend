@@ -72,7 +72,7 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-autocomplete v-if="searchType !== 'status' && searchType !== 'time'"
+                            <v-autocomplete v-if="searchType !== 'status' && searchType !== 'updated_date'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
                                 hide-details></v-autocomplete>
@@ -81,7 +81,7 @@
                                 dense outlined multiple class="mx-2 search-size small-font"></v-select>
 
 
-                            <v-menu v-if="searchType === 'time'" v-model="datePickerMenu"
+                            <v-menu v-if="searchType === 'updated_date'" v-model="datePickerMenu"
                                 :close-on-content-click="false" transition="scale-transition" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <div v-bind="attrs" v-on="on" class="date-picker-activator">
@@ -92,7 +92,7 @@
                                 </template>
                             </v-menu>
 
-                            <v-menu v-if="searchType === 'time'" v-model="endDatePickerMenu"
+                            <v-menu v-if="searchType === 'updated_date'" v-model="endDatePickerMenu"
                                 :close-on-content-click="false" transition="scale-transition" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <div v-bind="attrs" v-on="on" class="date-picker-activator ml-2">
@@ -149,7 +149,7 @@
                         {{ getStatusText(item.status).text }}
                     </span>
                 </template>
-                <template v-slot:item.time="{ item }">
+                <template v-slot:item.updated_date="{ item }">
                     <div class="text-center">{{ formatDateTime(item.updated_date) }}</div>
                 </template>
                 <template v-slot:item.detail="{ item }">
@@ -240,7 +240,7 @@ export default {
             selectedItemDetail: '',
             startDateTime: '',
             endDateTime: '',
-            sortBy: 'time',
+            sortBy: 'updated_date',
             modalConfirmOpen: false,
             dialog: false,
             isSearchFieldVisible: false,
@@ -255,7 +255,7 @@ export default {
             employees: [],
             selectedTopics: [],
             savedSearches: [],
-            visibleColumns: ['time', 'picture', 'status', 'email', 'fname', 'lname', 'phone', 'gender', 'detail'],
+            visibleColumns: ['updated_date', 'picture', 'status', 'email', 'fname', 'lname', 'phone', 'gender', 'detail'],
 
             searchQueries: {
                 'fname': [],
@@ -267,7 +267,7 @@ export default {
                 { text: 'ชื่อ-นามสกุล', value: 'fname' },
                 { text: 'อีเมล', value: 'email' },
                 { text: 'เบอร์โทรศัพท์', value: 'phone' },
-                { text: 'เวลา', value: 'time' }
+                { text: 'เวลา', value: 'updated_date' }
             ],
 
             actionTopics: [
@@ -277,7 +277,7 @@ export default {
             headers: [
                 {
                     text: 'เวลา',
-                    value: 'time',
+                    value: 'updated_date',
                     align: 'center',
                     cellClass: 'text-center',
                 },
@@ -463,7 +463,7 @@ export default {
         },
 
         onSearchTypeChange() {
-            this.isSearchFieldVisible = this.searchType !== 'time' && this.searchType !== 'status';
+            this.isSearchFieldVisible = this.searchType !== 'updated_date' && this.searchType !== 'status';
         },
 
         validateDateRange() {
@@ -544,7 +544,7 @@ export default {
                 const searchQuery = search.query.toLowerCase();
                 queryMatched = field.includes(searchQuery);
             }
-            const timeMatched = search.type === 'time' ? this.checkTimeRange(employee, search) : true;
+            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(employee, search) : true;
             const topicMatched = search.topics ? search.topics.some(topic => topic === employee.status) : true;
             return queryMatched && timeMatched && topicMatched;
         },

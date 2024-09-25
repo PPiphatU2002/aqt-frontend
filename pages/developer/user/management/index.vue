@@ -73,7 +73,7 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-autocomplete v-if="searchType !== 'type_id' && searchType !== 'time'"
+                            <v-autocomplete v-if="searchType !== 'type_id' && searchType !== 'updated_date'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
                                 hide-details></v-autocomplete>
@@ -81,7 +81,7 @@
                             <v-select v-if="searchType === 'type_id'" v-model="selectedTopics" :items="actionTopics"
                                 dense outlined multiple class="mx-2 search-size small-font"></v-select>
 
-                            <v-menu v-if="searchType === 'time'" v-model="datePickerMenu"
+                            <v-menu v-if="searchType === 'updated_date'" v-model="datePickerMenu"
                                 :close-on-content-click="false" transition="scale-transition" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <div v-bind="attrs" v-on="on" class="date-picker-activator">
@@ -92,7 +92,7 @@
                                 </template>
                             </v-menu>
 
-                            <v-menu v-if="searchType === 'time'" v-model="endDatePickerMenu"
+                            <v-menu v-if="searchType === 'updated_date'" v-model="endDatePickerMenu"
                                 :close-on-content-click="false" transition="scale-transition" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <div v-bind="attrs" v-on="on" class="date-picker-activator ml-2">
@@ -153,7 +153,7 @@
                 <template v-slot:item.from_id="{ item }">
                     <div class="text-center">{{ getFromName(item.from_id) }}</div>
                 </template>
-                <template v-slot:item.time="{ item }">
+                <template v-slot:item.updated_date="{ item }">
                     <div class="text-center">{{ formatDateTime(item.updated_date) }}</div>
                 </template>
                 <template v-slot:item.detail="{ item }">
@@ -247,7 +247,7 @@ export default {
             employees: [],
             froms: [],
 
-            sortBy: 'time',
+            sortBy: 'updated_date',
             currentAction: '',
             searchQuery: '',
             searchType: '',
@@ -271,7 +271,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['time', 'id', 'nickname', 'type_id', 'from_id', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'id', 'nickname', 'type_id', 'from_id', 'emp_id', 'detail'],
 
             searchQueries: {
                 'nickname': [],
@@ -282,7 +282,7 @@ export default {
                 { text: 'ชื่อเล่น', value: 'nickname' },
                 { text: 'ไอดี', value: 'id' },
                 { text: 'ประเภท', value: 'type_id' },
-                { text: 'เวลา', value: 'time' }
+                { text: 'เวลา', value: 'updated_date' }
             ],
 
             actionTopics: [
@@ -293,7 +293,7 @@ export default {
             headers: [
                 {
                     text: 'เวลา',
-                    value: 'time',
+                    value: 'updated_date',
                     align: 'center',
                     cellClass: 'text-center',
                 },
@@ -488,7 +488,7 @@ export default {
         },
 
         onSearchTypeChange() {
-            this.isSearchFieldVisible = this.searchType !== 'time' && this.searchType !== 'type_id';
+            this.isSearchFieldVisible = this.searchType !== 'updated_date' && this.searchType !== 'type_id';
         },
 
         validateDateRange() {
@@ -565,7 +565,7 @@ export default {
                 const searchQuery = search.query.toLowerCase();
                 queryMatched = lowerCaseField.includes(searchQuery);
             }
-            const timeMatched = search.type === 'time' ? this.checkTimeRange(customer, search) : true;
+            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(customer, search) : true;
             const topicMatched = search.topics ? search.topics.some(topic => topic === this.getTypeName(customer.type_id)) : true;
             return queryMatched && timeMatched && topicMatched;
         }
@@ -596,7 +596,7 @@ export default {
             const filteredData = this.filtered.map(item => {
                 const dataItem = {};
                 this.filteredHeaders.forEach(header => {
-                    if (header.value === 'time') {
+                    if (header.value === 'updated_date') {
                         dataItem['เวลา'] = this.formatDateTime(item.updated_date);
                     } else if (header.value === 'type_id') {
                         dataItem['ประเภท'] = this.getTypeName(item.type_id);
