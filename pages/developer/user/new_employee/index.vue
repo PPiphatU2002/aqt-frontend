@@ -6,7 +6,7 @@
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
 
-        <v-card flat>
+        <v-card class="custom-card" flat>
             <v-container>
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
@@ -104,10 +104,6 @@
 
                             <v-btn icon @click="addSearch">
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
-                            </v-btn>
-
-                            <v-btn color="success" @click="exportCSV" icon>
-                                <v-icon>mdi-file-excel</v-icon>
                             </v-btn>
                         </div>
                     </v-col>
@@ -574,38 +570,6 @@ export default {
             return found ? found.text : type;
         },
 
-        exportCSV() {
-            const filteredData = this.filtered.map(item => {
-                const dataItem = {};
-                this.filteredHeaders.forEach(header => {
-                    if (header.value === 'fname') {
-                        dataItem['ชื่อ-นามสกุล'] = `${item.fname} ${item.lname}`;
-                    } else if (header.value !== 'picture') {
-                        dataItem[header.text] = item[header.value];
-                    }
-                });
-                return dataItem;
-            });
-            const csv = Papa.unparse(filteredData);
-            const bom = '\uFEFF';
-            const csvWithBom = bom + csv;
-            const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const currentDate = moment().format('YYYY-MM-DD');
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `ข้อมูลการส่งคำร้องขอสมัครสมาชิก-${currentDate}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        },
-
-        convertToCSV(objArray) {
-            const array = [Object.keys(objArray[0])].concat(objArray);
-            return array.map(row => {
-                return Object.values(row).map(value => `"${value}"`).join(',');
-            }).join('\n');
-        },
-
         maskNewData(data) {
             if (!data) return '';
             const length = data.length;
@@ -781,5 +745,11 @@ export default {
 
 .custom-list {
     padding: 0.4px 2px;
+}
+
+.custom-card {
+    max-width: 1200px;
+    width: 100%;
+    margin: auto;
 }
 </style>

@@ -198,6 +198,7 @@
             </v-card>
         </v-dialog>
     </div>
+
 </template>
 
 <script>
@@ -479,7 +480,6 @@ export default {
 
         async fetchEmployeeData() {
             this.employees = await this.$store.dispatch('api/employee/getEmployeesStatus', '1');
-
         },
 
         formatDateTime(date) {
