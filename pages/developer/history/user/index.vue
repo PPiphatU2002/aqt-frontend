@@ -8,7 +8,7 @@
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon">mdi-account-clock-outline</v-icon>&nbsp;
+                            <v-icon class="little-icon">mdi-account-clock</v-icon>&nbsp;
                             <h3 class="mb-0">ประวัติลูกค้า</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
@@ -374,7 +374,7 @@ export default {
                     if (RankID === '1') {
                         this.$router.push('/developer/history/user');
                     } else if (RankID === '2') {
-                        this.$router.push('/employee/home');
+                        this.$router.push('/employee/history/user');
                     } else if (RankID === '3') {
                         this.$router.push('/admin/history/user');
                     } else {

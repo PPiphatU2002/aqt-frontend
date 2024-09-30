@@ -23,18 +23,12 @@
                                 ]" maxlength="12" />
                         </v-col>
 
-                        <v-col cols="2">
+                        <v-col cols="3">
                             <v-text-field v-model="item.nickname" label="ชื่อเล่น" type="text" dense outlined
                                 :rules="[(v) => !!v || 'กรุณากรอกชื่อเล่น', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'กรุณากรอกเฉพาะภาษาไทย']"></v-text-field>
                         </v-col>
 
-                        <v-col cols="2">
-                            <v-select v-model="item.from_id" :items="froms" item-text="name" item-value="id"
-                                label="ที่มาที่ไป" dense outlined :rules="[v => !!v || 'กรุณาเลือกที่มาที่ไปลูกค้า']">
-                            </v-select>
-                        </v-col>
-
-                        <v-col cols="2">
+                        <v-col cols="3">
                             <v-select v-model="item.type_id" :items="types" item-text="name" item-value="id"
                                 label="ประเภท" dense outlined></v-select>
                         </v-col>
@@ -273,7 +267,7 @@ export default {
 }
 
 .custom-card {
-    max-width: 1000px;
+    max-width: 800px;
     width: 100%;
     margin: auto;
 }

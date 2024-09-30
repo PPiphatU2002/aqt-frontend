@@ -105,7 +105,7 @@
           <v-list class="custom-list">
             <v-list-item @click="goToTransHist" class="custom-list-item">
               <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-archive-clock-outline</v-icon>
+                <v-icon class="icon-tab">mdi-cash-clock</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title style="font-size: 0.8rem;">ประวัติการซื้อขายหุ้น</v-list-item-title>
@@ -114,7 +114,7 @@
 
             <v-list-item @click="goToStocksHist" class="custom-list-item">
               <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-store-clock-outline</v-icon>
+                <v-icon class="icon-tab">mdi-archive-clock</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title style="font-size: 0.8rem;">ประวัติหุ้น</v-list-item-title>
@@ -123,7 +123,7 @@
 
             <v-list-item @click="goToUsersHist" class="custom-list-item">
               <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-account-clock-outline</v-icon>
+                <v-icon class="icon-tab">mdi-account-clock</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title style="font-size: 0.8rem;">ประวัติลูกค้า</v-list-item-title>
@@ -132,7 +132,7 @@
 
             <v-list-item @click="goToEmpsHist" class="custom-list-item">
               <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-home-clock-outline</v-icon>
+                <v-icon class="icon-tab">mdi-home-clock</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title style="font-size: 0.8rem;">ประวัติพนักงาน</v-list-item-title>

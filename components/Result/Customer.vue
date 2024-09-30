@@ -32,7 +32,6 @@ export default {
             headers: [
                 { text: 'ไอดีลูกค้า', value: 'id' },
                 { text: 'ชื่อเล่น', value: 'nickname' },
-                { text: 'ที่มาที่ไป', value: 'from_name' },
                 { text: 'ประเภท', value: 'type_name' },
             ],
         };
@@ -40,15 +39,12 @@ export default {
     computed: {
         formattedCustomers() {
             const types = this.types || [];
-            const froms = this.froms || [];
 
             return this.customers.map(customer => {
                 const type = types.find(t => t.id === customer.type_id);
-                const from = froms.find(f => f.id === customer.from_id);
                 return {
                     ...customer,
-                    type_name: type ? type.name : '',
-                    from_name: from ? from.name : ''
+                    type_name: type ? type.name : ''
                 };
             });
         },

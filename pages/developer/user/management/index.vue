@@ -150,9 +150,6 @@
                 <template v-slot:item.emp_id="{ item }">
                     <div class="text-center">{{ getEmployeeName(item.emp_id) }}</div>
                 </template>
-                <template v-slot:item.from_id="{ item }">
-                    <div class="text-center">{{ getFromName(item.from_id) }}</div>
-                </template>
                 <template v-slot:item.updated_date="{ item }">
                     <div class="text-center">{{ formatDateTime(item.updated_date) }}</div>
                 </template>
@@ -174,7 +171,7 @@
                                     <v-list-item-icon style="margin-right: 4px;">
                                         <v-icon class="icon-tab" color="#e50211">mdi-cancel</v-icon>
                                     </v-list-item-icon>
-                                    <v-list-item-content style="font-size: 0.8rem;">ลบผู้ใช้งาน</v-list-item-content>
+                                    <v-list-item-content style="font-size: 0.8rem;">ลบลูกค้า</v-list-item-content>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
@@ -219,7 +216,6 @@ export default {
         await this.fetchCustomerData();
         await this.fetchEmployeeData();
         await this.fetchTypeData();
-        await this.fetchFromData();
     },
 
     components: {
@@ -245,7 +241,6 @@ export default {
             customers: [],
             types: [],
             employees: [],
-            froms: [],
 
             sortBy: 'updated_date',
             currentAction: '',
@@ -271,7 +266,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'id', 'nickname', 'type_id', 'from_id', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'id', 'nickname', 'type_id', 'emp_id', 'detail'],
 
             searchQueries: {
                 'nickname': [],
@@ -288,6 +283,7 @@ export default {
             actionTopics: [
                 { text: 'เทรดเอง', value: 'เทรดเอง' },
                 { text: 'เทรดตามโค้ช', value: 'เทรดตามโค้ช' },
+                { text: 'ยังไม่ระบุ', value: 'ยังไม่ระบุ' },
             ],
 
             headers: [
@@ -317,14 +313,6 @@ export default {
                 {
                     text: 'ชื่อเล่น',
                     value: 'nickname',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ที่มาที่ไป',
-                    value: 'from_id',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -379,15 +367,6 @@ export default {
             return type ? type.type : 'ยังไม่ระบุ';
         },
 
-        async fetchFromData() {
-            this.froms = await this.$store.dispatch('api/from/getFroms')
-        },
-
-        getFromName(fromId) {
-            const from = this.froms.find(f => f.no === fromId);
-            return from ? from.from : 'ยังไม่ระบุ';
-        },
-
         async fetchCustomerData() {
             this.customers = await this.$store.dispatch('api/customer/getCustomers');
         },
@@ -430,7 +409,7 @@ export default {
             if (this.currentAction === 'delete') {
                 try {
                     await this.$store.dispatch('api/customer/deleteCustomer', this.currentItem.no);
-                    this.modal.complete.message = 'ลบผู้ใช้งานนี้เรียบร้อยแล้ว';
+                    this.modal.complete.message = 'ลบลูกค้าเรียบร้อยแล้ว';
                     this.recordLog();
                     this.modal.complete.open = true;
                 } catch (warning) {
@@ -647,8 +626,8 @@ export default {
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ? `ID ${this.currentItem.id}\nNICKNAME ${this.currentItem.nickname}\nFROM ${this.getFromName(this.currentItem.from_id)}\nTYPE ${this.getTypeName(this.currentItem.type_id)}`
-                    : `ID ${this.currentItem.id}\nNICKNAME ${this.currentItem.nickname}\nFROM ${this.getFromName(this.currentItem.from_id)}\nTYPE ${this.getTypeName(this.currentItem.type_id)}`,
+                    ? `ID ${this.currentItem.id}\nNICKNAME ${this.currentItem.nickname}\nTYPE ${this.getTypeName(this.currentItem.type_id)}`
+                    : `ID ${this.currentItem.id}\nNICKNAME ${this.currentItem.nickname}\nTYPE ${this.getTypeName(this.currentItem.type_id)}`,
                 type: 3,
                 picture: this.$auth.user.picture || 'Unknown',
                 action: this.currentAction === 'delete'
