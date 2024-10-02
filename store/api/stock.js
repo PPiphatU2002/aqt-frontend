@@ -23,5 +23,10 @@ export const actions = {
         return await this.$axios
             .delete(`stock/${no}`)
             .then((res) => res.data)
-    }
+    },
+    async updateClosePriceByName({ getters }, data) {
+        return await this.$axios
+            .$put(`stock/update-close-price/${data.name}`, data)
+            .then((res) => res.data)
+    },
 }
