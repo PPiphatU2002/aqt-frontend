@@ -14,7 +14,7 @@
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
-              <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-text-field v-model="formData.id" :rules="[(v) => /^(AQT)?[0-9]{9}$/.test(v) || 'กรุณากรอกข้อมูลให้ถูกต้อง'
                 ]" label="ไอดีลูกค้า" outlined required maxlength="12" />
               </v-col>
@@ -25,22 +25,9 @@
                   label="ชื่อเล่น" outlined required />
               </v-col>
 
-              <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+              <v-col cols="5" sm="11" class="pa-0 ml-4">
                 <v-select v-model="formData.type_id" :items="typeOptions" :item-text="item => item.text"
                   :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกประเภท']" label="ประเภท" outlined
-                  required>
-                  <template v-slot:item="data">
-                    <v-icon left>
-                      {{ data.item.icon }}
-                    </v-icon>
-                    {{ data.item.text }}
-                  </template>
-                </v-select>
-              </v-col>
-
-              <v-col cols="6" sm="5" class="pa-0">
-                <v-select v-model="formData.from_id" :items="fromOptions" :item-text="item => item.text"
-                  :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกที่มาที่ไป']" label="ที่มาที่ไป" outlined
                   required>
                   <template v-slot:item="data">
                     <v-icon left>
@@ -106,14 +93,12 @@ export default {
       formData: { ...this.data },
       valid: false,
       typeOptions: [],
-      fromOptions: [],
       originalData: {},
 
     };
   },
 
   mounted() {
-    this.setFromOptions();
     this.setTypeOptions();
     this.formData = { ...this.data };
     this.originalData = { ...this.data };
@@ -164,39 +149,6 @@ export default {
       }
     },
 
-    async setFromOptions() {
-      try {
-        this.froms = await this.$store.dispatch('api/from/getFroms');
-
-        const fromIcons = {
-          'หุ้นเก่า': 'mdi-cash-100',
-          'หุ้นใหม่': 'mdi-cash-plus',
-          'หุ้นแก้เกม': 'mdi-cash-fast',
-        };
-
-        const allFroms = this.froms.map(from => ({
-          value: from.no,
-          text: from.from,
-          icon: fromIcons[from.from] || 'mdi-cash'
-        }));
-
-        const prioritizedFroms = ['หุ้นเก่า', 'หุ้นใหม่', 'หุ้นแก้เกม'];
-        this.fromOptions = prioritizedFroms.reduce((acc, fromName) => {
-          const from = allFroms.find(f => f.text === fromName);
-          if (from) acc.push(from);
-          return acc;
-        }, []).concat(allFroms.filter(r => !prioritizedFroms.includes(r.text)));
-
-        if (this.data && this.data.from_id) {
-          const selectedFrom = this.fromOptions.find(r => r.value === this.data.from_id);
-          this.fromOptions = selectedFrom
-            ? [selectedFrom, ...this.fromOptions.filter(r => r.value !== this.data.from_id)]
-            : this.fromOptions;
-        }
-      } catch (warning) {
-      }
-    },
-
     async confirm() {
       this.modal.confirm.open = true;
       await new Promise((resolve) => {
@@ -224,8 +176,7 @@ export default {
       } catch (warning) {
         this.modal.warning.open = true;
       }
-    }
-    ,
+    },
 
     getTypeName(typeId) {
       const type = this.types.find(t => t.no === typeId);

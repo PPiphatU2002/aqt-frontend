@@ -13,7 +13,7 @@
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
-              <v-col cols="6" sm="5" class="ml-6 pa-0 mr-4">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-text-field :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :type="show2 ? 'text' : 'password'"
                   v-model="data.new_password" :rules="[
                     (v) => !!v || 'โปรดกรอกรหัสผ่านใหม่',

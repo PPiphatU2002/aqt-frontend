@@ -14,7 +14,7 @@
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
-              <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-text-field v-model="formData.fname"
                   :rules="[(v) => !!v || 'โปรดกรอกชื่อ', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ชื่อต้องเป็นภาษาไทยเท่านั้น']"
                   label="ชื่อ" outlined required />
@@ -26,7 +26,7 @@
                   label="นามสกุล" outlined required />
               </v-col>
 
-              <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-text-field v-model="formData.email"
                   :rules="[(v) => !!v || 'โปรดกรอกอีเมล', (v) => /.+@.+\..+/.test(v) || 'โปรดกรอกอีเมลที่ถูกต้อง']"
                   label="อีเมล" outlined required />
@@ -38,7 +38,7 @@
                   label="เบอร์โทรศัพท์" outlined required />
               </v-col>
 
-              <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-select v-model="formData.ranks_id" :items="rankOptions" :item-text="item => item.text"
                   :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกตำแหน่ง']" label="ตำแหน่ง" outlined
                   required>
@@ -64,7 +64,7 @@
                 </v-select>
 
               </v-col>
-              <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+              <v-col cols="5" sm="11" class="pa-0 ml-4">
                 <v-select v-model="formData.status" :items="statusOptions" :rules="[(v) => !!v || 'โปรดเลือกสถานะ']"
                   label="สถานะ" outlined required>
                   <template v-slot:item="data">

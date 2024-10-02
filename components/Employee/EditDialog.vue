@@ -14,7 +14,7 @@
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
-              <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-text-field v-model="data.fname" :rules="[
                   (v) => !!v || 'โปรดกรอกชื่อ',
                   (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ชื่อต้องเป็นภาษาไทยเท่านั้น'
@@ -28,7 +28,7 @@
                 ]" label="นามสกุล" outlined required />
               </v-col>
 
-              <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-text-field v-model="data.phone" :rules="[
                   (v) => !!v || 'โปรดกรอกเบอร์โทรศัพท์',
                   (v) => (v && v.length === 10) || 'เบอร์โทรศัพท์ต้องมี 10 หลัก',

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="open" max-width="800px">
+    <v-dialog v-model="open" max-width="500px">
         <v-card>
             <v-card-title class="d-flex justify-center">
                 <v-icon justify="center" class="mr-3" size="40" color="#24b224">mdi-archive-check</v-icon>
@@ -31,12 +31,8 @@ export default {
             headers: [
                 { text: 'ชื่อหุ้น', value: 'name' },
                 { text: 'ประเภท', value: 'set_name' },
-                { text: 'Low Price', value: 'low_price' },
-                { text: 'Up Price', value: 'up_price' },
                 { text: 'ปันผลครึ่งปีแรก/หลัง', value: 'dividend_amount' },
                 { text: 'ราคาปิดวันศุกร์', value: 'closing_price' },
-                { text: 'Remark', value: 'comment' },
-                { text: 'Remark 2', value: 'comment_two' },
             ],
         };
     },

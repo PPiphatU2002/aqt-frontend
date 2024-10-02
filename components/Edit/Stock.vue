@@ -14,18 +14,12 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-row>
-                <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
+                <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                   <v-text-field v-model="formData.name" :rules="[(v) => /^(AQT)?[0-9]{9}$/.test(v) || 'กรุณากรอกข้อมูลให้ถูกต้อง'
-                  ]" label="ไอดีลูกค้า" outlined required maxlength="12" />
+                  ]" label="ชื่อหุ้น" outlined required maxlength="12" />
                 </v-col>
   
                 <v-col cols="6" sm="5" class="pa-0">
-                  <v-text-field v-model="formData.nickname"
-                    :rules="[(v) => !!v || 'โปรดกรอกชื่อเล่นลูกค้า', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ต้องเป็นภาษาไทยเท่านั้น']"
-                    label="ชื่อเล่น" outlined required />
-                </v-col>
-  
-                <v-col cols="6" sm="5" class="pa-0 mr-4 ml-6">
                   <v-select v-model="formData.set_id" :items="typeOptions" :item-text="item => item.text"
                     :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกประเภท']" label="ประเภท" outlined
                     required>
@@ -36,6 +30,24 @@
                       {{ data.item.text }}
                     </template>
                   </v-select>
+                </v-col>
+
+                <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
+                  <v-text-field v-model="formData.closing_price"
+                    :rules="[(v) => !!v || 'โปรดกรอกชื่อเล่นลูกค้า', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ต้องเป็นภาษาไทยเท่านั้น']"
+                    label="ราคาปิด" outlined required />
+                </v-col>
+
+                <v-col cols="6" sm="5" class="pa-0">
+                  <v-text-field v-model="formData.dividend_amount"
+                    :rules="[(v) => !!v || 'โปรดกรอกชื่อเล่นลูกค้า', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ต้องเป็นภาษาไทยเท่านั้น']"
+                    label="จำนวนปันผล" outlined required />
+                </v-col>
+
+                <v-col cols="5" sm="11" class="pa-0 ml-4">
+                  <v-text-field v-model="formData.comment"
+                    :rules="[(v) => !!v || 'โปรดกรอกชื่อเล่นลูกค้า', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ต้องเป็นภาษาไทยเท่านั้น']"
+                    label="หมายเหตุ" outlined required />
                 </v-col>
               </v-row>
             </v-form>
