@@ -8,14 +8,14 @@
 
         <v-card class="custom-card" flat>
             <v-card-title class="d-flex align-center justify-center">
-                <v-icon class="little-icon">mdi-archive-plus</v-icon> &nbsp;
+                <v-icon class="little-icon" color="#24b224">mdi-archive-plus</v-icon> &nbsp;
                 <h3 class="mb-0">หุ้นใหม่</h3>
             </v-card-title>
 
             <v-card-text>
                 <v-form>
-                    <v-row v-for="(item, index) in withdrawalItems" :key="index" align="center">
-                        <v-col cols="2" class="ml-2">
+                    <v-row class="mb-0 mt-0 pa-0" v-for="(item, index) in withdrawalItems" :key="index" align="center">
+                        <v-col cols="3" class="ml-2">
                             <v-text-field v-model="item.name" label="ชื่อหุ้น" type="text" dense outlined
                                 :rules="[(v) => !!v || 'กรุณากรอกชื่อหุ้น']">
                             </v-text-field>
@@ -29,52 +29,33 @@
                         </v-col>
 
                         <v-col cols="2">
-                            <v-text-field v-model="item.low_price" label="Low Price" type="text" dense outlined
-                                :rules="[(v) => !v || /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข']">
-                            </v-text-field>
-                        </v-col>
-
-                        <v-col cols="2">
-                            <v-text-field v-model="item.up_price" label="Up Price" type="text" dense outlined
-                                :rules="[(v) => !v || /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข']">
-                            </v-text-field>
-                        </v-col>
-
-                        <v-col cols="2">
                             <v-text-field v-model="item.dividend_amount" label="ปันผลครึ่งปีแรก/หลัง" type="text" dense
                                 outlined :rules="[(v) => !v || /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข']">
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="2" class="ml-2">
+                        <v-col cols="2">
                             <v-text-field v-model="item.closing_price" label="ราคาปิดวันศุกร์" type="text" dense
                                 outlined :rules="[(v) => !v || /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข']">
                             </v-text-field>
                         </v-col>
 
-                        <v-col cols="4">
-                            <v-text-field v-model="item.comment" label="Remark" type="text" dense outlined>
-                            </v-text-field>
-                        </v-col>
-
-                        <v-col cols="4">
-                            <v-text-field v-model="item.comment_two" label="Remark 2" type="text" dense outlined>
-                            </v-text-field>
-                        </v-col>
-
                         <v-col cols="2" class="d-flex align-center">
-                            <v-btn icon color="error" @click="removeProduct(index)" class="mb-6">
+                            <v-btn icon color="#e50211" @click="removeProduct(index)" class="mb-6">
                                 <v-icon>mdi-delete</v-icon>
                             </v-btn>
-                            <v-btn color="success" @click="addProduct" text class="mb-6 ml-2">
+                            <v-btn color="#24b224" @click="addProduct" text class="mb-6 ml-2">
                                 <v-icon left>mdi-archive-plus</v-icon> เพิ่มหุ้น
                             </v-btn>
                         </v-col>
                     </v-row>
 
                     <div class="text-center">
-                        <v-btn color="#24b224" @click="showModalResult = true" :disabled="!isFormValid">
-                            ยืนยันการเพิ่มหุ้นใหม่
+                        <v-btn color="#24b224" @click="showModalResult = true" :disabled="!isFormValid" class="mr-2">
+                            บันทึก
+                        </v-btn>
+                        <v-btn color="#e50211" @click="goToStocksManagement">
+                            ย้อนกลับ
                         </v-btn>
                     </div>
                 </v-form>
@@ -111,9 +92,8 @@ export default {
             valid: false,
             showModalResult: false,
             withdrawalItems: [{
-                name: '', type_id: null,
-                low_price: null, up_price: null, dividend_amount: null,
-                closing_price: null, comment: '', comment_two: ''
+                name: '', set_id: null, dividend_amount: null,
+                closing_price: null, comment: null
             }],
             sets: [],
 
@@ -242,13 +222,13 @@ export default {
         },
 
         goBack() {
-            window.location.reload();
+            this.$router.push('/developer/stock/management');
         },
 
         recordLog() {
             const details = this.withdrawalItems.map((item, index) => {
                 const setName = this.sets.find(set => set.id === item.set_id)?.name || 'ยังไม่ระบุ';
-                return `STOCK ${index + 1}\nNAME ${item.name}\nTYPE ${setName}\nLOW ${item.low_price}\nUP ${item.up_price}\nDIVIDEND ${item.dividend_amount}\nCLOSE ${item.closing_price}\nREMARK ${item.comment}\nCOMMENT ${item.comment_two}`;
+                return `STOCK ${index + 1}\nNAME ${item.name}\nTYPE ${setName}\nDIVIDEND ${item.dividend_amount}\nCLOSE ${item.closing_price}\nCOMMENT ${item.comment}`;
             }).join('\n\n');
 
             const log = {
@@ -257,12 +237,16 @@ export default {
                 detail: details.trim(),
                 type: 2,
                 picture: this.$auth.user.picture || 'Unknown',
-                action: 'เพิ่มหุ้นใหม่',
+                action: 'เพิ่มหุ้น',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
 
             this.$store.dispatch('api/log/addLogs', log);
-        }
+        },
+
+        goToStocksManagement() {
+            this.$router.push('/developer/stock/management');
+        },
     },
 };
 </script>

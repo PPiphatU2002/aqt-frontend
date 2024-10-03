@@ -20,30 +20,12 @@
           </template>
 
           <v-list class="custom-list">
-            <v-list-item @click="goToNewUser" class="custom-list-item">
-              <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-account-plus</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">ลูกค้าใหม่</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
             <v-list-item @click="goToManagement" class="custom-list-item">
               <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-account-cog</v-icon>
+                <v-icon class="icon-tab">mdi-account</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">การจัดการลูกค้า</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-list-item @click="goToNewEmp" class="custom-list-item">
-              <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-home-plus</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">คำร้องขอสมัครสมาชิก</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลลูกค้า</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -52,7 +34,7 @@
                 <v-icon class="icon-tab">mdi-home-account</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">การจัดการพนักงาน</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลพนักงาน</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -66,21 +48,12 @@
           </template>
 
           <v-list class="custom-list">
-            <v-list-item @click="goToNewStock" class="custom-list-item">
-              <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-archive-plus</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">หุ้นใหม่</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-
             <v-list-item @click="goToStocksManagement" class="custom-list-item">
               <v-list-item-icon style="margin-right: 4px;">
-                <v-icon class="icon-tab">mdi-archive-cog</v-icon>
+                <v-icon class="icon-tab">mdi-archive</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">การจัดการหุ้น</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลหุ้น</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -275,16 +248,8 @@ export default {
       this.$store.dispatch('api/log/addLogs', log);
     },
 
-    goToNewUser() {
-      this.$router.push('/developer/user/new');
-    },
-
     goToManagement() {
       this.$router.push('/developer/user/management');
-    },
-
-    goToNewEmp() {
-      this.$router.push('/developer/user/new_employee');
     },
 
     goToEmpManagement() {
@@ -305,10 +270,6 @@ export default {
 
     goToEmpsHist() {
       this.$router.push('/developer/history/employee');
-    },
-
-    goToNewStock() {
-      this.$router.push('/developer/stock/new_stock');
     },
 
     goToStocksManagement() {

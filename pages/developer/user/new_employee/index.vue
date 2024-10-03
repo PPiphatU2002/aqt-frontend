@@ -11,7 +11,7 @@
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon">mdi-home-plus</v-icon>&nbsp;
+                            <v-icon class="little-icon" color="#24b224">mdi-home-plus</v-icon>&nbsp;
                             <h3 class="mb-0">คำร้องขอสมัครสมาชิก</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
@@ -177,6 +177,11 @@
                     </div>
                 </template>
             </v-data-table>
+            <div class="text-center">
+                <v-btn class = "mb-4" color="#e50211" @click="goToEmpManagement">
+                    ย้อนกลับ
+                </v-btn>
+            </div>
         </v-card>
 
         <v-dialog v-model="dialog" max-width="300px">
@@ -382,7 +387,8 @@ export default {
                 if (this.currentAction === 'approve') {
                     await this.$store.dispatch('api/employee/updateEmployeeStatus', {
                         no: this.currentItem.no,
-                        status: 1
+                        status: 1,
+                        emp_id: this.$auth.user.no
                     });
                     this.recordLog();
                     this.modal.complete.message = 'อนุมัติผู้ใช้งานเรียบร้อยแล้ว';
@@ -599,7 +605,11 @@ export default {
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
             this.$store.dispatch('api/log/addLogs', log);
-        }
+        },
+
+        goToEmpManagement() {
+            this.$router.push('/developer/user/employee_management');
+        },
     },
 };
 

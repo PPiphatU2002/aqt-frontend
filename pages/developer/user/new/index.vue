@@ -3,12 +3,12 @@
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
         <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
-        <ResultCustomer :open="showModalResult" :customers="withdrawalItems" :types="types" :froms="froms"
+        <ResultCustomer :open="showModalResult" :customers="withdrawalItems" :types="types"
             @confirm="confirmAndAddCustomers" @cancel="showModalResult = false" />
 
         <v-card class="custom-card" flat>
             <v-card-title class="d-flex align-center justify-center">
-                <v-icon class="little-icon">mdi-account-plus</v-icon> &nbsp;
+                <v-icon class="little-icon" color="#24b224">mdi-account-plus</v-icon> &nbsp;
                 <h3 class="mb-0">ลูกค้าใหม่</h3>
             </v-card-title>
 
@@ -34,18 +34,21 @@
                         </v-col>
 
                         <v-col cols="2" class="d-flex align-center">
-                            <v-btn icon color="error" @click="removeProduct(index)" class="mb-6">
+                            <v-btn icon color="#e50211" @click="removeProduct(index)" class="mb-6">
                                 <v-icon>mdi-delete</v-icon>
                             </v-btn>
-                            <v-btn color="success" @click="addProduct" text class="mb-6 ml-2">
+                            <v-btn color="#24b224" @click="addProduct" text class="mb-6 ml-2">
                                 <v-icon left>mdi-account-plus</v-icon> เพิ่มลูกค้า
                             </v-btn>
                         </v-col>
                     </v-row>
 
                     <div class="text-center">
-                        <v-btn color="#24b224" @click="showModalResult = true" :disabled="!isFormValid">
-                            ยืนยันการเพิ่มลูกค้าใหม่
+                        <v-btn color="#24b224" @click="showModalResult = true" :disabled="!isFormValid" class="mr-2">
+                            บันทึก
+                        </v-btn>
+                        <v-btn color="#e50211" @click="goToManagement">
+                            ย้อนกลับ
                         </v-btn>
                     </div>
                 </v-form>
@@ -65,7 +68,6 @@ export default {
     async mounted() {
         await this.checkRank()
         await this.fetchTypesData()
-        await this.fetchFromsData()
     },
 
     data() {
@@ -84,7 +86,6 @@ export default {
             showModalResult: false,
             withdrawalItems: [{ id: 'AQT', nickname: '', type_id: null }],
             types: [],
-            froms: [],
 
         }
     },
@@ -93,8 +94,7 @@ export default {
         isFormValid() {
             return this.withdrawalItems.every(item =>
                 this.isIdValid(item.numericId) &&
-                this.isNicknameValid(item.nickname) &&
-                this.isFromValid(item.from_id)
+                this.isNicknameValid(item.nickname)
             );
         },
     },
@@ -106,10 +106,6 @@ export default {
 
         isNicknameValid(nickname) {
             return !!nickname && /^[\u0E00-\u0E7F]+$/.test(nickname);
-        },
-
-        isFromValid(from_id) {
-            return from_id !== null && from_id !== '';
         },
 
         setFullId(item) {
@@ -162,7 +158,6 @@ export default {
                         id: customer.id,
                         nickname: customer.nickname,
                         type_id: customer.type_id,
-                        from_id: customer.from_id,
                         emp_id: this.$auth.user.no,
                         created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                         updated_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -199,33 +194,12 @@ export default {
             }
         },
 
-        async fetchFromsData() {
-            try {
-                const response = await this.$store.dispatch('api/from/getFroms');
-                if (response) {
-                    this.froms = response.map(item => ({ id: item.no, name: item.from }));
-
-                    const fromname = this.froms.find(from => from.name === 'หุ้นเก่า');
-                    if (fromname) {
-                        this.withdrawalItems[0].from_id = fromname.id;
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching froms:', error);
-            }
-        },
-
         addProduct() {
             this.withdrawalItems.push({
                 id: null,
                 nickname: '',
                 type_id: null,
-                from_id: null
             });
-            const fromname = this.froms.find(from => from.name === 'หุ้นเก่า');
-            if (fromname) {
-                this.withdrawalItems[this.withdrawalItems.length - 1].from_id = fromname.id;
-            }
         },
 
         removeProduct(index) {
@@ -233,14 +207,13 @@ export default {
         },
 
         goBack() {
-            window.location.reload();
+            this.$router.push('/developer/user/management');
         },
 
         recordLog() {
             const details = this.withdrawalItems.map((item, index) => {
                 const typeName = this.types.find(type => type.id === item.type_id)?.name || 'ยังไม่ระบุ';
-                const fromName = this.froms.find(from => from.id === item.from_id)?.name || 'ยังไม่ระบุ';
-                return `USER ${index + 1}\nID ${item.id}\nNICKNAME ${item.nickname}\nTYPE ${typeName}\nFROM ${fromName}`;
+                return `USER ${index + 1}\nID ${item.id}\nNICKNAME ${item.nickname}\nTYPE ${typeName}`;
             }).join('\n\n');
 
             const log = {
@@ -254,7 +227,11 @@ export default {
             };
 
             this.$store.dispatch('api/log/addLogs', log);
-        }
+        },
+
+        goToManagement() {
+            this.$router.push('/developer/user/management');
+        },
     },
 };
 </script>

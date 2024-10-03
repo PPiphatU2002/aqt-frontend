@@ -12,8 +12,8 @@
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon">mdi-archive-cog</v-icon>&nbsp;
-                            <h3 class="mb-0">การจัดการหุ้น</h3>
+                            <v-icon class="little-icon" color="#85d7df">mdi-archive</v-icon>&nbsp;
+                            <h3 class="mb-0">ข้อมูลหุ้น</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
                             <div class="d-flex align-center mt-2 justify-center">
@@ -114,20 +114,25 @@
                 </v-row>
             </v-container>
 
-            <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
-                <template v-slot:activator="{ on }">
-                    <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
-                        color="#85d7df">mdi-playlist-check</v-icon>
-                </template>
-                <v-list class="header-list">
-                    <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
-                        :key="header.value" class="header-item">
-                        <v-list-item-content>
-                            <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
+                    <template v-slot:activator="{ on }">
+                        <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
+                            color="#85d7df">mdi-playlist-check</v-icon>
+                    </template>
+                    <v-list class="header-list">
+                        <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
+                            :key="header.value" class="header-item">
+                            <v-list-item-content>
+                                <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+                <v-btn @click="goToNewStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
+                    <v-icon left color="#24b224">mdi-archive-plus</v-icon> เพิ่มหุ้น
+                </v-btn>
+            </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 item-key="no" :items-per-page="10">
@@ -135,12 +140,6 @@
                     <v-avatar size="40">
                         <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />
                     </v-avatar>
-                </template>
-                <template v-slot:item.id="{ item }">
-                    <div class="text-center">{{ item.id }}</div>
-                </template>
-                <template v-slot:item.nickname="{ item }">
-                    <div class="text-center">{{ item.nickname }}</div>
                 </template>
                 <template v-slot:item.set_id="{ item }">
                     <div class="text-center" :style="{ color: getFromText(getSetName(item.set_id)).color }">
@@ -266,7 +265,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'set_id', 'name', 'low_price', 'up_price', 'dividend_amount', 'closing_price', 'comment', 'comment_two', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'set_id', 'name', 'dividend_amount', 'closing_price', 'comment', 'emp_id', 'detail'],
 
             searchQueries: {
                 'name': [],
@@ -315,23 +314,7 @@ export default {
                 },
 
                 {
-                    text: 'Low Price',
-                    value: 'low_price',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'Up Price',
-                    value: 'up_price',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'จำนวนปันผลครึ่งปีแรก/หลัง',
+                    text: 'จำนวนปันผล',
                     value: 'dividend_amount',
                     sortable: false,
                     align: 'center',
@@ -339,7 +322,7 @@ export default {
                 },
 
                 {
-                    text: 'ราคาปิดวันศุกร์',
+                    text: 'ราคาปิด',
                     value: 'closing_price',
                     sortable: false,
                     align: 'center',
@@ -347,16 +330,8 @@ export default {
                 },
 
                 {
-                    text: 'Remark',
+                    text: 'หมายเหตุ',
                     value: 'comment',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'Remark 2',
-                    value: 'comment_two',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -689,8 +664,8 @@ export default {
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ? `NAME ${this.currentItem.name}\nTYPE ${this.getSetName(this.currentItem.set_id)}\nLOW ${this.currentItem.low_price}\nUP ${this.currentItem.up_price}\nDIVIDEND ${this.currentItem.dividend_amount}\nCLOSE ${this.currentItem.closing_price}\nREMARK ${this.currentItem.comment}\nCOMMENT ${this.currentItem.comment_two}`
-                    : `NAME ${this.currentItem.name}\nTYPE ${this.getSetName(this.currentItem.set_id)}\nLOW ${this.currentItem.low_price}\nUP ${this.currentItem.up_price}\nDIVIDEND ${this.currentItem.dividend_amount}\nCLOSE ${this.currentItem.closing_price}\nREMARK ${this.currentItem.comment}\nCOMMENT ${this.currentItem.comment_two}`,
+                    ? `NAME ${this.currentItem.name}\nTYPE ${this.getSetName(this.currentItem.set_id)}\nDIVIDEND ${this.currentItem.dividend_amount}\nCLOSE ${this.currentItem.closing_price}\nREMARK ${this.currentItem.comment}`
+                    : `NAME ${this.currentItem.name}\nTYPE ${this.getSetName(this.currentItem.set_id)}\nDIVIDEND ${this.currentItem.dividend_amount}\nCLOSE ${this.currentItem.closing_price}\nREMARK ${this.currentItem.comment}`,
                 type: 2,
                 picture: this.$auth.user.picture || 'Unknown',
                 action: this.currentAction === 'delete'
@@ -699,9 +674,11 @@ export default {
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
             this.$store.dispatch('api/log/addLogs', log);
-        }
+        },
 
-
+        goToNewStock() {
+            this.$router.push('/developer/stock/new_stock');
+        },
     },
 };
 
@@ -734,6 +711,12 @@ export default {
     cursor: pointer;
     margin-right: 6px;
     margin-left: 24px;
+}
+
+.tab-icon-two {
+    cursor: pointer;
+    margin-right: 24px;
+    margin-left: 0px;
 }
 
 .little-icon {

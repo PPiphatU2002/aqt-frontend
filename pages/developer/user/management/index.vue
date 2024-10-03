@@ -12,8 +12,8 @@
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon">mdi-account-cog</v-icon>&nbsp;
-                            <h3 class="mb-0">การจัดการลูกค้า</h3>
+                            <v-icon class="little-icon" color="#85d7df">mdi-account</v-icon>&nbsp;
+                            <h3 class="mb-0">ข้อมูลลูกค้า</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
                             <div class="d-flex align-center mt-2 justify-center">
@@ -114,20 +114,25 @@
                 </v-row>
             </v-container>
 
-            <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
-                <template v-slot:activator="{ on }">
-                    <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
-                        color="#85d7df">mdi-playlist-check</v-icon>
-                </template>
-                <v-list class="header-list">
-                    <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
-                        :key="header.value" class="header-item">
-                        <v-list-item-content>
-                            <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
+                    <template v-slot:activator="{ on }">
+                        <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
+                            color="#85d7df">mdi-playlist-check</v-icon>
+                    </template>
+                    <v-list class="header-list">
+                        <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
+                            :key="header.value" class="header-item">
+                            <v-list-item-content>
+                                <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+                <v-btn @click="goToNewUser" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
+                    <v-icon left color="#24b224">mdi-account-plus</v-icon> เพิ่มลูกค้า
+                </v-btn>
+            </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 item-key="no" :items-per-page="10">
@@ -636,9 +641,11 @@ export default {
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
             this.$store.dispatch('api/log/addLogs', log);
-        }
+        },
 
-
+        goToNewUser() {
+            this.$router.push('/developer/user/new');
+        },
     },
 };
 
@@ -671,6 +678,12 @@ export default {
     cursor: pointer;
     margin-right: 6px;
     margin-left: 24px;
+}
+
+.tab-icon-two {
+    cursor: pointer;
+    margin-right: 24px;
+    margin-left: 0px;
 }
 
 .little-icon {

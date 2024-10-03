@@ -12,8 +12,8 @@
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon">mdi-home-account</v-icon>&nbsp;
-                            <h3 class="mb-0">การจัดการพนักงาน</h3>
+                            <v-icon class="little-icon" color="#85d7df">mdi-home-account</v-icon>&nbsp;
+                            <h3 class="mb-0">ข้อมูลพนักงาน</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
                             <div class="d-flex align-center mt-2 justify-center">
@@ -73,8 +73,8 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-autocomplete v-if="searchType !== 'rank' && searchType !== 'updated_date'" v-model="searchQuery"
-                                :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
+                            <v-autocomplete v-if="searchType !== 'rank' && searchType !== 'updated_date'"
+                                v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
                                 hide-details></v-autocomplete>
 
@@ -114,20 +114,25 @@
                 </v-row>
             </v-container>
 
-            <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
-                <template v-slot:activator="{ on }">
-                    <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
-                        color="#85d7df">mdi-playlist-check</v-icon>
-                </template>
-                <v-list class="header-list">
-                    <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
-                        :key="header.value" class="header-item">
-                        <v-list-item-content>
-                            <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
+                    <template v-slot:activator="{ on }">
+                        <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
+                            color="#85d7df">mdi-playlist-check</v-icon>
+                    </template>
+                    <v-list class="header-list">
+                        <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
+                            :key="header.value" class="header-item">
+                            <v-list-item-content>
+                                <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+                <v-btn @click="goToNewEmp" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
+                    <v-icon left color="#24b224">mdi-home-plus</v-icon> คำร้องขอสมัครสมาชิก
+                </v-btn>
+            </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 item-key="no" :items-per-page="10">
@@ -138,6 +143,13 @@
                 </template>
                 <template v-slot:item.email="{ item }">
                     <div class="text-center">{{ item.email }}</div>
+                </template>
+                <template v-slot:item.emp_id="{ item }">
+                    <div class="text-center">
+                        <span v-if="getEmployeeById(item.emp_id)">{{ getEmployeeById(item.emp_id).fname }} {{
+                            getEmployeeById(item.emp_id).lname }}</span>
+                        <span v-else>ไม่ทราบ</span>
+                    </div>
                 </template>
                 <template v-slot:item.fname="{ item }">
                     <div class="text-center">{{ item.fname + ' ' + item.lname }}</div>
@@ -268,7 +280,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'picture', 'rank', 'email', 'fname', 'lname', 'phone', 'gender', 'detail'],
+            visibleColumns: ['updated_date', 'picture', 'rank', 'email', 'fname', 'lname', 'phone', 'gender', 'emp_id', 'detail'],
 
             searchQueries: {
                 'fname': [],
@@ -347,6 +359,14 @@ export default {
                 },
 
                 {
+                    text: 'ผู้อนุมัติ',
+                    value: 'emp_id',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
                     text: '',
                     value: 'detail',
                     sortable: false,
@@ -378,6 +398,9 @@ export default {
     },
 
     methods: {
+        getEmployeeById(empId) {
+            return this.employees.find(employee => employee.no === empId);
+        },
 
         openEditAllDialog(employee) {
             this.editAllData = employee;
@@ -664,14 +687,17 @@ export default {
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
             this.$store.dispatch('api/log/addLogs', log);
-        }
+        },
+
+        goToNewEmp() {
+            this.$router.push('/developer/user/new_employee');
+        },
     },
 };
 
 </script>
 
 <style scoped>
-
 .small-font {
     font-size: 0.8rem;
 }
@@ -698,6 +724,12 @@ export default {
     cursor: pointer;
     margin-right: 6px;
     margin-left: 24px;
+}
+
+.tab-icon-two {
+    cursor: pointer;
+    margin-right: 24px;
+    margin-left: 0px;
 }
 
 .little-icon {
@@ -812,5 +844,4 @@ export default {
 .custom-list {
     padding: 0.4px 2px;
 }
-
 </style>

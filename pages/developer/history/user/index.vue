@@ -341,7 +341,7 @@ export default {
             lines.forEach((line, index) => {
                 formattedLines.push(line);
                 if (line.trim() === '' && index < lines.length - 1) {
-                    formattedLines.push('---------------------------------------------------------------');
+                    formattedLines.push('----------------------------------------------------------');
                 }
             });
             return formattedLines;
