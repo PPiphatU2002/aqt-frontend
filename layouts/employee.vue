@@ -8,7 +8,7 @@
     <v-app :class="appBackground">
       <v-app-bar :clipped-left="clipped" fixed app :color="navBarColor" dark>
         <v-toolbar-title class="d-flex align-center" @click="home">
-          <v-img src="http://localhost:3001/file/profile/logo.png" max-width="120" contain class="logo-img" />
+          <v-img src="http://localhost:3001/file/default/logo.png" max-width="120" contain class="logo-img" />
         </v-toolbar-title>
 
         <v-menu bottom right :offset-y="true" :nudge-top="8" :nudge-right="8" class="user-menu">
@@ -132,7 +132,8 @@
 
             <v-list class="custom-list">
               <v-card class="profile-card ml-2 mr-2 mt-2 mb-2 non-clickable">
-                <v-img :src="userProfilePicture" class="profile-image" />
+                <v-img :src="profileImage" class="profile-image" @error="onImageError">
+                </v-img>
               </v-card>
 
               <v-list-item @click="gotoProfile" class="custom-list-item">
@@ -185,7 +186,7 @@ export default {
           open: false,
         },
       },
-
+      profileImage: `http://localhost:3001/file/profile/${this.$auth.user.picture}`,
       clipped: false,
       fixed: false,
       menuActive: false,
@@ -194,6 +195,9 @@ export default {
   },
 
   computed: {
+    onImageError() {
+      this.profileImage = `http://localhost:3001/file/default/${this.$auth.user.picture}`;
+    },
     iconColor() {
       return this.$vuetify.theme.dark ? 'night-icon' : 'day-icon';
     },
@@ -209,13 +213,6 @@ export default {
     navBarColor() {
       return this.$vuetify.theme.dark ? '#545454' : '#fff6ea';
     },
-
-    userProfilePicture() {
-      const defaultPicture = 'http://localhost:3001/file/profile/person-icon.jpg';
-      return this.$auth.user && this.$auth.user.picture
-        ? `http://localhost:3001/file/profile/${this.$auth.user.picture}`
-        : defaultPicture;
-    }
   },
 
   methods: {
@@ -224,39 +221,39 @@ export default {
     },
 
     goToNewUser() {
-      this.$router.push('/employee/user/new');
+      this.$router.push('/app/user/new');
     },
 
     goToManagement() {
-      this.$router.push('/employee/user/management');
+      this.$router.push('/app/user/management');
     },
 
     goToTransHist() {
-      this.$router.push('/employee/history/transaction');
+      this.$router.push('/app/history/transaction');
     },
 
     goToStocksHist() {
-      this.$router.push('/employee/history/stock');
+      this.$router.push('/app/history/stock');
     },
 
     goToUsersHist() {
-      this.$router.push('/employee/history/user');
+      this.$router.push('/app/history/user');
     },
 
     goToNewStock() {
-      this.$router.push('/employee/stock/new_stock');
+      this.$router.push('/app/stock/new_stock');
     },
 
     goToStocksManagement() {
-      this.$router.push('/employee/stock/management');
+      this.$router.push('/app/stock/management');
     },
 
     goToStocksUpdate() {
-      this.$router.push('/employee/stock/update');
+      this.$router.push('/app/stock/update');
     },
 
     gotoProfile() {
-      this.$router.push('/developer/profile');
+      this.$router.push('/app/profile');
     },
 
     toggleTheme() {
@@ -264,7 +261,7 @@ export default {
     },
 
     home() {
-      this.$router.push('/developer/home');
+      this.$router.push('/app/home');
     },
 
     buttonSignOut() {
@@ -341,7 +338,7 @@ export default {
 
 .background-dark {
   background-color: #545454 !important;
-  background-image: url('http://localhost:3001/file/profile/background.png') !important;
+  background-image: url('http://localhost:3001/file/default/background.png') !important;
   background-size: 45% !important;
   background-position: center;
   background-repeat: no-repeat;
@@ -349,7 +346,7 @@ export default {
 
 .background-light {
   background-color: #fff6ea !important;
-  background-image: url('http://localhost:3001/file/profile/background.png') !important;
+  background-image: url('http://localhost:3001/file/default/background.png') !important;
   background-size: 45% !important;
   background-position: center;
   background-repeat: no-repeat;

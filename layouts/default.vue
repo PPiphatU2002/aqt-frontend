@@ -4,7 +4,7 @@
     <v-app :class="appBackground">
       <v-app-bar :clipped-left="clipped" fixed app :color="navBarColor" dark>
         <v-toolbar-title class="d-flex align-center" @click="home">
-          <v-img src="http://localhost:3001/file/profile/logo.png" max-width="120" contain
+          <v-img src="http://localhost:3001/file/default/logo.png" max-width="120" contain
             class="logo-img" />
         </v-toolbar-title>
 
@@ -110,7 +110,7 @@ export default {
 
 .background-dark {
   background-color: #545454 !important;
-  background-image: url('http://localhost:3001/file/profile/background.png') !important;
+  background-image: url('http://localhost:3001/file/default/background.png') !important;
   background-size: 45% !important;
   background-position: center;
   background-repeat: no-repeat;
@@ -118,7 +118,7 @@ export default {
 
 .background-light {
   background-color: #fff6ea !important;
-  background-image: url('http://localhost:3001/file/profile/background.png') !important;
+  background-image: url('http://localhost:3001/file/default/background.png') !important;
   background-size: 45% !important;
   background-position: center;
   background-repeat: no-repeat;

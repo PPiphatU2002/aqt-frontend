@@ -9,6 +9,11 @@ export const actions = {
         .get('file/profile/:picture', data)
         .then((res) => res.data)
     },
+    async viewDefault({ getters }, data) {
+        return await this.$axios
+        .get('file/default/:picture', data)
+        .then((res) => res.data)
+    },
     async downloadProfile({ getters }, data) {
         return await this.$axios
         .get('file/profile/download/:picture', data)

@@ -57,7 +57,7 @@
 
         <v-card-actions class="card-title-center pa-0">
           <v-btn @click="confirm"
-            :disabled="!valid || !data.name || !data.set_id || !data.closing_price || !data.dividend_amount" depressed
+            :disabled="!valid || !data.name || !data.set_id" depressed
             color="#24b224" class="font-weight-medium mr-2 mb-5">
             บันทึก
           </v-btn>

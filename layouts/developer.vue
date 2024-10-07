@@ -8,8 +8,7 @@
     <v-app :class="appBackground">
       <v-app-bar :clipped-left="clipped" fixed app :color="navBarColor" dark>
         <v-toolbar-title class="d-flex align-center" @click="home">
-          <v-img src="http://localhost:3001/file/profile/logo.png" max-width="120" contain
-            class="logo-img" />
+          <v-img src="http://localhost:3001/file/default/logo.png" max-width="120" contain class="logo-img" />
         </v-toolbar-title>
 
         <v-menu bottom right :offset-y="true" :nudge-top="8" :nudge-right="8" class="user-menu">
@@ -133,7 +132,8 @@
 
             <v-list class="custom-list">
               <v-card class="profile-card ml-2 mr-2 mt-2 mb-2 non-clickable">
-                <v-img :src="userProfilePicture" class="profile-image" />
+                <v-img :src="profileImage" class="profile-image" @error="onImageError">
+                </v-img>
               </v-card>
 
               <v-list-item @click="gotoProfile" class="custom-list-item">
@@ -179,6 +179,7 @@ export default {
 
   data() {
     return {
+      profileImage: `http://localhost:3001/file/profile/${this.$auth.user.picture}`,
       employees: [],
       clipped: false,
       fixed: false,
@@ -192,8 +193,11 @@ export default {
   },
 
   methods: {
+    onImageError() {
+      this.profileImage = `http://localhost:3001/file/default/${this.$auth.user.picture}`;
+    },
     gotoProfile() {
-      this.$router.push('/developer/profile');
+      this.$router.push('/app/profile');
     },
 
     toggleTheme() {
@@ -201,7 +205,7 @@ export default {
     },
 
     home() {
-      this.$router.push('/developer/home');
+      this.$router.push('/app/home');
     },
 
     buttonSignOut() {
@@ -249,35 +253,35 @@ export default {
     },
 
     goToManagement() {
-      this.$router.push('/developer/user/management');
+      this.$router.push('/app/user/management');
     },
 
     goToEmpManagement() {
-      this.$router.push('/developer/user/employee_management');
+      this.$router.push('/app/user/employee_management');
     },
 
     goToTransHist() {
-      this.$router.push('/developer/history/transaction');
+      this.$router.push('/app/history/transaction');
     },
 
     goToStocksHist() {
-      this.$router.push('/developer/history/stock');
+      this.$router.push('/app/history/stock');
     },
 
     goToUsersHist() {
-      this.$router.push('/developer/history/user');
+      this.$router.push('/app/history/user');
     },
 
     goToEmpsHist() {
-      this.$router.push('/developer/history/employee');
+      this.$router.push('/app/history/employee');
     },
 
     goToStocksManagement() {
-      this.$router.push('/developer/stock/management');
+      this.$router.push('/app/stock/management');
     },
 
     goToStocksUpdate() {
-      this.$router.push('/developer/stock/update');
+      this.$router.push('/app/stock/update');
     },
 
   },
@@ -298,20 +302,12 @@ export default {
     navBarColor() {
       return this.$vuetify.theme.dark ? '#545454' : '#fff6ea';
     },
-
-    userProfilePicture() {
-      const defaultPicture = 'http://localhost:3001/file/profile/person-icon.jpg';
-      return this.$auth.user && this.$auth.user.picture
-        ? `http://localhost:3001/file/profile/${this.$auth.user.picture}`
-        : defaultPicture;
-    }
   }
 };
 
 </script>
 
 <style scoped>
-
 .logo-img {
   cursor: pointer;
 }
@@ -341,7 +337,7 @@ export default {
 
 .background-dark {
   background-color: #545454 !important;
-  background-image: url('http://localhost:3001/file/profile/background.png') !important;
+  background-image: url('http://localhost:3001/file/default/background.png') !important;
   background-size: 45% !important;
   background-position: center;
   background-repeat: no-repeat;
@@ -349,7 +345,7 @@ export default {
 
 .background-light {
   background-color: #fff6ea !important;
-  background-image: url('http://localhost:3001/file/profile/background.png') !important;
+  background-image: url('http://localhost:3001/file/default/background.png') !important;
   background-size: 45% !important;
   background-position: center;
   background-repeat: no-repeat;
@@ -434,5 +430,4 @@ export default {
 .non-clickable {
   pointer-events: none;
 }
-
 </style>

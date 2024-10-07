@@ -25,9 +25,22 @@
                   label="ชื่อเล่น" outlined required />
               </v-col>
 
-              <v-col cols="5" sm="11" class="pa-0 ml-4">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-select v-model="formData.type_id" :items="typeOptions" :item-text="item => item.text"
                   :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกประเภท']" label="ประเภท" outlined
+                  required>
+                  <template v-slot:item="data">
+                    <v-icon left>
+                      {{ data.item.icon }}
+                    </v-icon>
+                    {{ data.item.text }}
+                  </template>
+                </v-select>
+              </v-col>
+
+              <v-col cols="6" sm="5" class="pa-0">
+                <v-select v-model="formData.base_id" :items="baseOptions" :item-text="item => item.text"
+                  :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกฐานทุน']" label="ฐานทุน" outlined
                   required>
                   <template v-slot:item="data">
                     <v-icon left>
@@ -42,7 +55,7 @@
         </v-card-text>
 
         <v-card-actions class="card-title-center pa-0">
-          <v-btn @click="confirm" :disabled="!valid || !data.id || !data.nickname || !data.type_id" depressed
+          <v-btn @click="confirm" :disabled="!valid || !data.id || !data.nickname" depressed
             color="#24b224" class="font-weight-medium mr-2 mb-5">
             บันทึก
           </v-btn>
@@ -93,6 +106,7 @@ export default {
       formData: { ...this.data },
       valid: false,
       typeOptions: [],
+      baseOptions: [],
       originalData: {},
 
     };
@@ -100,6 +114,7 @@ export default {
 
   mounted() {
     this.setTypeOptions();
+    this.setBaseOptions();
     this.formData = { ...this.data };
     this.originalData = { ...this.data };
     document.addEventListener('keydown', this.handleKeydown);
@@ -117,6 +132,39 @@ export default {
   },
 
   methods: {
+    async setBaseOptions() {
+      try {
+        this.bases = await this.$store.dispatch('api/base/getBases');
+
+        const baseIcons = {
+          'มีเงิน': 'mdi-cash-100',
+          'รอจังหวะ': 'mdi-timer-sand',
+          'รอคุย': 'mdi-phone-in-talk',
+        };
+
+        const allBases = this.bases.map(base => ({
+          value: base.no,
+          text: base.base,
+          icon: baseIcons[base.base] || 'mdi-cash'
+        }));
+
+        const prioritizedBases = ['มีเงิน', 'รอจังหวะ','รอคุย'];
+        this.baseOptions = prioritizedBases.reduce((acc, baseName) => {
+          const base = allBases.find(r => r.text === baseName);
+          if (base) acc.push(base);
+          return acc;
+        }, []).concat(allBases.filter(r => !prioritizedBases.includes(r.text)));
+
+        if (this.data && this.data.base_id) {
+          const selectedBase = this.baseOptions.find(r => r.value === this.data.base_id);
+          this.baseOptions = selectedBase
+            ? [selectedBase, ...this.baseOptions.filter(r => r.value !== this.data.base_id)]
+            : this.baseOptions;
+        }
+      } catch (warning) {
+      }
+    },
+
     async setTypeOptions() {
       try {
         this.types = await this.$store.dispatch('api/type/getTypes');
@@ -183,6 +231,11 @@ export default {
       return type ? type.type : 'ไม่ทราบ';
     },
 
+    getBaseName(baseId) {
+      const base = this.bases.find(b => b.no === baseId);
+      return base ? base.base : 'ไม่ทราบ';
+    },
+
     handleKeydown(event) {
       if (event.key === 'Escape') {
         this.cancel();
@@ -216,6 +269,12 @@ export default {
       const originalTypeText = this.getTypeName(this.originalData.type_id);
       if (typeText !== originalTypeText) {
         changes.push('TYPE ' + typeText + '\n');
+      }
+
+      const baseText = this.getBaseName(this.data.base_id);
+      const originalBaseText = this.getBaseName(this.originalData.base_id);
+      if (baseText !== originalBaseText) {
+        changes.push('BASE ' + baseText + '\n');
       }
 
       const log = {
