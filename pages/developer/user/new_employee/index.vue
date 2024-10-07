@@ -126,7 +126,7 @@
             </v-menu>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                item-key="no" :items-per-page="10">
+                item-key="no" :items-per-page="5">
                 <template v-slot:item.picture="{ item }">
                     <v-avatar size="40">
                         <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />

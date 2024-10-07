@@ -10,7 +10,7 @@
     <v-dialog persistent :retain-focus="false" v-model="open" v-if="data" max-width="400" max-height="300"
       content-class="rounded-xl">
       <v-card class="rounded-xl">
-        <v-card-title class="card-title-center mb-7">แก้ไขรายละเอียดผู้ใช้</v-card-title>
+        <v-card-title class="card-title-center mb-7">แก้ไขรายละเอียด</v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>

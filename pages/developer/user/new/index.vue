@@ -3,7 +3,7 @@
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
         <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
-        <ResultCustomer :open="showModalResult" :customers="withdrawalItems" :types="types"
+        <ResultCustomer :open="showModalResult" :customers="withdrawalItems" :types="types" :bases="bases"
             @confirm="confirmAndAddCustomers" @cancel="showModalResult = false" />
 
         <v-card class="custom-card" flat>
@@ -23,14 +23,19 @@
                                 ]" maxlength="12" />
                         </v-col>
 
-                        <v-col cols="3">
+                        <v-col cols="2">
                             <v-text-field v-model="item.nickname" label="ชื่อเล่น" type="text" dense outlined
                                 :rules="[(v) => !!v || 'กรุณากรอกชื่อเล่น', (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'กรุณากรอกเฉพาะภาษาไทย']"></v-text-field>
                         </v-col>
 
-                        <v-col cols="3">
+                        <v-col cols="2">
                             <v-select v-model="item.type_id" :items="types" item-text="name" item-value="id"
                                 label="ประเภท" dense outlined></v-select>
+                        </v-col>
+
+                        <v-col cols="2">
+                            <v-select v-model="item.base_id" :items="bases" item-text="name" item-value="id"
+                                label="ฐานทุน" dense outlined></v-select>
                         </v-col>
 
                         <v-col cols="2" class="d-flex align-center">
@@ -68,6 +73,7 @@ export default {
     async mounted() {
         await this.checkRank()
         await this.fetchTypesData()
+        await this.fetchBasesData()
     },
 
     data() {
@@ -84,8 +90,9 @@ export default {
             },
             valid: false,
             showModalResult: false,
-            withdrawalItems: [{ id: 'AQT', nickname: '', type_id: null }],
+            withdrawalItems: [{ id: 'AQT', nickname: '', type_id: null, base_id: null }],
             types: [],
+            bases: [],
 
         }
     },
@@ -158,6 +165,7 @@ export default {
                         id: customer.id,
                         nickname: customer.nickname,
                         type_id: customer.type_id,
+                        base_id: customer.base_id,
                         emp_id: this.$auth.user.no,
                         created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                         updated_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -194,11 +202,23 @@ export default {
             }
         },
 
+        async fetchBasesData() {
+            try {
+                const response = await this.$store.dispatch('api/base/getBases');
+                if (response) {
+                    this.bases = response.map(item => ({ id: item.no, name: item.base }));
+                }
+            } catch (error) {
+                console.error('Error fetching types:', error);
+            }
+        },
+
         addProduct() {
             this.withdrawalItems.push({
                 id: null,
                 nickname: '',
                 type_id: null,
+                base_id: null,
             });
         },
 
@@ -213,7 +233,8 @@ export default {
         recordLog() {
             const details = this.withdrawalItems.map((item, index) => {
                 const typeName = this.types.find(type => type.id === item.type_id)?.name || 'ยังไม่ระบุ';
-                return `USER ${index + 1}\nID ${item.id}\nNICKNAME ${item.nickname}\nTYPE ${typeName}`;
+                const baseName = this.bases.find(base => base.id === item.base_id)?.name || 'ยังไม่ระบุ';
+                return `USER ${index + 1}\nID ${item.id}\nNICKNAME ${item.nickname}\nTYPE ${typeName}\nBASE ${baseName}`;
             }).join('\n\n');
 
             const log = {

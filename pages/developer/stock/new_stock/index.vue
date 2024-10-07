@@ -181,7 +181,6 @@ export default {
                     }
                 }
             }
-
             this.modal.complete.message = 'เพิ่มหุ้นเรียบร้อยแล้ว!';
             this.modal.complete.open = true;
             this.recordLog();

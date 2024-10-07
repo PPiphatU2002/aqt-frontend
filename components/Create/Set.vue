@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="open" max-width="300px">
+    <v-dialog v-model="isOpen" @close="updateOpen(false)" max-width="300px">
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
         <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
@@ -48,6 +48,7 @@ export default {
     data() {
         return {
             newStockType: '',
+            isOpen: this.open,
             isFormValid: false,
             modal: {
                 complete: { open: false, message: '' },
@@ -56,7 +57,27 @@ export default {
             },
         };
     },
+    watch: {
+        open(newVal) { 
+            this.isOpen = newVal;
+        }
+    },
+    mounted() {
+        window.addEventListener('keydown', this.handleKeydown);
+    },
+    beforeDestroy() {
+        window.removeEventListener('keydown', this.handleKeydown);
+    },
     methods: {
+        handleKeydown(event) {
+            if (event.key === 'Escape') {
+                this.cancel();
+            }
+        },
+        updateOpen(val) {
+            this.isOpen = val;
+            this.$emit('update:open', val);
+        },
         goBack() {
             window.location.reload();
         },
@@ -90,9 +111,9 @@ export default {
         },
         async confirm() {
             try {
-                this.modal.confirm.open = true
+                this.modal.confirm.open = true;
             } catch (error) {
-                this.modal.error.open = true
+                this.modal.error.open = true;
             }
         },
         cancel() {
@@ -100,17 +121,17 @@ export default {
             this.$emit('update:open', false);
         },
         recordLog() {
-        const log = {
-          emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
-          emp_email: this.$auth.user.email,
-          detail: 'TYPE ' + this.newStockType,
-          type: 2,
-          picture: this.$auth.user.picture || 'Unknown',
-          action: 'เพิ่มประเภทหุ้น',
-          time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-        };
-        this.$store.dispatch('api/log/addLogs', log);
-      },
+            const log = {
+                emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
+                emp_email: this.$auth.user.email,
+                detail: 'TYPE ' + this.newStockType,
+                type: 2,
+                picture: this.$auth.user.picture || 'Unknown',
+                action: 'เพิ่มประเภทหุ้น',
+                time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+            };
+            this.$store.dispatch('api/log/addLogs', log);
+        },
     },
 };
 </script>

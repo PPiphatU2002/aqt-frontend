@@ -13,7 +13,7 @@
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
                             <v-icon class="little-icon" color="#85d7df">mdi-home-account</v-icon>&nbsp;
-                            <h3 class="mb-0">ข้อมูลพนักงาน</h3>
+                            <h3 class="mb-0">ข้อมูลสมาชิก</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
                             <div class="d-flex align-center mt-2 justify-center">
@@ -73,13 +73,13 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-autocomplete v-if="searchType !== 'rank' && searchType !== 'updated_date'"
+                            <v-autocomplete v-if="searchType !== 'ranks_id' && searchType !== 'updated_date'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
                                 hide-details></v-autocomplete>
 
-                            <v-select v-if="searchType === 'rank'" v-model="selectedTopics" :items="actionTopics" dense
-                                outlined multiple class="mx-2 search-size small-font"></v-select>
+                            <v-select v-if="searchType === 'ranks_id'" v-model="selectedTopics" :items="actionTopics"
+                                dense outlined multiple class="mx-2 search-size small-font"></v-select>
 
                             <v-menu v-if="searchType === 'updated_date'" v-model="datePickerMenu"
                                 :close-on-content-click="false" transition="scale-transition" offset-y>
@@ -135,7 +135,7 @@
             </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                item-key="no" :items-per-page="10">
+                item-key="no" :items-per-page="5">
                 <template v-slot:item.picture="{ item }">
                     <v-avatar size="40">
                         <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />
@@ -160,12 +160,11 @@
                 <template v-slot:item.gender="{ item }">
                     <div class="text-center">{{ item.gender }}</div>
                 </template>
-                <template v-slot:item.rank="{ item }">
+                <template v-slot:item.ranks_id="{ item }">
                     <div class="text-center" :style="{ color: getStatusText(getRankName(item.ranks_id)).color }">
                         {{ getRankName(item.ranks_id) }}
                     </div>
                 </template>
-
                 <template v-slot:item.updated_date="{ item }">
                     <div class="text-center">{{ formatDateTime(item.updated_date) }}</div>
                 </template>
@@ -194,6 +193,11 @@
                     </div>
                 </template>
             </v-data-table>
+            <div class="text-center">
+                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                    <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
+                </v-btn>
+            </div>
         </v-card>
 
         <v-dialog v-model="dialog" max-width="300px">
@@ -280,7 +284,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'picture', 'rank', 'email', 'fname', 'lname', 'phone', 'gender', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'picture', 'ranks_id', 'email', 'fname', 'lname', 'phone', 'gender', 'emp_id', 'detail'],
 
             searchQueries: {
                 'fname': [],
@@ -292,7 +296,7 @@ export default {
                 { text: 'ชื่อ-นามสกุล', value: 'fname' },
                 { text: 'อีเมล', value: 'email' },
                 { text: 'เบอร์โทรศัพท์', value: 'phone' },
-                { text: 'ตำแหน่ง', value: 'rank' },
+                { text: 'ตำแหน่ง', value: 'ranks_id' },
                 { text: 'เวลา', value: 'updated_date' }
             ],
 
@@ -320,7 +324,7 @@ export default {
 
                 {
                     text: 'ตำแหน่ง',
-                    value: 'rank',
+                    value: 'ranks_id',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -398,6 +402,10 @@ export default {
     },
 
     methods: {
+        goToHome() {
+            this.$router.push('/developer/home');
+        },
+        
         getEmployeeById(empId) {
             return this.employees.find(employee => employee.no === empId);
         },
@@ -518,7 +526,7 @@ export default {
         },
 
         onSearchTypeChange() {
-            this.isSearchFieldVisible = this.searchType !== 'updated_date' && this.searchType !== 'rank';
+            this.isSearchFieldVisible = this.searchType !== 'updated_date' && this.searchType !== 'ranks_id';
         },
 
         validateDateRange() {
@@ -537,7 +545,7 @@ export default {
                 return;
             }
 
-            if (this.searchType === 'rank') {
+            if (this.searchType === 'ranks_id') {
                 this.addTopicToSearch();
             } else if (this.searchType === 'fname' || this.searchType === 'email' || this.searchType === 'phone') {
                 this.addTextToSearch();
@@ -573,7 +581,7 @@ export default {
         addTopicToSearch() {
             this.savedSearches.push({
                 query: '',
-                type: 'rank',
+                type: 'ranks_id',
                 topics: [...this.selectedTopics],
                 start: this.startDateTime,
                 end: this.endDateTime
@@ -632,12 +640,23 @@ export default {
                 this.filteredHeaders.forEach(header => {
                     if (header.value === 'fname') {
                         dataItem['ชื่อ-นามสกุล'] = `${item.fname} ${item.lname}`;
+                    } else if (header.value === 'ranks_id') {
+                        dataItem['ตำแหน่ง'] = this.getRankName(item.ranks_id);
                     } else if (header.value !== 'picture') {
                         dataItem[header.text] = item[header.value];
                     }
                 });
+
+                const empDetail = this.getEmployeeById(item.emp_id);
+                if (empDetail) {
+                    dataItem['ผู้อนุมัติ'] = `${empDetail.fname} ${empDetail.lname}`;
+                } else {
+                    dataItem['ผู้อนุมัติ'] = 'ไม่ทราบ';
+                }
+
                 return dataItem;
             });
+
             const csv = Papa.unparse(filteredData);
             const bom = '\uFEFF';
             const csvWithBom = bom + csv;
@@ -645,7 +664,7 @@ export default {
             const link = document.createElement('a');
             const currentDate = moment().format('YYYY-MM-DD');
             link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `ข้อมูลการส่งคำร้องขอสมัครสมาชิก-${currentDate}.csv`);
+            link.setAttribute('download', `ข้อมูลสมาชิก-${currentDate}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

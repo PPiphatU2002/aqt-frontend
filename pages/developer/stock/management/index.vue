@@ -129,13 +129,18 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <v-btn @click="goToNewStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
-                    <v-icon left color="#24b224">mdi-archive-plus</v-icon> เพิ่มหุ้น
-                </v-btn>
+                <div>
+                    <v-btn @click="goToTypeStock" class="tab-icon-three" style="font-size: 1.5 rem; margin-left: auto;">
+                        <v-icon left color="#85d7df">mdi-archive-settings</v-icon> ประเภทหุ้น
+                    </v-btn>
+                    <v-btn @click="goToNewStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
+                        <v-icon left color="#24b224">mdi-archive-plus</v-icon> เพิ่มหุ้น
+                    </v-btn>
+                </div>
             </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                item-key="no" :items-per-page="10">
+                item-key="no" :items-per-page="5">
                 <template v-slot:item.picture="{ item }">
                     <v-avatar size="40">
                         <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />
@@ -177,6 +182,11 @@
                     </div>
                 </template>
             </v-data-table>
+            <div class="text-center">
+                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                    <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
+                </v-btn>
+            </div>
         </v-card>
 
         <v-dialog v-model="dialog" max-width="300px">
@@ -377,6 +387,10 @@ export default {
     },
 
     methods: {
+        goToHome() {
+            this.$router.push('/developer/home');
+        },
+
         async fetchSetData() {
             this.sets = await this.$store.dispatch('api/set/getSets')
         },
@@ -632,7 +646,7 @@ export default {
             const link = document.createElement('a');
             const currentDate = moment().format('YYYY-MM-DD');
             link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `ข้อมูลลูกค้า-${currentDate}.csv`);
+            link.setAttribute('download', `ข้อมูลหุ้น-${currentDate}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -679,6 +693,10 @@ export default {
         goToNewStock() {
             this.$router.push('/developer/stock/new_stock');
         },
+
+        goToTypeStock() {
+            this.$router.push('/developer/stock/type');
+        },
     },
 };
 
@@ -716,6 +734,12 @@ export default {
 .tab-icon-two {
     cursor: pointer;
     margin-right: 24px;
+    margin-left: 0px;
+}
+
+.tab-icon-three {
+    cursor: pointer;
+    margin-right: 8px;
     margin-left: 0px;
 }
 

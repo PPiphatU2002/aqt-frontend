@@ -135,7 +135,7 @@
             </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                item-key="no" :items-per-page="10">
+                item-key="no" :items-per-page="5">
                 <template v-slot:item.picture="{ item }">
                     <v-avatar size="40">
                         <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />
@@ -148,8 +148,13 @@
                     <div class="text-center">{{ item.nickname }}</div>
                 </template>
                 <template v-slot:item.type_id="{ item }">
-                    <div class="text-center" :style="{ color: getFromText(getTypeName(item.type_id)).color }">
+                    <div class="text-center" :style="{ color: getTypeText(getTypeName(item.type_id)).color }">
                         {{ getTypeName(item.type_id) }}
+                    </div>
+                </template>
+                <template v-slot:item.base_id="{ item }">
+                    <div class="text-center" :style="{ color: getBaseText(getBaseName(item.base_id)).color }">
+                        {{ getBaseName(item.base_id) }}
                     </div>
                 </template>
                 <template v-slot:item.emp_id="{ item }">
@@ -183,6 +188,11 @@
                     </div>
                 </template>
             </v-data-table>
+            <div class="text-center">
+                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                    <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
+                </v-btn>
+            </div>
         </v-card>
 
         <v-dialog v-model="dialog" max-width="300px">
@@ -221,6 +231,7 @@ export default {
         await this.fetchCustomerData();
         await this.fetchEmployeeData();
         await this.fetchTypeData();
+        await this.fetchBaseData();
     },
 
     components: {
@@ -246,6 +257,7 @@ export default {
             customers: [],
             types: [],
             employees: [],
+            bases: [],
 
             sortBy: 'updated_date',
             currentAction: '',
@@ -271,7 +283,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'id', 'nickname', 'type_id', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'id', 'nickname', 'type_id', 'base_id', 'emp_id', 'detail'],
 
             searchQueries: {
                 'nickname': [],
@@ -324,6 +336,14 @@ export default {
                 },
 
                 {
+                    text: 'ฐานทุน',
+                    value: 'base_id',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
                     text: 'ทำรายการโดย',
                     value: 'emp_id',
                     sortable: false,
@@ -363,6 +383,10 @@ export default {
     },
 
     methods: {
+        goToHome() {
+            this.$router.push('/developer/home');
+        },
+
         async fetchTypeData() {
             this.types = await this.$store.dispatch('api/type/getTypes')
         },
@@ -370,6 +394,15 @@ export default {
         getTypeName(typeId) {
             const type = this.types.find(t => t.no === typeId);
             return type ? type.type : 'ยังไม่ระบุ';
+        },
+
+        async fetchBaseData() {
+            this.bases = await this.$store.dispatch('api/base/getBases')
+        },
+
+        getBaseName(baseId) {
+            const base = this.bases.find(b => b.no === baseId);
+            return base ? base.base : 'ยังไม่ระบุ';
         },
 
         async fetchCustomerData() {
@@ -449,11 +482,23 @@ export default {
             }
         },
 
-        getFromText(type) {
+        getTypeText(type) {
             if (type === 'เทรดเอง') {
                 return { text: 'เทรดเอง', color: '#24b224' };
             } else if (type === 'เทรดตามโค้ช') {
                 return { text: 'เทรดตามโค้ช', color: '#ffc800' };
+            } else {
+                return { text: 'ยังไม่ระบุ', color: '#e50211' };
+            }
+        },
+
+        getBaseText(base) {
+            if (base === 'มีเงิน') {
+                return { text: 'มีเงิน', color: '#24b224' };
+            } else if (base === 'รอจังหวะ') {
+                return { text: 'รอจังหวะ', color: '#ffc800' };
+            } else if (base === 'รอคุย') {
+                return { text: 'รอคุย', color: '#85d7df' };
             } else {
                 return { text: 'ยังไม่ระบุ', color: '#e50211' };
             }

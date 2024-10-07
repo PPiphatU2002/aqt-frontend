@@ -25,7 +25,7 @@ export default {
         open: Boolean,
         customers: Array,
         types: Array,
-        froms: Array,
+        bases: Array,
     },
     data() {
         return {
@@ -33,18 +33,22 @@ export default {
                 { text: 'ไอดีลูกค้า', value: 'id' },
                 { text: 'ชื่อเล่น', value: 'nickname' },
                 { text: 'ประเภท', value: 'type_name' },
+                { text: 'ฐานทุน', value: 'base_name' },
             ],
         };
     },
     computed: {
         formattedCustomers() {
             const types = this.types || [];
+            const bases = this.bases || [];
 
             return this.customers.map(customer => {
                 const type = types.find(t => t.id === customer.type_id);
+                const base = bases.find(b => b.id === customer.base_id);
                 return {
                     ...customer,
-                    type_name: type ? type.name : ''
+                    type_name: type ? type.name : '',
+                    base_name: base ? base.name : '',
                 };
             });
         },

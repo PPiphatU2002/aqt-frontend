@@ -127,7 +127,7 @@
             </v-menu>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
-                item-key="no" :items-per-page="10">
+                item-key="no" :items-per-page="5">
                 <template v-slot:item.picture="{ item }">
                     <v-avatar size="40">
                         <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />
@@ -153,6 +153,11 @@
                     <div class="text-center">{{ formatDateTime(item.time) }}</div>
                 </template>
             </v-data-table>
+            <div class="text-center">
+                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                    <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
+                </v-btn>
+            </div>
         </v-card>
 
         <v-dialog v-model="dialog" max-width="300px">
@@ -353,6 +358,10 @@ export default {
     },
 
     methods: {
+        goToHome() {
+            this.$router.push('/developer/home');
+        },
+        
         getSearchItems(type) {
             if (type === 'emp_name') {
                 return this.logs.map(log => log.emp_name);

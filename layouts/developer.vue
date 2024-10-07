@@ -34,7 +34,7 @@
                 <v-icon class="icon-tab">mdi-home-account</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลพนักงาน</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลสมาชิก</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
