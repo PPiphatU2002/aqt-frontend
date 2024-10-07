@@ -292,7 +292,7 @@ export default {
                     } else if (RankID === '2') {
                         this.$router.push('/app/home');
                     } else if (RankID === '3') {
-                        this.$router.push('app/stock/type');
+                        this.$router.push('/app/stock/type');
                     } else {
                         this.$router.push('/auth');
                     }

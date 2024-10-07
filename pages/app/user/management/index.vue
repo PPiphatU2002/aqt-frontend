@@ -472,7 +472,7 @@ export default {
                     } else if (RankID === '2') {
                         this.$router.push('/app/user/management');
                     } else if (RankID === '3') {
-                        this.$router.push('app/user/management');
+                        this.$router.push('/app/user/management');
                     } else {
                         this.$router.push('/auth');
                     }

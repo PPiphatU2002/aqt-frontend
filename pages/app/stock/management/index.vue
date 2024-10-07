@@ -468,7 +468,7 @@ export default {
                     } else if (RankID === '2') {
                         this.$router.push('/app/home');
                     } else if (RankID === '3') {
-                        this.$router.push('app/stock/management');
+                        this.$router.push('/app/stock/management');
                     } else {
                         this.$router.push('/auth');
                     }
