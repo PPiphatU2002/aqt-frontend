@@ -80,6 +80,7 @@ export default {
 
                 this.modal.complete.message = 'เพิ่มประเภทหุ้นสำเร็จ';
                 this.modal.complete.open = true;
+                this.recordLog();
                 this.newStockType = '';
                 this.$emit('update:open', false);
             } catch (error) {
@@ -98,6 +99,18 @@ export default {
             this.newStockType = '';
             this.$emit('update:open', false);
         },
+        recordLog() {
+        const log = {
+          emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
+          emp_email: this.$auth.user.email,
+          detail: 'TYPE ' + this.newStockType,
+          type: 2,
+          picture: this.$auth.user.picture || 'Unknown',
+          action: 'เพิ่มประเภทหุ้น',
+          time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+        };
+        this.$store.dispatch('api/log/addLogs', log);
+      },
     },
 };
 </script>
