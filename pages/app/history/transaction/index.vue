@@ -2,6 +2,6 @@
 
 <script>
     export default {
-        layout: 'developer'
+        layout: 'user'
     }
 </script>

@@ -18,7 +18,7 @@ import Papa from 'papaparse';
 import moment from 'moment'; // อย่าลืมตรวจสอบการนำเข้า moment
 
 export default {
-    layout: 'developer',
+    layout: 'user',
     middleware: 'auth',
     data() {
         return {

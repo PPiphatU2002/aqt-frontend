@@ -67,7 +67,7 @@ import moment from 'moment'
 moment.locale('th')
 
 export default {
-    layout: 'developer',
+    layout: 'user',
     middleware: 'auth',
 
     async mounted() {

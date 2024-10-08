@@ -212,7 +212,7 @@ import Papa from 'papaparse';
 
 export default {
 
-    layout: 'developer',
+    layout: 'user',
     middleware: 'auth',
 
     async mounted() {
