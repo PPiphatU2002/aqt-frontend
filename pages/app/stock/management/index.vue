@@ -106,7 +106,7 @@
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
                             </v-btn>
 
-                            <v-btn color="success" @click="exportCSV" icon>
+                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportCSV" icon>
                                 <v-icon>mdi-file-excel</v-icon>
                             </v-btn>
                         </div>

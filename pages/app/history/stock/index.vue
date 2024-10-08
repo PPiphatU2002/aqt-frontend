@@ -104,7 +104,7 @@
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
                             </v-btn>
 
-                            <v-btn color="success" @click="exportCSV" icon>
+                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportCSV" icon>
                                 <v-icon>mdi-file-excel</v-icon>
                             </v-btn>
                         </div>
@@ -155,7 +155,7 @@
                 </template>
             </v-data-table>
             <div class="text-center">
-                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                <v-btn class="mb-4" color="#e50211" @click="goToHome">
                     <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
                 </v-btn>
             </div>
@@ -385,7 +385,7 @@ export default {
         goToHome() {
             this.$router.push('/app/home');
         },
-        
+
         getSearchItems(type) {
             if (type === 'emp_name') {
                 return this.logs.map(log => log.emp_name);

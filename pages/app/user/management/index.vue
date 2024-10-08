@@ -106,7 +106,7 @@
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
                             </v-btn>
 
-                            <v-btn color="success" @click="exportCSV" icon>
+                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportCSV" icon>
                                 <v-icon>mdi-file-excel</v-icon>
                             </v-btn>
                         </div>
@@ -163,7 +163,7 @@
                 <template v-slot:item.updated_date="{ item }">
                     <div class="text-center">{{ formatDateTime(item.updated_date) }}</div>
                 </template>
-                <template v-slot:item.detail="{ item }">
+                <template v-if="$auth.user.ranks_id === 1 || $auth.user.ranks_id === 3" v-slot:item.detail="{ item }">
                     <div class="text-center">
                         <v-menu offset-y>
                             <template v-slot:activator="{ on, attrs }">

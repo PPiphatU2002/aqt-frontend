@@ -407,7 +407,7 @@ export default {
                     } else if (RankID === '2') {
                         this.$router.push('/app/home');
                     } else if (RankID === '3') {
-                        this.$router.push('/app/history/employee');
+                        this.$router.push('/app/home');
                     } else {
                         this.$router.push('/auth');
                     }
