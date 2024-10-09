@@ -15,14 +15,7 @@
                         <v-col cols="12" class="d-flex justify-center">
                             <v-btn color="#24b224" @click="transaction"
                                 :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
-                                ซื้อหุ้น
-                            </v-btn>
-                        </v-col>
-
-                        <v-col cols="12" class="d-flex justify-center">
-                            <v-btn color="#24b224" @click="management"
-                                :style="{ fontSize: '20px', height: '60px', width: '150%' }">
-                                ขายหุ้น
+                                ข้อมูลการซื้อขายหุ้นของลูกค้า
                             </v-btn>
                         </v-col>
                     </v-row>
@@ -75,11 +68,7 @@ export default {
         },
 
         transaction() {
-            this.$router.push('/app/transaction/buy');
-        },
-
-        management() {
-            this.$router.push('/app/transaction/sale');
+            this.$router.push('/app/transaction/customer_trade');
         },
     }
 }

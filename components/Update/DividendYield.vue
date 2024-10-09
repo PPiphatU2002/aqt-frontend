@@ -8,7 +8,7 @@
             </div>
 
             <div class="d-flex justify-center mt-0">
-                <img src="http://localhost:3001/file/default/close_price.gif" alt="Loading" width="150" />
+                <img src="http://localhost:3001/file/default/dividend_yield.gif" alt="Loading" width="150" />
             </div>
 
             <v-card-actions class="justify-center mb-2">

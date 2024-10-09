@@ -9,11 +9,6 @@ export const actions = {
             .get(`customer/${no}`)
             .then((res) => res.data)
     },
-    async getCustomersByType({ getters }, type_id) {
-        return await this.$axios
-            .get(`customer/type/${type_id}`)
-            .then((res) => res.data)
-    },
     async addCustomer({ getters }, data) {
         return await this.$axios
             .post('customer', data)

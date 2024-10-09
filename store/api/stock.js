@@ -29,4 +29,9 @@ export const actions = {
             .$put(`stock/update-close-price/${data.name}`, data)
             .then((res) => res.data)
     },
+    async updateDividendYieldByName({ getters }, data) {
+        return await this.$axios
+            .$put(`stock/update-dividend-yield/${data.name}`, data)
+            .then((res) => res.data)
+    },
 }

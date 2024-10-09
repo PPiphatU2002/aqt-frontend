@@ -45,7 +45,7 @@
                                 <v-icon>mdi-delete</v-icon>
                             </v-btn>
                             <v-btn color="#24b224" @click="addProduct" text class="mb-6 ml-2">
-                                <v-icon left>mdi-archive-plus</v-icon> เพิ่มหุ้น
+                                <v-icon left>mdi-archive-plus</v-icon> เพิ่ม
                             </v-btn>
                         </v-col>
                     </v-row>

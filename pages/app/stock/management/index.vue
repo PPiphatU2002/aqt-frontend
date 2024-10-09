@@ -254,7 +254,7 @@ export default {
             sortBy: 'updated_date',
             currentAction: '',
             searchQuery: '',
-            searchType: '',
+            searchType: 'name',
             selectedItemDetail: '',
             startDateTime: '',
             endDateTime: '',
