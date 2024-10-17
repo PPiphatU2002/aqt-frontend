@@ -179,21 +179,22 @@
                 <template v-slot:item.percent="{ item }">
                     <div class="text-center">
                         <span :style="{ color: getColorForPercent(item.percent) }">
-                            {{ item.percent }}%
+                            {{ item.percent.toFixed(2) }}%
                         </span>
                     </div>
                 </template>
                 <template v-slot:item.port="{ item }">
                     <div class="text-center">
-                        <span :style="{ color: getPortText(item.port).color }">
-                            {{ item.port }}
+                        <span :style="{ color: getPortText(item.total_percent).color }">
+                            {{ getPortText(item.total_percent).text }}
                         </span>
                     </div>
                 </template>
+
                 <template v-slot:item.total_percent="{ item }">
                     <div class="text-center">
                         <span :style="{ color: getColorForPercent(item.total_percent) }">
-                            {{ item.total_percent }}%
+                            {{ item.total_percent.toFixed(2) }}%
                         </span>
                     </div>
                 </template>
@@ -380,7 +381,7 @@ export default {
                 },
 
                 {
-                    text: 'ยอดเงินปันผล',
+                    text: 'มูลค่าปัจจุบัน',
                     value: 'money',
                     sortable: false,
                     align: 'center',
@@ -388,7 +389,7 @@ export default {
                 },
 
                 {
-                    text: 'มูลค่าปัจจุบัน',
+                    text: 'ยอดเงินปันผล',
                     value: 'balance_dividend',
                     sortable: false,
                     align: 'center',
@@ -524,18 +525,8 @@ export default {
 
         async handleConfirm() {
             if (this.currentAction === 'delete') {
-                if (currentRank === 'ผู้พัฒนา' && targetRank === 'ผู้พัฒนา') {
-                    this.modal.warning.open = true;
-                    this.modal.warning.message = 'ไม่สามารถลบผู้ใช้งานที่มีตำแหน่งผู้พัฒนาได้';
-                    return;
-                }
-                if (currentRank === 'แอดมิน' && (targetRank === 'ผู้พัฒนา' || targetRank === 'แอดมิน')) {
-                    this.modal.warning.open = true;
-                    this.modal.warning.message = 'ไม่สามารถลบผู้ใช้งานที่มีตำแหน่งผู้พัฒนาหรือแอดมินได้';
-                    return;
-                }
                 try {
-                    await this.$store.dispatch('api/employee/deleteEmployee', this.currentItem.no);
+                    await this.$store.dispatch('api/detail/deleteDetail', this.currentItem.no);
                     this.modal.complete.message = 'ลบผู้ใช้งานนี้เรียบร้อยแล้ว';
                     this.recordLog();
                     this.modal.complete.open = true;
@@ -619,17 +610,25 @@ export default {
             }
         },
 
-        getPortText(port) {
-            if (port === 'ถือ') {
-                return { text: 'ถือ', color: '#ff5757' };
-            } else if (port === 'กำไร') {
-                return { text: 'กำไร', color: '#c1ff72' };
-            } else if (port === 'แก้เกมได้') {
-                return { text: 'แก้เกมได้', color: '#85d7df' };
+        getPortText(total_percent) {
+            let port, color;
+
+            // Determine the port and color based on total_percent
+            if (total_percent >= 0) {
+                port = 'กำไร';
+                color = '#c1ff72'; // Color for 'กำไร'
+            } else if (total_percent >= -19.99 && total_percent < 0) {
+                port = 'แก้เกมได้';
+                color = '#85d7df'; // Color for 'แก้เกมได้'
             } else {
-                return { text: '', color: 'inherit' };
+                port = 'ถือ';
+                color = '#ff5757'; // Color for 'ถือ'
             }
+
+            // Return object with port and color
+            return { text: port, color: color };
         },
+
 
         getColorForNumber(value) {
             if (value < 0) {

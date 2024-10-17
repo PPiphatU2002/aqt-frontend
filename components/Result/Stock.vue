@@ -31,8 +31,8 @@ export default {
             headers: [
                 { text: 'ชื่อหุ้น', value: 'name' },
                 { text: 'ประเภท', value: 'set_name' },
-                { text: 'ปันผลครึ่งปีแรก/หลัง', value: 'dividend_amount' },
-                { text: 'ราคาปิดวันศุกร์', value: 'closing_price' },
+                { text: 'จำนวนปันผล', value: 'dividend_amount' },
+                { text: 'ราคาปิด', value: 'closing_price' },
             ],
         };
     },

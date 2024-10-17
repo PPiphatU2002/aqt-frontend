@@ -74,7 +74,6 @@
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
                                 hide-details></v-autocomplete>
 
-
                             <v-select v-if="searchType === 'action'" v-model="selectedTopics" :items="actionTopics"
                                 dense outlined multiple class="mx-2 search-size small-font"></v-select>
 
@@ -155,7 +154,7 @@
                 </template>
             </v-data-table>
             <div class="text-center">
-                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                <v-btn class="mb-4" color="#e50211" @click="goToHome">
                     <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
                 </v-btn>
             </div>
@@ -164,7 +163,7 @@
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
                 <v-card-title class="headline"
-                    style="justify-content: center; display: flex;">รายละเอียดเพิ่มเติม</v-card-title>
+                    style="justify-content: center; display: flex;">การแก้ไข</v-card-title>
                 <v-card-text>
                     <div v-for="line in formattedDetailLines" :key="line">
                         <template v-if="line.includes('.jpg') || line.includes('.png') || line.includes('.jpeg')">
@@ -173,45 +172,45 @@
                                     height="100" />
                             </div>
                         </template>
-                        <template v-else-if="line.includes('PHONE')">
-                            <v-icon color="green">mdi-phone</v-icon>
-                            {{ line.replace('PHONE', '').trim() }}
+                        <template v-else-if="line.includes('เบอร์โทรศัพท์')">
+                            <span style="color: green">เบอร์โทรศัพท์ </span>{{ line.replace('เบอร์โทรศัพท์', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('NEW')">
-                            <v-icon color="white">mdi-lock-reset</v-icon>
-                            {{ maskNewData(line.replace('NEW', '').trim()) }}
+                        <template v-else-if="line.includes('รหัสผ่าน')">
+                            <span style="color: white">รหัสผ่าน </span>{{ line.replace('รหัสผ่าน', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('GENDER')">
-                            <v-icon color="blue">mdi-gender-male-female</v-icon>
-                            {{ line.replace('GENDER', '').trim() }}
+                        <template v-else-if="line.includes('เพศ')">
+                            <span style="color: blue">เพศ </span>{{ line.replace('เพศ', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('NAME')">
-                            <v-icon color="white">mdi-pen</v-icon>
-                            {{ line.replace('NAME', '').trim() }}
+                        <template v-else-if="line.includes('ชื่อเล่น')">
+                            <span style="color: white">ชื่อเล่น </span>{{ line.replace('ชื่อเล่น', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('SUR')">
-                            <v-icon color="yellow">mdi-home-group</v-icon>
-                            {{ line.replace('SUR', '').trim() }}
+                        <template v-else-if="line.includes('ชื่อ')">
+                            <span style="color: yellow">ชื่อ </span>{{ line.replace('ชื่อ', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('EMAIL')">
-                            <v-icon color="red">mdi-email</v-icon>
-                            {{ line.replace('EMAIL', '').trim() }}
+                        <template v-else-if="line.includes('อีเมล')">
+                            <span style="color: red">อีเมล </span>{{ line.replace('อีเมล', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('STATUS')">
-                            <v-icon color="orange">mdi-information-symbol</v-icon>
-                            {{ line.replace('STATUS', '').trim() }}
+                        <template v-else-if="line.includes('สถานะ')">
+                            <span style="color: orange">สถานะ </span>{{ line.replace('สถานะ', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('RANK')">
-                            <v-icon color="purple">mdi-chair-rolling</v-icon>
-                            {{ line.replace('RANK', '').trim() }}
+                        <template v-else-if="line.includes('ตำแหน่ง')">
+                            <span style="color: purple">ตำแหน่ง </span>{{ line.replace('ตำแหน่ง', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('LOCATION')">
-                            <v-icon color="red">mdi-map-marker</v-icon>
-                            {{ line.replace('LOCATION', '').trim() }}
+                        <template v-else-if="line.includes('ที่อยู่')">
+                            <span style="color: green">ที่อยู่ </span>{{ line.replace('ที่อยู่', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('IP')">
-                            <v-icon color="blue">mdi-ip</v-icon>
-                            {{ line.replace('IP', '').trim() }}
+                        <template v-else-if="line.includes('ไอพี')">
+                            <span style="color: blue">ไอพี </span>{{ line.replace('ไอพี', '').trim()
+                            }}
                         </template>
                         <template v-else>
                             {{ line }}
@@ -278,7 +277,7 @@ export default {
             showColumnSelector: false,
             selectedTopics: [],
             savedSearches: [],
-            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'detail'],
+            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_id', 'emp_name', 'detail'],
 
             searchQueries: {
                 'emp_name': [],
@@ -286,7 +285,7 @@ export default {
             },
 
             searchTypes: [
-                { text: 'ชื่อ-นามสกุล', value: 'emp_name' },
+                { text: 'ทำรายการโดย', value: 'emp_name' },
                 { text: 'อีเมล', value: 'emp_email' },
                 { text: 'การกระทำ', value: 'action' },
                 { text: 'เวลา', value: 'time' }
@@ -321,8 +320,8 @@ export default {
                 },
 
                 {
-                    text: 'การกระทำ',
-                    value: 'action',
+                    text: 'ทำรายการโดย',
+                    value: 'emp_name',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -337,15 +336,23 @@ export default {
                 },
 
                 {
-                    text: 'ชื่อ-นามสกุล',
-                    value: 'emp_name',
+                    text: 'การกระทำ',
+                    value: 'action',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'หมายเหตุ',
+                    text: 'ผู้ถูกกระทำ',
+                    value: 'emp_id',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'รายละเอียด',
                     value: 'detail',
                     sortable: false,
                     align: 'center',
@@ -379,7 +386,7 @@ export default {
         onImageError(event, item) {
             event.target.src = `http://localhost:3001/file/default/${item.picture}`;
         },
-        
+
         goToHome() {
             this.$router.push('/app/home');
         },

@@ -55,7 +55,7 @@
         </v-card-text>
 
         <v-card-actions class="card-title-center pa-0">
-          <v-btn @click="confirm" :disabled="!valid || !data.id || !data.nickname" depressed
+          <v-btn @click="confirm" :disabled="!valid || !formData.id || !formData.nickname" depressed
             color="#24b224" class="font-weight-medium mr-2 mb-5">
             บันทึก
           </v-btn>

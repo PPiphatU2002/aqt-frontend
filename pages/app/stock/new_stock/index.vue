@@ -162,12 +162,9 @@ export default {
                     await this.$store.dispatch('api/stock/addStock', {
                         name: stock.name,
                         set_id: stock.set_id,
-                        up_price: stock.up_price,
-                        low_price: stock.low_price,
                         dividend_amount: stock.dividend_amount,
                         closing_price: stock.closing_price,
                         comment: stock.comment,
-                        comment_two: stock.comment_two,
                         emp_id: this.$auth.user.no,
                         created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                         updated_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -207,12 +204,9 @@ export default {
             this.withdrawalItems.push({
                 name: '',
                 set_id: null,
-                up_price: null,
-                low_price: null,
                 dividend_amount: null,
                 closing_price: null,
                 comment: null,
-                comment_two: null,
             });
         },
 

@@ -249,7 +249,7 @@ export default {
         picture: employeePicture,
         type: 4,
         action: 'ออกจากระบบ',
-        detail: `LOCATION ${userLocation}\nIP ${userIP}`,
+        detail: `ที่อยู่ ${userLocation}\nไอพี ${userIP}`,
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };
       this.$store.dispatch('api/log/addLogs', log);

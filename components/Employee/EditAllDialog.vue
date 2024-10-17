@@ -81,7 +81,7 @@
 
         <v-card-actions class="card-title-center pa-0">
           <v-btn @click="confirm"
-            :disabled="!valid || !data.fname || !data.lname || !data.phone || !data.email || !data.ranks_id || !data.status"
+            :disabled="!valid || !hasChanges || !formData.fname || !formData.lname || !formData.phone || !formData.email || !formData.ranks_id || !formData.status"
             depressed color="#24b224" class="font-weight-medium mr-2 mb-5">
             บันทึก
           </v-btn>
@@ -139,18 +139,29 @@ export default {
     };
   },
 
+  computed: {
+    hasChanges() {
+      return JSON.stringify(this.formData) !== JSON.stringify(this.originalData);
+    }
+  },
+
   mounted() {
     this.setGenderOptions();
     this.setRankOptions();
     this.setStatusOptions();
-    this.formData = { ...this.data };
-    this.originalData = { ...this.data };
+    this.formData = JSON.parse(JSON.stringify(this.data));
+    this.originalData = JSON.parse(JSON.stringify(this.data));
     document.addEventListener('keydown', this.handleKeydown);
   },
 
   watch: {
-    data(newData) {
-      this.formData = { ...newData };
+    data: {
+      handler(newData) {
+        this.formData = JSON.parse(JSON.stringify(newData));
+        this.originalData = JSON.parse(JSON.stringify(newData));
+      },
+      deep: true,
+      immediate: true
     }
   },
 
@@ -194,8 +205,8 @@ export default {
 
     async confirm() {
       const currentRank = this.getRankName(this.$auth.user.ranks_id);
-      const targetRank = this.getRankName(this.data.ranks_id);
-      const isSelfEdit = this.$auth.user.email === this.data.email;
+      const targetRank = this.getRankName(this.formData.ranks_id);
+      const isSelfEdit = this.$auth.user.email === this.formData.email;
 
       if (currentRank === 'ผู้พัฒนา') {
         if (targetRank === 'ผู้พัฒนา' && !isSelfEdit) {
@@ -344,40 +355,41 @@ export default {
 
     recordLogUpdate() {
       const changes = [];
-      if (this.data.fname !== this.originalData.fname) {
-        changes.push('NAME ' + this.data.fname + '\n');
+      if (this.formData.fname !== this.originalData.fname) {
+        changes.push('ชื่อเล่น : ' + this.formData.fname + '\n');
       }
-      if (this.data.lname !== this.originalData.lname) {
-        changes.push('SUR ' + this.data.lname + '\n');
+      if (this.formData.lname !== this.originalData.lname) {
+        changes.push('ชื่อ : ' + this.formData.lname + '\n');
       }
-      if (this.data.phone !== this.originalData.phone) {
-        changes.push('PHONE ' + this.data.phone + '\n');
+      if (this.formData.phone !== this.originalData.phone) {
+        changes.push('เบอร์โทรศัพท์ : ' + this.formData.phone + '\n');
       }
-      if (this.data.gender !== this.originalData.gender) {
-        changes.push('GENDER ' + this.data.gender + '\n');
+      if (this.formData.gender !== this.originalData.gender) {
+        changes.push('เพศ : ' + this.formData.gender + '\n');
       }
-      if (this.data.email !== this.originalData.email) {
-        changes.push('EMAIL ' + this.data.email + '\n');
+      if (this.formData.email !== this.originalData.email) {
+        changes.push('อีเมล : ' + this.formData.email + '\n');
       }
 
-      const rankText = this.getRankName(this.data.ranks_id);
+      const rankText = this.getRankName(this.formData.ranks_id);
       const originalRankText = this.getRankName(this.originalData.ranks_id);
       if (rankText !== originalRankText) {
-        changes.push('RANK ' + rankText + '\n');
+        changes.push('ตำแหน่ง : ' + rankText + '\n');
       }
 
-      const statusText = this.getStatusText(this.data.status);
+      const statusText = this.getStatusText(this.formData.status);
       const originalStatusText = this.getStatusText(this.originalData.status);
       if (statusText !== originalStatusText) {
-        changes.push('STATUS ' + statusText + '\n');
+        changes.push('สถานะ : ' + statusText + '\n');
       }
 
       const log = {
+        emp_id: this.originalData.fname + ' ' + this.originalData.lname,
         emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
         emp_email: this.$auth.user.email,
         detail: changes.join(''),
         type: 4,
-        picture: this.$auth.user.picture || 'Unknown',
+        picture: this.$auth.user.picture || 'ไม่รู้จัก',
         action: 'แก้ไขข้อมูลผู้ใช้งาน',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };

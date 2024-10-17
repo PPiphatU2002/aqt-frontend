@@ -166,9 +166,10 @@ export default {
         fetchDividendYieldData() {
             this.isLoadingDividendYield = true;
             this.headers = [ // ตั้งค่า headers สำหรับจำนวนปันผล
-                { text: 'Year', value: 'year' },
-                { text: 'Symbol', value: 'symbol' },
-                { text: 'Dividend', value: 'dividend' }
+                { text: 'ปี', value: 'year' },
+                { text: 'ชื่อหุ้น', value: 'symbol' },
+                { text: 'จำนวนปันผล', value: 'dividend' },
+                { text: 'หมายเหตุ', value: 'remark' }
             ];
 
             this.xhr = new XMLHttpRequest();
@@ -241,31 +242,31 @@ export default {
             Papa.parse(data, {
                 header: true,
                 complete: (results) => {
-                    // สร้าง object เพื่อเก็บข้อมูลปีล่าสุดสำหรับแต่ละ symbol
                     const latestData = {};
 
                     results.data.forEach(item => {
                         const symbol = item.symbol;
                         const year = parseInt(item.year);
                         const dividend = item.dividend;
+                        const remark = item.remark; // Extract the remark
 
                         if (symbol && !isNaN(year) && dividend) {
-                            // ถ้ายังไม่มีข้อมูลสำหรับ symbol นี้ หรือปีปัจจุบันมากกว่าปีล่าสุดที่เก็บไว้
                             if (!latestData[symbol] || year > latestData[symbol].year) {
-                                latestData[symbol] = { year: year, dividend: dividend };
+                                latestData[symbol] = { year: year, dividend: dividend, remark: remark }; // Store remark
                             }
                         }
                     });
 
-                    // แปลง object ให้กลับมาเป็น array สำหรับ v-data-table
+                    // Convert object back to array for v-data-table
                     this.csvData = Object.keys(latestData).map(symbol => ({
                         year: latestData[symbol].year,
                         symbol: symbol,
                         dividend: latestData[symbol].dividend,
+                        remark: latestData[symbol].remark, // Include remark in the output
                     }));
 
                     this.isLoadingDividendYield = false;
-                    this.isDataLoaded = true; // ตั้งค่า flag เป็น true หลังจากโหลดข้อมูลเสร็จ
+                    this.isDataLoaded = true;
                 },
             });
         },
@@ -298,10 +299,13 @@ export default {
 
                     if (stockData.dividend !== undefined) {
                         const dividend = stockData.dividend;
+                        const remark = stockData.remark; // Get the remark from stockData
+
                         await this.$store.dispatch('api/stock/updateDividendYieldByName', {
                             emp_id: this.$auth.user.no,
                             name: symbol,
-                            dividend_amount: dividend
+                            dividend_amount: dividend,
+                            comment: remark // Include the remark in the payload
                         });
                     }
                 }
@@ -311,7 +315,7 @@ export default {
             } catch (error) {
                 alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
             }
-        },
+        }
     },
 };
 </script>

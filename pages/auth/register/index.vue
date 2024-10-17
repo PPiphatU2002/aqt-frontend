@@ -45,12 +45,12 @@
 
                                 <v-row class="pa-0">
                                     <v-col cols="12" sm="6" class="pa-1">
-                                        <v-text-field v-model="form.fname" label="ชื่อ" prepend-icon="mdi-pen" outlined
+                                        <v-text-field v-model="form.fname" label="ชื่อเล่น" prepend-icon="mdi-pen" outlined
                                             dense class="small-text-field"
                                             :rules="[rules.required, rules.thaiOnly]"></v-text-field>
                                     </v-col>
                                     <v-col cols="12" sm="6" class="pa-1">
-                                        <v-text-field v-model="form.lname" label="นามสกุล" prepend-icon="mdi-home-group"
+                                        <v-text-field v-model="form.lname" label="ชื่อจริง" prepend-icon="mdi-home-group"
                                             outlined dense class="small-text-field"
                                             :rules="[rules.required, rules.thaiOnly]"></v-text-field>
                                     </v-col>
