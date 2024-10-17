@@ -155,7 +155,7 @@
                 </template>
             </v-data-table>
             <div class="text-center">
-                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                <v-btn class="mb-4" color="#e50211" @click="goToHome">
                     <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
                 </v-btn>
             </div>
@@ -163,8 +163,9 @@
 
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
-                <v-card-title class="headline"
-                    style="justify-content: center; display: flex;">รายละเอียดเพิ่มเติม</v-card-title>
+                <v-card-title class="headline" style="justify-content: center; display: flex;">
+                    {{ getDetailTitle(selectedItemDetail.action) }}
+                </v-card-title>
                 <v-card-text>
                     <div v-for="(line, index) in formattedDetailLines" :key="`${line}-${index}`">
                         <template v-if="line.includes('.jpg') || line.includes('.png') || line.includes('.jpeg')">
@@ -173,25 +174,25 @@
                                     height="100" />
                             </div>
                         </template>
-                        <template v-else-if="line.includes('NICKNAME')">
-                            <v-icon color="white">mdi-pen</v-icon>
-                            {{ line.replace('NICKNAME', '').trim() }}
+                        <template v-else-if="line.includes('ชื่อเล่น')">
+                            <span style="color: white">ชื่อเล่น </span>{{ line.replace('ชื่อเล่น', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('USER')">
-                            <v-icon color="green">mdi-account-plus</v-icon>
-                            {{ line.replace('USER', '').trim() }}
+                        <template v-else-if="line.includes('ลูกค้าคนที่ ')">
+                            <span style="color: green">ลูกค้าคนที่ </span>{{ line.replace('ลูกค้าคนที่', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('BASE')">
-                            <v-icon color="yellow">mdi-currency-usd</v-icon>
-                            {{ line.replace('BASE', '').trim() }}
+                        <template v-else-if="line.includes('ฐานทุน')">
+                            <span style="color: yellow">ฐานทุน </span>{{ line.replace('ฐานทุน', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('TYPE')">
-                            <v-icon color="blue">mdi-format-list-bulleted-type</v-icon>
-                            {{ line.replace('TYPE', '').trim() }}
+                        <template v-else-if="line.includes('ประเภท')">
+                            <span style="color: blue">ประเภท </span>{{ line.replace('ประเภท', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('ID')">
-                            <v-icon color="red">mdi-identifier</v-icon>
-                            {{ line.replace('ID', '').trim() }}
+                        <template v-else-if="line.includes('รหัส')">
+                            <span style="color: red">รหัส </span>{{ line.replace('รหัส', '').trim()
+                            }}
                         </template>
                         <template v-else>
                             {{ line }}
@@ -258,7 +259,7 @@ export default {
             showColumnSelector: false,
             selectedTopics: [],
             savedSearches: [],
-            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'detail'],
+            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'customer_id', 'detail'],
 
             searchQueries: {
                 'emp_name': [],
@@ -295,8 +296,8 @@ export default {
                 },
 
                 {
-                    text: 'การกระทำ',
-                    value: 'action',
+                    text: 'ทำรายการโดย',
+                    value: 'emp_name',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -311,15 +312,23 @@ export default {
                 },
 
                 {
-                    text: 'ชื่อ-นามสกุล',
-                    value: 'emp_name',
+                    text: 'การกระทำ',
+                    value: 'action',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'หมายเหตุ',
+                    text: 'ลูกค้า',
+                    value: 'customer_id',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'รายละเอียด',
                     value: 'detail',
                     sortable: false,
                     align: 'center',
@@ -341,17 +350,26 @@ export default {
         },
 
         formattedDetailLines() {
-            const lines = this.selectedItemDetail.split('\n');
-            const formattedLines = [];
+            if (!this.selectedItemDetail || !this.selectedItemDetail.detail) {
+                return [];
+            }
 
-            lines.forEach((line, index) => {
-                formattedLines.push(line);
-                if (line.trim() === '' && index < lines.length - 1) {
-                    formattedLines.push('----------------------------------------------------------');
-                }
-            });
-            return formattedLines;
+            if (typeof this.selectedItemDetail.detail === 'string') {
+                const lines = this.selectedItemDetail.detail.split('\n');
+                const formattedLines = [];
+
+                lines.forEach((line, index) => {
+                    formattedLines.push(line);
+                    if (line.trim() === '' && index < lines.length - 1) {
+                        formattedLines.push('----------------------------------------------------------');
+                    }
+                });
+                return formattedLines;
+            }
+
+            return [];
         },
+
 
         filteredHeaders() {
             return this.headers.filter(header => this.visibleColumns.includes(header.value));
@@ -359,14 +377,22 @@ export default {
     },
 
     methods: {
+        getDetailTitle(action) {
+            if (['เพิ่มลูกค้าใหม่', 'ลบลูกค้า'].includes(action)) {
+                return 'ข้อมูลเพิ่มเติม';
+            } else if (['แก้ไขข้อมูลลูกค้า'].includes(action)) {
+                return 'ข้อมูลที่ถูกแก้ไข';
+            }
+            return 'ข้อมูลทั่วไป';
+        },
         onImageError(event, item) {
             event.target.src = `http://localhost:3001/file/default/${item.picture}`;
         },
-        
+
         goToHome() {
             this.$router.push('/app/home');
         },
-        
+
         getSearchItems(type) {
             if (type === 'emp_name') {
                 return this.logs.map(log => log.emp_name);
@@ -425,7 +451,7 @@ export default {
         },
 
         openDetail(item) {
-            this.selectedItemDetail = item.detail;
+            this.selectedItemDetail = item;
             this.dialog = true;
         },
 

@@ -162,8 +162,9 @@
 
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
-                <v-card-title class="headline"
-                    style="justify-content: center; display: flex;">การแก้ไข</v-card-title>
+                <v-card-title class="headline" style="justify-content: center; display: flex;">
+                    {{ getDetailTitle(selectedItemDetail.action) }}
+                </v-card-title>
                 <v-card-text>
                     <div v-for="line in formattedDetailLines" :key="line">
                         <template v-if="line.includes('.jpg') || line.includes('.png') || line.includes('.jpeg')">
@@ -177,8 +178,8 @@
                             }}
                         </template>
                         <template v-else-if="line.includes('รหัสผ่าน')">
-                            <span style="color: white">รหัสผ่าน </span>{{ line.replace('รหัสผ่าน', '').trim()
-                            }}
+                            <span style="color: white">รหัสผ่าน </span>{{ maskNewData(line.replace('รหัสผ่าน ',
+                                '').trim()) }}
                         </template>
                         <template v-else-if="line.includes('เพศ')">
                             <span style="color: blue">เพศ </span>{{ line.replace('เพศ', '').trim()
@@ -344,7 +345,7 @@ export default {
                 },
 
                 {
-                    text: 'ผู้ถูกกระทำ',
+                    text: 'ผู้ใช้งาน',
                     value: 'emp_id',
                     sortable: false,
                     align: 'center',
@@ -374,7 +375,13 @@ export default {
         },
 
         formattedDetailLines() {
-            return this.selectedItemDetail.split('\n');
+            if (!this.selectedItemDetail || !this.selectedItemDetail.detail) {
+                return [];
+            }
+            if (typeof this.selectedItemDetail.detail === 'string') {
+                return this.selectedItemDetail.detail.split('\n');
+            }
+            return [];
         },
 
         filteredHeaders() {
@@ -383,6 +390,16 @@ export default {
     },
 
     methods: {
+        getDetailTitle(action) {
+            // เพิ่มฟังก์ชันเพื่อคืนค่าชื่อหัวเรื่องตาม action
+            if (['เข้าสู่ระบบ', 'ออกจากระบบ', 'อนุมัติผู้ใช้งาน', 'ไม่อนุมัติผู้ใช้งาน', 'ลบผู้ใช้งาน'].includes(action)) {
+                return 'ข้อมูลเพิ่มเติม';
+            } else if (['เปลี่ยนรหัสผ่าน', 'อัพโหลดรูปภาพ', 'แก้ไขข้อมูลส่วนตัว', 'แก้ไขข้อมูลผู้ใช้งาน'].includes(action)) {
+                return 'ข้อมูลที่ถูกแก้ไข';
+            }
+            return 'ข้อมูลทั่วไป';
+        },
+
         onImageError(event, item) {
             event.target.src = `http://localhost:3001/file/default/${item.picture}`;
         },
@@ -461,7 +478,7 @@ export default {
         },
 
         openDetail(item) {
-            this.selectedItemDetail = item.detail;
+            this.selectedItemDetail = item;
             this.dialog = true;
         },
 

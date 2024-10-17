@@ -673,13 +673,14 @@ export default {
 
         recordLog() {
             const log = {
+                customer_id: this.currentItem.nickname,
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ? `ID ${this.currentItem.id}\nNICKNAME ${this.currentItem.nickname}\nTYPE ${this.getTypeName(this.currentItem.type_id)}`
-                    : `ID ${this.currentItem.id}\nNICKNAME ${this.currentItem.nickname}\nTYPE ${this.getTypeName(this.currentItem.type_id)}`,
+                    ? `รหัส : ${this.currentItem.id}\nประเภท : ${this.getTypeName(this.currentItem.type_id)}\nฐานทุน : ${this.getBaseName(this.currentItem.base_id)}`
+                    : `รหัส : ${this.currentItem.id}\nประเภท : ${this.getTypeName(this.currentItem.type_id)}\nฐานทุน : ${this.getBaseName(this.currentItem.base_id)}`,
                 type: 3,
-                picture: this.$auth.user.picture || 'Unknown',
+                picture: this.$auth.user.picture || 'ไม่รู้จัก',
                 action: this.currentAction === 'delete'
                     ? 'ลบลูกค้า'
                     : 'ไม่ลบลูกค้า',

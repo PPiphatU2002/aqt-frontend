@@ -55,7 +55,7 @@
         </v-card-text>
 
         <v-card-actions class="card-title-center pa-0">
-          <v-btn @click="confirm" :disabled="!valid || !formData.id || !formData.nickname" depressed
+          <v-btn @click="confirm" :disabled="!valid || !hasChanges || !formData.id || !formData.nickname" depressed
             color="#24b224" class="font-weight-medium mr-2 mb-5">
             บันทึก
           </v-btn>
@@ -112,19 +112,29 @@ export default {
     };
   },
 
+  computed: {
+    hasChanges() {
+      return JSON.stringify(this.formData) !== JSON.stringify(this.originalData);
+    }
+  },
+
   mounted() {
     this.setTypeOptions();
     this.setBaseOptions();
-    this.formData = { ...this.data };
-    this.originalData = { ...this.data };
+    this.formData = JSON.parse(JSON.stringify(this.data));
+    this.originalData = JSON.parse(JSON.stringify(this.data));
     document.addEventListener('keydown', this.handleKeydown);
   },
 
   watch: {
-    data(newData) {
-      this.formData = { ...newData };
-    },
-    deep: true,
+    data: {
+      handler(newData) {
+        this.formData = JSON.parse(JSON.stringify(newData));
+        this.originalData = JSON.parse(JSON.stringify(newData));
+      },
+      deep: true,
+      immediate: true
+    }
   },
 
   beforeDestroy() {
@@ -258,26 +268,27 @@ export default {
 
     recordLogUpdate() {
       const changes = [];
-      if (this.data.id !== this.originalData.id) {
-        changes.push('ID ' + this.data.id + '\n');
+      if (this.formData.id !== this.originalData.id) {
+        changes.push('รหัส : ' + this.formData.id + '\n');
       }
-      if (this.data.nickname !== this.originalData.nickname) {
-        changes.push('NICKNAME ' + this.data.nickname + '\n');
+      if (this.formData.nickname !== this.originalData.nickname) {
+        changes.push('ชื่อเล่น : ' + this.formData.nickname + '\n');
       }
 
-      const typeText = this.getTypeName(this.data.type_id);
+      const typeText = this.getTypeName(this.formData.type_id);
       const originalTypeText = this.getTypeName(this.originalData.type_id);
       if (typeText !== originalTypeText) {
-        changes.push('TYPE ' + typeText + '\n');
+        changes.push('ประเภท : ' + typeText + '\n');
       }
 
-      const baseText = this.getBaseName(this.data.base_id);
+      const baseText = this.getBaseName(this.formData.base_id);
       const originalBaseText = this.getBaseName(this.originalData.base_id);
       if (baseText !== originalBaseText) {
-        changes.push('BASE ' + baseText + '\n');
+        changes.push('ฐานทุน : ' + baseText + '\n');
       }
 
       const log = {
+        customer_id: this.originalData.nickname,
         emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
         emp_email: this.$auth.user.email,
         detail: changes.join(''),

@@ -173,41 +173,29 @@
                                     height="100" />
                             </div>
                         </template>
-                        <template v-else-if="line.includes('STOCK')">
-                            <v-icon color="green">mdi-archive-plus</v-icon>
-                            {{ line.replace('STOCK', '').trim() }}
+                        <template v-else-if="line.includes('หุ้นที่ ')">
+                            <span style="color: green">หุ้นที่ </span>{{ line.replace('หุ้นที่', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('NAME')">
-                            <v-icon color="white">mdi-archive</v-icon>
-                            {{ line.replace('NAME', '').trim() }}
+                        <template v-else-if="line.includes('ชื่อ ')">
+                            <span style="color: white">ชื่อ </span>{{ line.replace('ชื่อ', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('LOW')">
-                            <v-icon color="yellow">mdi-cash-minus</v-icon>
-                            {{ line.replace('LOW', '').trim() }}
+                        <template v-else-if="line.includes('ประเภท ')">
+                            <span style="color: blue">ประเภท </span>{{ line.replace('ประเภท', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('TYPE')">
-                            <v-icon color="blue">mdi-format-list-bulleted-type</v-icon>
-                            {{ line.replace('TYPE', '').trim() }}
+                        <template v-else-if="line.includes('จำนวนปันผล ')">
+                            <span style="color: orange">จำนวนปันผล </span>{{ line.replace('จำนวนปันผล', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('UP')">
-                            <v-icon color="red">mdi-cash-plus</v-icon>
-                            {{ line.replace('UP', '').trim() }}
+                        <template v-else-if="line.includes('ราคาปิด ')">
+                            <span style="color: purple">ราคาปิด </span>{{ line.replace('ราคาปิด', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('DIVIDEND')">
-                            <v-icon color="orange">mdi-bank</v-icon>
-                            {{ line.replace('DIVIDEND', '').trim() }}
-                        </template>
-                        <template v-else-if="line.includes('CLOSE')">
-                            <v-icon color="purple">mdi-currency-thb</v-icon>
-                            {{ line.replace('CLOSE', '').trim() }}
-                        </template>
-                        <template v-else-if="line.includes('REMARK')">
-                            <v-icon color="pink">mdi-comment</v-icon>
-                            {{ line.replace('REMARK', '').trim() }}
-                        </template>
-                        <template v-else-if="line.includes('COMMENT')">
-                            <v-icon color="brown">mdi-comment-processing</v-icon>
-                            {{ line.replace('COMMENT', '').trim() }}
+                        <template v-else-if="line.includes('หมายเหตุ ')">
+                            <span style="color: pink">หมายเหตุ </span>{{ line.replace('หมายเหตุ', '').trim()
+                            }}
                         </template>
                         <template v-else>
                             {{ line }}
@@ -274,7 +262,7 @@ export default {
             showColumnSelector: false,
             selectedTopics: [],
             savedSearches: [],
-            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'detail'],
+            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'stock_id', 'emp_name', 'detail'],
 
             searchQueries: {
                 'emp_name': [],
@@ -314,8 +302,8 @@ export default {
                 },
 
                 {
-                    text: 'การกระทำ',
-                    value: 'action',
+                    text: 'ทำรายการโดย',
+                    value: 'emp_name',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -330,15 +318,23 @@ export default {
                 },
 
                 {
-                    text: 'ชื่อ-นามสกุล',
-                    value: 'emp_name',
+                    text: 'การกระทำ',
+                    value: 'action',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'หมายเหตุ',
+                    text: 'หุ้น',
+                    value: 'stock_id',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'รายละเอียด',
                     value: 'detail',
                     sortable: false,
                     align: 'center',

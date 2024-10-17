@@ -57,7 +57,7 @@
 
         <v-card-actions class="card-title-center pa-0">
           <v-btn @click="confirm"
-            :disabled="!valid || !formData.name" depressed
+            :disabled="!valid || !hasChanges || !formData.name" depressed
             color="#24b224" class="font-weight-medium mr-2 mb-5">
             บันทึก
           </v-btn>
@@ -113,18 +113,28 @@ export default {
     };
   },
 
+  computed: {
+    hasChanges() {
+      return JSON.stringify(this.formData) !== JSON.stringify(this.originalData);
+    }
+  },
+
   mounted() {
     this.setSetOptions();
-    this.formData = { ...this.data };
-    this.originalData = { ...this.data };
+    this.formData = JSON.parse(JSON.stringify(this.data));
+    this.originalData = JSON.parse(JSON.stringify(this.data));
     document.addEventListener('keydown', this.handleKeydown);
   },
 
   watch: {
-    data(newData) {
-      this.formData = { ...newData };
-    },
-    deep: true,
+    data: {
+      handler(newData) {
+        this.formData = JSON.parse(JSON.stringify(newData));
+        this.originalData = JSON.parse(JSON.stringify(newData));
+      },
+      deep: true,
+      immediate: true
+    }
   },
 
   beforeDestroy() {
@@ -226,32 +236,33 @@ export default {
 
     recordLogUpdate() {
       const changes = [];
-      if (this.data.name !== this.originalData.name) {
-        changes.push('NAME ' + this.data.name + '\n');
+      if (this.formData.name !== this.originalData.name) {
+        changes.push('ชื่อ : ' + this.formData.name + '\n');
       }
-      const setText = this.getSetName(this.data.set_id);
+      const setText = this.getSetName(this.formData.set_id);
       const originalTypeText = this.getSetName(this.originalData.set_id);
       if (setText !== originalTypeText) {
-        changes.push('TYPE' + setText + '\n');
+        changes.push('ประเภท : ' + setText + '\n');
       }
 
-      if (this.data.closing_price !== this.originalData.closing_price) {
-        changes.push('CLOSE' + this.data.closing_price + '\n');
+      if (this.formData.closing_price !== this.originalData.closing_price) {
+        changes.push('ราคาปิด : ' + this.formData.closing_price + '\n');
       }
 
-      if (this.data.dividend_amount !== this.originalData.dividend_amount) {
-        changes.push('DIVIDEND' + this.data.dividend_amount + '\n');
+      if (this.formData.dividend_amount !== this.originalData.dividend_amount) {
+        changes.push('จำนวนปันผล : ' + this.formData.dividend_amount + '\n');
       }
 
-      if (this.data.comment !== this.originalData.comment) {
-        changes.push('COMMENT' + this.data.comment + '\n');
+      if (this.formData.comment !== this.originalData.comment) {
+        changes.push('หมายเหตุ : ' + this.formData.comment + '\n');
       }
       const log = {
+        stock_id: this.originalData.name,
         emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
         emp_email: this.$auth.user.email,
         detail: changes.join(''),
         type: 2,
-        picture: this.$auth.user.picture || 'Unknown',
+        picture: this.$auth.user.picture || 'ไม่รู้จัก',
         action: 'แก้ไขข้อมูลหุ้น',
         time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       };

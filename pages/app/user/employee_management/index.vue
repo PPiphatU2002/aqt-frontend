@@ -698,11 +698,12 @@ export default {
 
         recordLog() {
             const log = {
+                emp_id: this.currentItem.fname+' '+this.currentItem.lname,
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ? `NAME ${this.currentItem.fname}\nSUR ${this.currentItem.lname}\nEMAIL ${this.currentItem.email}\nPHONE ${this.currentItem.phone}\nGENDER ${this.currentItem.gender}`
-                    : `NAME ${this.currentItem.fname}\nSUR ${this.currentItem.lname}\nEMAIL ${this.currentItem.email}\nPHONE ${this.currentItem.phone}\nGENDER ${this.currentItem.gender}`,
+                    ? `อีเมล : ${this.currentItem.email}\nเบอร์โทรศัพท์ : ${this.currentItem.phone}\nเพศ : ${this.currentItem.gender}`
+                    : `อีเมล : ${this.currentItem.email}\nเบอร์โทรศัพท์ : ${this.currentItem.phone}\nเพศ : ${this.currentItem.gender}`,
                 type: 4,
                 picture: this.$auth.user.picture || 'Unknown',
                 action: this.currentAction === 'delete'

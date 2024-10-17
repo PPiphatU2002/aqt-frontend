@@ -29,14 +29,14 @@
                         </v-col>
 
                         <v-col cols="2">
-                            <v-text-field v-model="item.dividend_amount" label="ปันผลครึ่งปีแรก/หลัง" type="text" dense
-                                outlined :rules="[(v) => !v || /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข']">
+                            <v-text-field v-model="item.dividend_amount" label="จำนวนปันผล" type="text" dense outlined
+                                :rules="[(v) => !v || /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข']">
                             </v-text-field>
                         </v-col>
 
                         <v-col cols="2">
-                            <v-text-field v-model="item.closing_price" label="ราคาปิดวันศุกร์" type="text" dense
-                                outlined :rules="[(v) => !v || /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข']">
+                            <v-text-field v-model="item.closing_price" label="ราคาปิด" type="text" dense outlined
+                                :rules="[(v) => !v || /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข']">
                             </v-text-field>
                         </v-col>
 
@@ -93,7 +93,7 @@ export default {
             showModalResult: false,
             withdrawalItems: [{
                 name: '', set_id: null, dividend_amount: null,
-                closing_price: null, comment: null
+                closing_price: null
             }],
             sets: [],
 
@@ -164,7 +164,6 @@ export default {
                         set_id: stock.set_id,
                         dividend_amount: stock.dividend_amount,
                         closing_price: stock.closing_price,
-                        comment: stock.comment,
                         emp_id: this.$auth.user.no,
                         created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                         updated_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -206,7 +205,6 @@ export default {
                 set_id: null,
                 dividend_amount: null,
                 closing_price: null,
-                comment: null,
             });
         },
 
@@ -221,7 +219,11 @@ export default {
         recordLog() {
             const details = this.withdrawalItems.map((item, index) => {
                 const setName = this.sets.find(set => set.id === item.set_id)?.name || 'ยังไม่ระบุ';
-                return `STOCK ${index + 1}\nNAME ${item.name}\nTYPE ${setName}\nDIVIDEND ${item.dividend_amount}\nCLOSE ${item.closing_price}\nCOMMENT ${item.comment}`;
+                return `หุ้นที่ ${index + 1}\n` +
+                    `ชื่อ : ${item.name || 'ยังไม่ระบุ'}\n` +
+                    `ประเภท : ${setName}\n` +
+                    `จำนวนปันผล : ${item.dividend_amount || 'ยังไม่ระบุ'}\n` +
+                    `ราคาปิด : ${item.closing_price || 'ยังไม่ระบุ'}`;
             }).join('\n\n');
 
             const log = {
@@ -229,7 +231,7 @@ export default {
                 emp_email: this.$auth.user.email,
                 detail: details.trim(),
                 type: 2,
-                picture: this.$auth.user.picture || 'Unknown',
+                picture: this.$auth.user.picture || 'ไม่รู้จัก',
                 action: 'เพิ่มหุ้น',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };

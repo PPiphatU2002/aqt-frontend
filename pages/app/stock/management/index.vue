@@ -183,7 +183,7 @@
                 </template>
             </v-data-table>
             <div class="text-center">
-                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                <v-btn class="mb-4" color="#e50211" @click="goToHome">
                     <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
                 </v-btn>
             </div>
@@ -675,16 +675,21 @@ export default {
 
         recordLog() {
             const log = {
+                stock_id: this.currentItem.name,
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ? `NAME ${this.currentItem.name}\nTYPE ${this.getSetName(this.currentItem.set_id)}\nDIVIDEND ${this.currentItem.dividend_amount}\nCLOSE ${this.currentItem.closing_price}\nREMARK ${this.currentItem.comment}`
-                    : `NAME ${this.currentItem.name}\nTYPE ${this.getSetName(this.currentItem.set_id)}\nDIVIDEND ${this.currentItem.dividend_amount}\nCLOSE ${this.currentItem.closing_price}\nREMARK ${this.currentItem.comment}`,
+                    ? `ประเภท : ${this.getSetName(this.currentItem.set_id) || 'ยังไม่ระบุ'}\n` +
+                    `จำนวนปันผล : ${this.currentItem.dividend_amount || 'ยังไม่ระบุ'}\n` +
+                    `ราคาปิด : ${this.currentItem.closing_price || 'ยังไม่ระบุ'}\n` +
+                    `หมายเหตุ : ${this.currentItem.comment || 'ยังไม่ระบุ'}`
+                    : `ประเภท : ${this.getSetName(this.currentItem.set_id) || 'ยังไม่ระบุ'}\n` +
+                    `จำนวนปันผล : ${this.currentItem.dividend_amount || 'ยังไม่ระบุ'}\n` +
+                    `ราคาปิด : ${this.currentItem.closing_price || 'ยังไม่ระบุ'}\n` +
+                    `หมายเหตุ : ${this.currentItem.comment || 'ยังไม่ระบุ'}`,
                 type: 2,
                 picture: this.$auth.user.picture || 'Unknown',
-                action: this.currentAction === 'delete'
-                    ? 'ลบหุ้น'
-                    : 'ไม่ลบหุ้น',
+                action: this.currentAction === 'delete' ? 'ลบหุ้น' : 'ไม่ลบหุ้น',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
             this.$store.dispatch('api/log/addLogs', log);

@@ -235,7 +235,7 @@ export default {
             const details = this.withdrawalItems.map((item, index) => {
                 const typeName = this.types.find(type => type.id === item.type_id)?.name || 'ยังไม่ระบุ';
                 const baseName = this.bases.find(base => base.id === item.base_id)?.name || 'ยังไม่ระบุ';
-                return `USER ${index + 1}\nID ${item.id}\nNICKNAME ${item.nickname}\nTYPE ${typeName}\nBASE ${baseName}`;
+                return `ลูกค้าคนที่ ${index + 1}\nรหัส : ${item.id}\nชื่อเล่น : ${item.nickname}\nประเภท : ${typeName}\nฐานทุน : ${baseName}`;
             }).join('\n\n');
 
             const log = {
@@ -243,7 +243,7 @@ export default {
                 emp_email: this.$auth.user.email,
                 detail: details.trim(),
                 type: 3,
-                picture: this.$auth.user.picture || 'Unknown',
+                picture: this.$auth.user.picture || 'ไม่รู้จัก',
                 action: 'เพิ่มลูกค้าใหม่',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };

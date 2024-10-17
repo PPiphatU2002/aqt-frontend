@@ -15,21 +15,21 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
               <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
-                <v-text-field v-model="data.fname" :rules="[
+                <v-text-field v-model="formData.fname" :rules="[
                   (v) => !!v || 'โปรดกรอกชื่อ',
                   (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'ชื่อต้องเป็นภาษาไทยเท่านั้น'
                 ]" label="ชื่อ" outlined required />
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0">
-                <v-text-field v-model="data.lname" :rules="[
+                <v-text-field v-model="formData.lname" :rules="[
                   (v) => !!v || 'โปรดกรอกนามสกุล',
                   (v) => /^[\u0E00-\u0E7F]+$/.test(v) || 'นามสกุลต้องเป็นภาษาไทยเท่านั้น'
                 ]" label="นามสกุล" outlined required />
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
-                <v-text-field v-model="data.phone" :rules="[
+                <v-text-field v-model="formData.phone" :rules="[
                   (v) => !!v || 'โปรดกรอกเบอร์โทรศัพท์',
                   (v) => (v && v.length === 10) || 'เบอร์โทรศัพท์ต้องมี 10 หลัก',
                   (v) => /^0/.test(v) || 'เบอร์โทรศัพท์ต้องมี 10 หลัก'
@@ -37,7 +37,7 @@
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0">
-                <v-select v-model="data.gender" :items="genderOptions" :item-text="item => item.text"
+                <v-select v-model="formData.gender" :items="genderOptions" :item-text="item => item.text"
                   :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดเลือกเพศ']" label="เพศ" outlined
                   required>
                   <template v-slot:item="data">
@@ -53,7 +53,7 @@
         </v-card-text>
 
         <v-card-actions class="card-title-center pa-0">
-          <v-btn @click="confirm" :disabled="!valid || !data.fname || !data.lname || !data.phone" depressed
+          <v-btn @click="confirm" :disabled="!valid || !hasChanges || !formData.fname || !formData.lname || !formData.phone || !formData.gender" depressed
             color="#24b224" class="font-weight-medium mr-2 mb-5">
             บันทึก
           </v-btn>
@@ -83,6 +83,23 @@ export default {
     },
   },
 
+  computed: {
+    hasChanges() {
+      return JSON.stringify(this.formData) !== JSON.stringify(this.originalData);
+    }
+  },
+
+  watch: {
+    data: {
+      handler(newData) {
+        this.formData = JSON.parse(JSON.stringify(newData));
+        this.originalData = JSON.parse(JSON.stringify(newData));
+      },
+      deep: true,
+      immediate: true
+    }
+  },
+
   data() {
     return {
 
@@ -104,13 +121,15 @@ export default {
       valid: false,
       genderOptions: [],
       originalData: {},
+      formData: { ...this.data },
 
     }
   },
 
   mounted() {
     this.setGenderOptions();
-    this.originalData = { ...this.data };
+    this.formData = JSON.parse(JSON.stringify(this.data));
+    this.originalData = JSON.parse(JSON.stringify(this.data));
     document.addEventListener('keydown', this.handleKeydown);
   },
 
@@ -134,8 +153,9 @@ export default {
 
     async updateData() {
       try {
-        const req = await this.$store.dispatch('api/employee/updateEmployee', this.data);
+        const req = await this.$store.dispatch('api/employee/updateEmployee', this.formData);
         this.recordLogUpdate();
+        this.data = { ...this.formData };
         this.modal.complete.open = true;
       } catch (error) {
         this.modal.error.open = true;
@@ -194,17 +214,17 @@ export default {
 
     recordLogUpdate() {
       const changes = [];
-      if (this.data.fname !== this.originalData.fname) {
-        changes.push('NAME ' + this.data.fname + '\n');
+      if (this.formData.fname !== this.originalData.fname) {
+        changes.push('ชื่อเล่น : ' + this.formData.fname + '\n');
       }
-      if (this.data.lname !== this.originalData.lname) {
-        changes.push('SUR ' + this.data.lname + '\n');
+      if (this.formData.lname !== this.originalData.lname) {
+        changes.push('ชื่อ : ' + this.formData.lname + '\n');
       }
-      if (this.data.phone !== this.originalData.phone) {
-        changes.push('PHONE ' + this.data.phone + '\n');
+      if (this.formData.phone !== this.originalData.phone) {
+        changes.push('เบอร์โทรศัพท์ : ' + this.formData.phone + '\n');
       }
-      if (this.data.gender !== this.originalData.gender) {
-        changes.push('GENDER ' + this.data.gender + '\n');
+      if (this.formData.gender !== this.originalData.gender) {
+        changes.push('เพศ : ' + this.formData.gender + '\n');
       }
 
       const log = {

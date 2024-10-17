@@ -162,7 +162,7 @@ export default {
       const log = {
         emp_name: employeeFName + ' ' + employeeSName,
         emp_email: employeeEmail,
-        detail: 'NEW ' + this.data.new_password,
+        detail: 'รหัสผ่าน : ' + this.data.new_password,
         type: 4,
         picture: employeePicture,
         action: 'เปลี่ยนรหัสผ่าน',
