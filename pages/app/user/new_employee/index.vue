@@ -18,20 +18,22 @@
                 </v-row>
             </v-container>
 
-            <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
-                <template v-slot:activator="{ on }">
-                    <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
-                        color="#85d7df">mdi-playlist-check</v-icon>
-                </template>
-                <v-list class="header-list">
-                    <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
-                        :key="header.value" class="header-item">
-                        <v-list-item-content>
-                            <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <v-menu v-model="showColumnSelector" offset-y offset-x :close-on-content-click="false">
+                    <template v-slot:activator="{ on }">
+                        <v-icon v-on="on" class="tab-icon" style="font-size: 2rem;"
+                            color="#85d7df">mdi-playlist-check</v-icon>
+                    </template>
+                    <v-list class="header-list">
+                        <v-list-item v-for="header in headers.filter(header => header.value !== 'detail')"
+                            :key="header.value" class="header-item">
+                            <v-list-item-content>
+                                <v-checkbox v-model="visibleColumns" :value="header.value" :label="header.text" />
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 item-key="no" :items-per-page="5">

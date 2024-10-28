@@ -9,8 +9,8 @@
 
         <v-card class="custom-card" flat>
             <v-card-title class="d-flex align-center justify-center">
-                <v-icon class="little-icon" color="#24b224">mdi-bank-plus</v-icon> &nbsp;
-                <h3 class="mb-0">ข้อมูลหุ้นของลูกค้าใหม่</h3>
+                <v-icon class="little-icon" color="#24b224">mdi-cash-plus</v-icon> &nbsp;
+                <h3 class="mb-0">ข้อมูลการซื้อขายหุ้นของลูกค้าใหม่</h3>
             </v-card-title>
 
             <v-row class="mb-0 mt-0 pa-0 justify-center">
@@ -28,7 +28,20 @@
                         :rules="[(v) => !!v || 'กรุณากรอกรหัสลูกค้า']">
                     </v-autocomplete>
                 </v-col>
+                <v-col cols="3">
+                    <v-autocomplete v-model="commission_id" :items="commissions"
+                        item-text="name" item-value="no" label="ค่าธรรมเนียม" dense outlined clearable
+                        :rules="[(v) => !!v || 'กรุณากรอกค่าธรรมเนียม']">
+                    </v-autocomplete>
+                </v-col>
+                <v-col cols="2">
+                    <v-autocomplete v-model="customer_name" :items="customers"
+                        item-text="name" item-value="no" label="ซื้อ/ขาย" dense outlined clearable
+                        :rules="[(v) => !!v || 'กรุณาเลือกซื้อหรือขาย']">
+                    </v-autocomplete>
+                </v-col>
             </v-row>
+            
 
             <v-card-text class="mb-0 mt-0 pa-0">
                 <v-form>
@@ -63,14 +76,13 @@
                                 <v-icon>mdi-delete</v-icon>
                             </v-btn>
                             <v-btn color="#24b224" @click="addProduct" text class="mb-6 ml-2">
-                                <v-icon left>mdi-bank-plus</v-icon> เพิ่ม
+                                <v-icon left>mdi-cash-plus</v-icon> เพิ่ม
                             </v-btn>
                         </v-col>
                     </v-row>
 
                     <div class="text-center">
-                        <v-btn color="#24b224" @click="showModalResult = true" :disabled="!isFormValid"
-                            class="mr-2 mb-3">
+                        <v-btn color="#24b224" @click="showModalResult = true" :disabled="!isFormValid" class="mr-2 mb-3">
                             บันทึก
                         </v-btn>
                         <v-btn color="#e50211" @click="goToStocksDetail" class="mb-3">
@@ -96,6 +108,7 @@ export default {
         await this.fetchCustomerData()
         await this.fetchStockData()
         await this.fetchFromData()
+        await this.fetchCommissionData()
     },
 
     data() {
@@ -117,6 +130,7 @@ export default {
             ],
             customer_id: null,
             customer_name: null,
+            commission_id: 1,
             valid: false,
             showModalResult: false,
             withdrawalItems: [{
@@ -124,6 +138,7 @@ export default {
                 closing_price: null, from_id: 1, comment: null
             }],
             customers: [],
+            commissions: [],
             stocks: [],
             froms: [],
 
@@ -215,11 +230,11 @@ export default {
                 }
                 else {
                     if (RankID === '1') {
-                        this.$router.push('/app/transaction/add_stock');
+                        this.$router.push('/app/transaction/add_transaction');
                     } else if (RankID === '2') {
-                        this.$router.push('/app/transaction/add_stock');
+                        this.$router.push('/app/transaction/add_transaction');
                     } else if (RankID === '3') {
-                        this.$router.push('/app/transaction/add_stock');
+                        this.$router.push('/app/transaction/add_transaction');
                     } else {
                         this.$router.push('/auth');
                     }
@@ -272,7 +287,6 @@ export default {
                     }
                 }
             }
-            this.recordLog()
             this.modal.complete.message = 'เพิ่มหุ้นเรียบร้อยแล้ว!';
             this.modal.complete.open = true;
             this.showModalResult = false;
@@ -293,9 +307,14 @@ export default {
             }
         },
 
-        getCustomerID(customerId) {
-            const customer = this.customers.find(c => c.no === customerId);
-            return customer ? customer.id : 'ไม่ทราบ';
+        async fetchCommissionData() {
+            try {
+                const response = await this.$store.dispatch('api/commission/getCommissions');
+                if (response) {
+                    this.commissions = response.map(item => ({ no: item.no, name: item.commission }));
+                }
+            } catch (error) {
+            }
         },
 
         addProduct() {
@@ -318,13 +337,10 @@ export default {
 
         recordLog() {
             const details = this.withdrawalItems.map((item, index) => {
-                const stockName = this.stocks.find(stock => stock.no === item.stock_id)?.name || 'ยังไม่ระบุ';
-                const fromkName = this.froms.find(from => from.no === item.from_id)?.name || 'ยังไม่ระบุ';
-                return `รายการที่ ${index + 1}\nชื่อหุ้น : ${stockName}\nราคาที่ติด : ${item.price}\nจำนวนที่ติด : ${item.amount}\nที่มาที่ไป : ${fromkName}`;
+                return `TRANSACTION ${index + 1}\nNAME ${item.name}\nTYPE ${setName}\nDIVIDEND ${item.dividend_amount}\nCLOSE ${item.closing_price}\nCOMMENT ${item.comment}`;
             }).join('\n\n');
 
             const log = {
-                customer_id: this.getCustomerID(this.customer_id) || this.getCustomerID(this.customer_name),
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: details.trim(),

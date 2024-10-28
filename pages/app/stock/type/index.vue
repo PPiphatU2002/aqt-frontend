@@ -317,6 +317,8 @@ export default {
                 return { text: 'Warrants', color: '#c1ff72' };
             } else if (set === 'DR') {
                 return { text: 'DR', color: '#ff5757' };
+            } else if (set === 'Preferred Stock') {
+                return { text: 'Preferred Stock', color: '#ff66c4' }; 
             } else {
                 return { text: '', color: 'inherit' };
             }

@@ -75,8 +75,8 @@
 
                             <v-autocomplete v-if="searchType !== 'ranks_id' && searchType !== 'updated_date'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
-                                append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
-                                hide-details clearable></v-autocomplete>
+                                append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data hide-details
+                                clearable></v-autocomplete>
 
                             <v-select v-if="searchType === 'ranks_id'" v-model="selectedTopics" :items="actionTopics"
                                 dense outlined multiple class="mx-2 search-size small-font"></v-select>
@@ -106,7 +106,7 @@
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
                             </v-btn>
 
-                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportCSV" icon>
+                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportExcel" icon>
                                 <v-icon>mdi-file-excel</v-icon>
                             </v-btn>
                         </div>
@@ -220,12 +220,11 @@
 
 <script>
 
-import * as XLSX from 'xlsx';
-import moment from 'moment';
+import ExcelJS from 'exceljs';
+import moment from 'moment-timezone';
 import 'moment/locale/th'
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
-import Papa from 'papaparse';
 
 export default {
 
@@ -406,7 +405,7 @@ export default {
         onImageError(event, item) {
             event.target.src = `http://localhost:3001/file/default/${item.picture}`;
         },
-        
+
         goToHome() {
             this.$router.push('/app/home');
         },
@@ -432,6 +431,11 @@ export default {
         getRankName(rankId) {
             const rank = this.ranks.find(r => r.no === rankId);
             return rank ? rank.name : 'ไม่ทราบ';
+        },
+
+        getEmployeeName(employeeId) {
+            const employee = this.employees.find(e => e.no === employeeId);
+            return employee ? employee.fname + ' ' + employee.lname : 'ไม่ทราบ';
         },
 
         getSearchItems(type) {
@@ -639,57 +643,62 @@ export default {
             return found ? found.text : type;
         },
 
-        exportCSV() {
-            const filteredData = this.filtered.map(item => {
-                const dataItem = {};
+        exportExcel() {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Sheet1');
+
+            const headers = this.filteredHeaders
+                .filter(header => header.value !== 'picture' && header.value !== 'detail')
+                .map(header => ({
+                    header: header.text,
+                    key: header.value,
+                    style: { font: { name: 'Angsana New', size: 16 } }
+                }));
+
+            worksheet.columns = headers;
+
+            this.filtered.forEach((item, index) => {
+                const rowData = {};
                 this.filteredHeaders.forEach(header => {
-                    if (header.value === 'fname') {
-                        dataItem['ชื่อ'] = `${item.fname} ${item.lname}`;
+                    if (header.value === 'updated_date') {
+                        rowData[header.value] = moment(item[header.value]).tz('Asia/Bangkok').format('YYYY-MM-DD HH:mm');
                     } else if (header.value === 'ranks_id') {
-                        dataItem['ตำแหน่ง'] = this.getRankName(item.ranks_id);
-                    } else if (header.value !== 'picture') {
-                        dataItem[header.text] = item[header.value];
+                        rowData[header.value] = this.getRankName(item.ranks_id);
+                    } else if (header.value === 'emp_id') {
+                        rowData[header.value] = this.getEmployeeName(item.emp_id);
+                    } else if (header.value !== 'picture' && header.value !== 'detail') {
+                        rowData[header.value] = item[header.value];
                     }
                 });
-
-                const empDetail = this.getEmployeeById(item.emp_id);
-                if (empDetail) {
-                    dataItem['ผู้อนุมัติ'] = `${empDetail.fname} ${empDetail.lname}`;
-                } else {
-                    dataItem['ผู้อนุมัติ'] = 'ไม่ทราบ';
-                }
-
-                return dataItem;
+                worksheet.addRow(rowData);
             });
 
-            const csv = Papa.unparse(filteredData);
-            const bom = '\uFEFF';
-            const csvWithBom = bom + csv;
-            const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const currentDate = moment().format('YYYY-MM-DD');
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `ข้อมูลสมาชิก-${currentDate}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        },
+            worksheet.getRow(1).eachCell({ includeEmpty: true }, (cell) => {
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.font = { bold: true, name: 'Angsana New', size: 18 };
+            });
 
-        convertToCSV(objArray) {
-            const array = [Object.keys(objArray[0])].concat(objArray);
-            return array.map(row => {
-                return Object.values(row).map(value => `"${value}"`).join(',');
-            }).join('\n');
-        },
+            worksheet.eachRow((row) => {
+                row.eachCell({ includeEmpty: true }, (cell) => {
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' },
+                    };
+                });
+            });
 
-        maskNewData(data) {
-            if (!data) return '';
-            const length = data.length;
-            if (length <= 4) return data;
-            const firstPart = data.slice(0, 1);
-            const lastPart = data.slice(-1);
-            const maskedPart = '*'.repeat(length - 4)
-            return `${firstPart}${maskedPart}${lastPart}`;
+            const currentDate = moment().tz('Asia/Bangkok').format('YYYY-MM-DD');
+            workbook.xlsx.writeBuffer().then(buffer => {
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute('download', `ข้อมูลผู้ใช้งาน-${currentDate}.xlsx`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
         },
 
         goBack() {
@@ -698,7 +707,7 @@ export default {
 
         recordLog() {
             const log = {
-                emp_id: this.currentItem.fname+' '+this.currentItem.lname,
+                emp_id: this.currentItem.fname + ' ' + this.currentItem.lname,
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'

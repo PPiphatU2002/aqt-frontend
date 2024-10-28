@@ -104,7 +104,7 @@
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
                             </v-btn>
 
-                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportCSV" icon>
+                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportExcel" icon>
                                 <v-icon>mdi-file-excel</v-icon>
                             </v-btn>
                         </div>
@@ -212,12 +212,11 @@
 
 <script>
 
-import * as XLSX from 'xlsx';
-import moment from 'moment';
+import ExcelJS from 'exceljs';
+import moment from 'moment-timezone';
 import 'moment/locale/th'
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
-import Papa from 'papaparse';
 
 export default {
 
@@ -558,37 +557,58 @@ export default {
             return found ? found.text : type;
         },
 
-        exportCSV() {
-            const filteredData = this.filtered.map(item => {
-                const dataItem = {};
+        exportExcel() {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Sheet1');
+
+            const headers = this.filteredHeaders
+                .filter(header => header.value !== 'picture')
+                .map(header => ({
+                    header: header.text,
+                    key: header.value,
+                    style: { font: { name: 'Angsana New' , size: 16 } }
+                }));
+
+            worksheet.columns = headers;
+
+            this.filtered.forEach((item, index) => {
+                const rowData = {};
                 this.filteredHeaders.forEach(header => {
-                    if (header.value !== 'picture') {
-                        dataItem[header.text] = item[header.value];
+                    if (header.value === 'time') {
+                        rowData[header.value] = moment(item[header.value]).tz('Asia/Bangkok').format('YYYY-MM-DD HH:mm');
+                    } else if (header.value !== 'picture') {
+                        rowData[header.value] = item[header.value];
                     }
                 });
-                return dataItem;
+                worksheet.addRow(rowData);
             });
 
-            const csv = Papa.unparse(filteredData);
-            const bom = '\uFEFF';
-            const csvWithBom = bom + csv;
+            worksheet.getRow(1).eachCell({ includeEmpty: true }, (cell) => {
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.font = { bold: true, name: 'Angsana New', size: 18 };
+            });
 
-            const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const currentDate = moment().format('YYYY-MM-DD');
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `ประวัติพนักงาน-${currentDate}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        },
-
-        convertToCSV(objArray) {
-            const array = [Object.keys(objArray[0])].concat(objArray);
-
-            return array.map(row => {
-                return Object.values(row).map(value => `"${value}"`).join(',');
-            }).join('\n');
+            worksheet.eachRow((row) => {
+                row.eachCell({ includeEmpty: true }, (cell) => {
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' },
+                    };
+                });
+            });
+            
+            const currentDate = moment().tz('Asia/Bangkok').format('YYYY-MM-DD');
+            workbook.xlsx.writeBuffer().then(buffer => {
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute('download', `ประวัติลูกค้า-${currentDate}.xlsx`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
         },
 
         maskNewData(data) {

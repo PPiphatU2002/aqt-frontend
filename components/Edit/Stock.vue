@@ -56,9 +56,8 @@
         </v-card-text>
 
         <v-card-actions class="card-title-center pa-0">
-          <v-btn @click="confirm"
-            :disabled="!valid || !hasChanges || !formData.name" depressed
-            color="#24b224" class="font-weight-medium mr-2 mb-5">
+          <v-btn @click="confirm" :disabled="!valid || !hasChanges || !formData.name" depressed color="#24b224"
+            class="font-weight-medium mr-2 mb-5">
             บันทึก
           </v-btn>
           <v-btn color="#e50211" @click="cancel" class="font-weight-medium mb-5">ยกเลิก
@@ -108,6 +107,8 @@ export default {
       formData: { ...this.data },
       valid: false,
       setOptions: [],
+      details: [],
+      stocks: [],
       originalData: {},
 
     };
@@ -119,7 +120,14 @@ export default {
     }
   },
 
+  async mounted() {
+    await this.fetchDetailData();
+    await this.fetchStockData();
+  },
+
   mounted() {
+    this.fetchDetailData();
+    this.fetchStockData();
     this.setSetOptions();
     this.formData = JSON.parse(JSON.stringify(this.data));
     this.originalData = JSON.parse(JSON.stringify(this.data));
@@ -163,7 +171,7 @@ export default {
           icon: setIcons[set.set] || 'mdi-currency-usd'
         }));
 
-        const prioritizedTypes = ['SET', 'SET50','SET100','ETF','MAI','Warrants','DR','Preferred Stock'];
+        const prioritizedTypes = ['SET', 'SET50', 'SET100', 'ETF', 'MAI', 'Warrants', 'DR', 'Preferred Stock'];
         this.setOptions = prioritizedTypes.reduce((acc, setName) => {
           const set = allTypes.find(r => r.text === setName);
           if (set) acc.push(set);
@@ -199,6 +207,7 @@ export default {
         return;
       }
 
+      await this.updateDetailData();
       await this.updateData();
     },
 
@@ -212,8 +221,72 @@ export default {
       } catch (warning) {
         this.modal.warning.open = true;
       }
-    }
-    ,
+    },
+
+    async fetchDetailData() {
+      this.details = await this.$store.dispatch('api/detail/getDetails');
+    },
+
+    async fetchStockData() {
+      this.stocks = await this.$store.dispatch('api/stock/getStocks');
+    },
+
+    getStockNameByNo(stockNo) {
+      const stock = this.stocks.find(item => item.no === stockNo);
+      return stock ? stock.name : "ไม่พบข้อมูลหุ้น";
+    },
+
+    async updateDetailData() {
+      try {
+        // ค้นหารายการที่ตรงตาม stock_id
+        const detailsToUpdate = this.details.filter(detail => {
+          const stockName = this.getStockNameByNo(detail.stock_id);
+          return stockName === this.formData.name; // เงื่อนไขการค้นหาแค่ stock_name
+        });
+
+        if (detailsToUpdate.length === 0) {
+          throw new Error("ไม่พบข้อมูลที่ตรงกับชื่อหุ้น");
+        }
+
+        // อัพเดทข้อมูลใน formData สำหรับแต่ละ detail ที่ค้นพบ
+        for (const detail of detailsToUpdate) {
+          // ดึงข้อมูล money และ amount จากรายการที่ค้นพบ
+          const money = detail.money;
+          const amount = detail.amount;
+
+          // คำนวณค่าต่าง ๆ ตามที่ระบุ
+          const balance_dividend = amount * this.formData.dividend_amount;
+          const present_price = amount * this.formData.closing_price;
+          const total = balance_dividend + present_price;
+          const present_profit = total - money;
+          const percent = ((present_profit - money) / money) * 100;
+          const total_percent = (present_profit / money) * 100;
+
+          // อัพเดทค่าใน formData สำหรับ detail ปัจจุบัน
+          const updatedData = {
+            money: money,
+            balance_dividend: balance_dividend,
+            present_price: present_price,
+            total: total,
+            present_profit: present_profit,
+            percent: percent,
+            total_percent: total_percent
+          };
+
+          // อัพเดทข้อมูลใน store
+          await this.$store.dispatch('api/detail/updateDetail', {
+            ...detail,
+            ...updatedData
+          });
+        }
+
+        this.modal.complete.open = true;
+        this.data = { ...this.formData };
+      } catch (error) {
+        this.modal.warning.open = true;
+        console.error("Error updating detail data:", error);
+      }
+    },
 
     handleKeydown(event) {
       if (event.key === 'Escape') {
@@ -233,6 +306,7 @@ export default {
     handleConfirmMethod() {
       this.modal.confirm.open = false;
       this.updateData();
+      this.updateDetailData();
     },
 
     recordLogUpdate() {
