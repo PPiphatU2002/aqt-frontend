@@ -154,6 +154,7 @@ export default {
           'MAI': 'mdi-numeric-5',
           'Warrants': 'mdi-numeric-6',
           'DR': 'mdi-numeric-7',
+          'Preferred Stock': 'mdi-numeric-8',
         };
 
         const allTypes = this.sets.map(set => ({
@@ -162,7 +163,7 @@ export default {
           icon: setIcons[set.set] || 'mdi-currency-usd'
         }));
 
-        const prioritizedTypes = ['SET', 'SET50','SET100','ETF','MAI','Warrants','DR'];
+        const prioritizedTypes = ['SET', 'SET50','SET100','ETF','MAI','Warrants','DR','Preferred Stock'];
         this.setOptions = prioritizedTypes.reduce((acc, setName) => {
           const set = allTypes.find(r => r.text === setName);
           if (set) acc.push(set);

@@ -335,11 +335,12 @@ export default {
 
         recordLog() {
             const log = {
+                stock_id: this.currentItem.set, 
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ? `TYPE ${this.currentItem.set}`
-                    : `TYPE ${this.this.currentItem.set}`,
+                    ? `ไม่มีข้อมูลเพิ่มเติม`
+                    : `ไม่มีข้อมูลเพิ่มเติม`,
                 type: 2,
                 picture: this.$auth.user.picture || 'Unknown',
                 action: this.currentAction === 'delete'

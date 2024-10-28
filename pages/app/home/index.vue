@@ -18,12 +18,22 @@
                                 ข้อมูลการซื้อขายหุ้นของลูกค้า
                             </v-btn>
                         </v-col>
+
+                        <v-col cols="12" class="d-flex justify-center">
+                            <v-btn color="#24b224" @click="goToStocksFollowManagement"
+                                :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
+                                <v-icon v-if="pendingEmployeesCount > 0" class="small-bell-icon"
+                                    style="margin-right: 6px;">mdi-bell</v-icon>
+                                ข้อมูลการติดตามหุ้น<v-icon v-if="pendingEmployeesCount > 0" class="small-bell-icon"
+                                    style="margin-left: 6px;">mdi-bell</v-icon>
+                            </v-btn>
+                        </v-col>
                     </v-row>
                 </v-col>
             </v-row>
         </v-container>
     </div>
-    
+
 </template>
 
 
@@ -36,9 +46,25 @@ export default {
 
     async mounted() {
         await this.checkRank();
+        await this.fetchPendingEmployeeCount();
+    },
+
+    data() {
+        return {
+            pendingEmployeesCount: 0,
+        };
     },
 
     methods: {
+        async fetchPendingEmployeeCount() {
+            try {
+                const response = await this.$store.dispatch('api/employee/getEmployeesStatus', '2');
+                this.pendingEmployeesCount = response.length;
+            } catch (error) {
+                console.error('Error fetching pending employees:', error);
+            }
+        },
+
         async checkRank() {
             if (this.$auth.loggedIn) {
                 const Status = this.$auth.user.status.toString();
@@ -70,7 +96,28 @@ export default {
         transaction() {
             this.$router.push('/app/transaction/customer_trade');
         },
+
+        goToStocksFollowManagement() {
+            this.$router.push('/app/stock/stock_follow');
+        },
     }
 }
 
 </script>
+
+<style scoped>
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.small-bell-icon {
+  font-size: 1.2rem;
+  vertical-align: middle;
+  color: #ffc800;
+  animation: shake 0.8s ease infinite;
+}
+</style>

@@ -76,7 +76,7 @@
                             <v-autocomplete v-if="searchType !== 'set_id' && searchType !== 'updated_date'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
-                                hide-details></v-autocomplete>
+                                hide-details clearable></v-autocomplete>
 
                             <v-select v-if="searchType === 'set_id'" v-model="selectedTopics" :items="actionTopics"
                                 dense outlined multiple class="mx-2 search-size small-font"></v-select>
@@ -225,6 +225,7 @@ export default {
         await this.fetchStockData();
         await this.fetchEmployeeData();
         await this.fetchSetData();
+        await this.fetchSetTopic();
     },
 
     components: {
@@ -289,15 +290,7 @@ export default {
                 { text: 'เวลา', value: 'updated_date' }
             ],
 
-            actionTopics: [
-                { text: 'SET', value: 'SET' },
-                { text: 'SET50', value: 'SET50' },
-                { text: 'SET100', value: 'SET100' },
-                { text: 'ETF', value: 'ETF' },
-                { text: 'MAI', value: 'MAI' },
-                { text: 'Warrants', value: 'Warrants' },
-                { text: 'DR', value: 'DR' },
-            ],
+            actionTopics: [],
 
             headers: [
                 {
@@ -389,6 +382,20 @@ export default {
     methods: {
         goToHome() {
             this.$router.push('/app/home');
+        },
+
+        async fetchSetTopic() {
+            try {
+                // Fetch stocks from the API
+                const settopics = await this.$store.dispatch('api/set/getSets');
+                // Map stocks to actionTopics array with text and value fields
+                this.actionTopics = settopics.map(set => ({
+                    text: set.set,
+                    value: set.set
+                }));
+            } catch (error) {
+                console.error('Failed to fetch stocks:', error);
+            }
         },
 
         async fetchSetData() {
@@ -493,6 +500,8 @@ export default {
                 return { text: 'Warrants', color: '#c1ff72' };
             } else if (set === 'DR') {
                 return { text: 'DR', color: '#ff5757' };
+            } else if (set === 'Preferred Stock') {
+                return { text: 'Preferred Stock', color: '#ff66c4' }; 
             } else {
                 return { text: '', color: 'inherit' };
             }

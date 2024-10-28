@@ -5,7 +5,7 @@
         <ModalConfirm :method="handleConfirm" :open="modalConfirmOpen" @update:confirm="modalConfirmOpen = false" />
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
-        <EmployeeEditAllDialog :open="editAllDialog" :data="editAllData" @update:edit="editAllDialog = false" />
+        <EditStockDetail :open="editAllDialog" :data="editAllData" @update:edit="editAllDialog = false" />
 
         <v-card flat>
             <v-container>
@@ -73,13 +73,13 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-autocomplete v-if="searchType !== 'ranks_id' && searchType !== 'updated_date'"
+                            <v-autocomplete v-if="searchType !== 'port' && searchType !== 'updated_date'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
-                                append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
-                                hide-details></v-autocomplete>
+                                append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data hide-details
+                                clearable></v-autocomplete>
 
-                            <v-select v-if="searchType === 'ranks_id'" v-model="selectedTopics" :items="actionTopics"
-                                dense outlined multiple class="mx-2 search-size small-font"></v-select>
+                            <v-select v-if="searchType === 'port'" v-model="selectedTopics" :items="actionTopics" dense
+                                outlined multiple class="mx-2 search-size small-font"></v-select>
 
                             <v-menu v-if="searchType === 'updated_date'" v-model="datePickerMenu"
                                 :close-on-content-click="false" transition="scale-transition" offset-y>
@@ -136,9 +136,6 @@
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
                 item-key="no" :items-per-page="5" style="overflow-x: auto; white-space: nowrap;">
-                <template v-slot:item.email="{ item }">
-                    <div class="text-center">{{ item.email }}</div>
-                </template>
                 <template v-slot:item.emp_id="{ item }">
                     <div class="text-center">
                         <span v-if="getEmployeeByNo(item.emp_id)">
@@ -150,6 +147,36 @@
                 <template v-slot:item.customer_id="{ item }">
                     <div class="text-center">
                         {{ getCustomerByNo(item.customer_id)?.id || 'N/A' }}
+                    </div>
+                </template>
+                <template v-slot:item.money="{ item }">
+                    <div class="text-center">
+                        {{ item.money.toLocaleString() }}
+                    </div>
+                </template>
+                <template v-slot:item.balance_dividend="{ item }">
+                    <div class="text-center">
+                        {{ item.balance_dividend.toLocaleString() }}
+                    </div>
+                </template>
+                <template v-slot:item.present_price="{ item }">
+                    <div class="text-center">
+                        {{ item.present_price.toLocaleString() }}
+                    </div>
+                </template>
+                <template v-slot:item.total="{ item }">
+                    <div class="text-center">
+                        {{ item.total.toLocaleString() }}
+                    </div>
+                </template>
+                <template v-slot:item.price="{ item }">
+                    <div class="text-center">
+                        {{ item.price.toLocaleString() }}
+                    </div>
+                </template>
+                <template v-slot:item.amount="{ item }">
+                    <div class="text-center">
+                        {{ item.amount.toLocaleString() }}
                     </div>
                 </template>
                 <template v-slot:item.customer_name="{ item }">
@@ -172,7 +199,7 @@
                 <template v-slot:item.present_profit="{ item }">
                     <div class="text-center">
                         <span :style="{ color: getColorForNumber(item.present_profit) }">
-                            {{ item.present_profit }}
+                            {{ item.present_profit.toLocaleString() }}
                         </span>
                     </div>
                 </template>
@@ -190,7 +217,6 @@
                         </span>
                     </div>
                 </template>
-
                 <template v-slot:item.total_percent="{ item }">
                     <div class="text-center">
                         <span :style="{ color: getColorForPercent(item.total_percent) }">
@@ -289,7 +315,7 @@ export default {
             sortBy: 'updated_date',
             currentAction: '',
             searchQuery: '',
-            searchType: '',
+            searchType: 'customer_id',
             selectedItemDetail: '',
             startDateTime: '',
             endDateTime: '',
@@ -313,23 +339,26 @@ export default {
             visibleColumns: ['updated_date', 'customer_id', 'customer_name', 'stock_id', 'price', 'amount', 'money', 'balance_dividend', 'present_price', 'total', 'present_profit', 'percent', 'total_percent', 'port', 'from_id', 'comment', 'emp_id', 'detail'],
 
             searchQueries: {
-                'fname': [],
-                'email': [],
-                'phone': [],
+                'customer_id': [],
+                'customer_name': [],
+                'stock_id': [],
+                'emp_id': [],
             },
 
             searchTypes: [
-                { text: 'ชื่อ-นามสกุล', value: 'fname' },
-                { text: 'อีเมล', value: 'email' },
-                { text: 'เบอร์โทรศัพท์', value: 'phone' },
-                { text: 'ตำแหน่ง', value: 'ranks_id' },
+                { text: 'รหัสสมาชิก', value: 'customer_id' },
+                { text: 'ชื่อเล่น', value: 'customer_name' },
+                { text: 'ชื่อหุ้นที่ติด', value: 'stock_id' },
+                { text: 'ทำรายการโดย', value: 'emp_id' },
+                { text: 'ประเภทพอร์ต', value: 'port' },
                 { text: 'เวลา', value: 'updated_date' }
             ],
 
             actionTopics: [
-                { text: 'ผู้พัฒนา', value: 'ผู้พัฒนา' },
-                { text: 'พนักงานทั่วไป', value: 'พนักงานทั่วไป' },
-                { text: 'แอดมิน', value: 'แอดมิน' },
+                { text: 'ถือ', value: 'ถือ' },
+                { text: 'แก้เกมได้', value: 'แก้เกมได้' },
+                { text: 'ระวัง', value: 'ระวัง' },
+                { text: 'กำไร', value: 'กำไร' },
             ],
 
             headers: [
@@ -381,7 +410,7 @@ export default {
                 },
 
                 {
-                    text: 'มูลค่าปัจจุบัน',
+                    text: 'จำนวนเงิน',
                     value: 'money',
                     sortable: false,
                     align: 'center',
@@ -391,6 +420,14 @@ export default {
                 {
                     text: 'ยอดเงินปันผล',
                     value: 'balance_dividend',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'มูลค่าปัจจุบัน',
+                    value: 'present_price',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -407,14 +444,6 @@ export default {
                 {
                     text: 'กำไร/ขาดทุน ปัจจุบัน',
                     value: 'present_profit',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'เปอร์เซ็น กำไร/ขาดทุนไม่รวมปันผล',
-                    value: 'percent',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -507,12 +536,14 @@ export default {
         },
 
         getSearchItems(type) {
-            if (type === 'fname') {
-                return this.employees.map(emp => `${emp.fname} ${emp.lname}`);
-            } else if (type === 'email') {
-                return this.employees.map(emp => emp.email);
-            } else if (type === 'phone') {
-                return this.employees.map(emp => emp.phone);
+            if (type === 'stock_id') {
+                return this.stocks.map(stock => stock.name);
+            } else if (type === 'customer_name') {
+                return this.customers.map(customer => customer.nickname);
+            } else if (type === 'customer_id') {
+                return this.customers.map(customer => customer.id);
+            } else if (type === 'emp_id') {
+                return this.employees.map(employee => employee.fname + ' ' + employee.lname);
             }
             return [];
         },
@@ -612,23 +643,21 @@ export default {
 
         getPortText(total_percent) {
             let port, color;
-
-            // Determine the port and color based on total_percent
             if (total_percent >= 0) {
                 port = 'กำไร';
-                color = '#c1ff72'; // Color for 'กำไร'
-            } else if (total_percent >= -19.99 && total_percent < 0) {
+                color = '#c1ff72';
+            } else if (total_percent >= -10 && total_percent < 0) {
+                port = 'ระวัง';
+                color = '#ffde59';
+            } else if (total_percent >= -19.99 && total_percent <= -10.01) {
                 port = 'แก้เกมได้';
-                color = '#85d7df'; // Color for 'แก้เกมได้'
+                color = '#85d7df';
             } else {
                 port = 'ถือ';
-                color = '#ff5757'; // Color for 'ถือ'
+                color = '#ff5757';
             }
-
-            // Return object with port and color
             return { text: port, color: color };
         },
-
 
         getColorForNumber(value) {
             if (value < 0) {
@@ -643,7 +672,9 @@ export default {
         getColorForPercent(value) {
             if (value >= 0) {
                 return '#24b224';
-            } else if (value >= -19.99 && value < 0) {
+            } else if (value >= -10 && value < 0) {
+                return '#ffc800';
+            } else if (value >= -19.99 && value <= -10.01) {
                 return '#38b6ff';
             } else {
                 return '#e50211';
@@ -663,7 +694,7 @@ export default {
         },
 
         onSearchTypeChange() {
-            this.isSearchFieldVisible = this.searchType !== 'updated_date' && this.searchType !== 'ranks_id';
+            this.isSearchFieldVisible = this.searchType !== 'updated_date' && this.searchType !== 'port';
         },
 
         validateDateRange() {
@@ -682,9 +713,9 @@ export default {
                 return;
             }
 
-            if (this.searchType === 'ranks_id') {
+            if (this.searchType === 'port') {
                 this.addTopicToSearch();
-            } else if (this.searchType === 'fname' || this.searchType === 'email' || this.searchType === 'phone') {
+            } else if (this.searchType === 'stock_id' || this.searchType === 'customer_name' || this.searchType === 'customer_id' || this.searchType === 'emp_id') {
                 this.addTextToSearch();
             } else {
                 this.savedSearches.push({
@@ -718,7 +749,7 @@ export default {
         addTopicToSearch() {
             this.savedSearches.push({
                 query: '',
-                type: 'ranks_id',
+                type: 'port',
                 topics: [...this.selectedTopics],
                 start: this.startDateTime,
                 end: this.endDateTime
@@ -728,34 +759,45 @@ export default {
             this.endDateTime = '';
         },
 
-        applySearchFilter(employee, search) {
-            const field = employee[search.type] ? employee[search.type].toLowerCase() : '';
+        applySearchFilter(detail, search) {
+            const field = detail[search.type];
             let queryMatched = true;
-
-            if (search.type === 'email' || search.type === 'phone') {
-                queryMatched = this.searchQueries[search.type].some(query =>
-                    field.includes(query.toLowerCase())
-                );
-            } else if (search.type === 'fname') {
-                const field = `${employee.fname} ${employee.lname}`.toLowerCase();
-                queryMatched = this.searchQueries[search.type].some(query =>
-                    field.includes(query.toLowerCase())
-                );
+            const lowerCaseField = typeof field === 'string' ? field.toLowerCase() : '';
+            if (search.type === 'customer_name') {
+                queryMatched = this.searchQueries[search.type].some(query => {
+                    const cust = this.getCustomerByNo(detail.customer_id);
+                    return cust.nickname.toLowerCase().includes(query.toLowerCase());
+                });
+            } else if (search.type === 'customer_id') {
+                queryMatched = this.searchQueries[search.type].some(query => {
+                    const cust = this.getCustomerByNo(detail.customer_id);
+                    return cust.id.toLowerCase().includes(query.toLowerCase());
+                });
+            } else if (search.type === 'stock_id') {
+                queryMatched = this.searchQueries[search.type].some(query => {
+                    const st = this.getStockByNo(detail.stock_id);
+                    return st.name.toLowerCase().includes(query.toLowerCase());
+                });
+            } else if (search.type === 'emp_id') {
+                queryMatched = this.searchQueries[search.type].some(query => {
+                    const emp = this.getEmployeeByNo(detail.emp_id);
+                    return emp.fname.toLowerCase().includes(query.toLowerCase()) + ' ' + emp.lname.toLowerCase().includes(query.toLowerCase());
+                });
             } else {
                 const searchQuery = search.query.toLowerCase();
-                queryMatched = field.includes(searchQuery);
+                queryMatched = lowerCaseField.includes(searchQuery);
             }
-            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(employee, search) : true;
-            const topicMatched = search.topics ? search.topics.some(topic => topic === this.employee.ranks_id) : true;
+            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(detail, search) : true;
+            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getPortText(detail.total_percent).text) : true;
             return queryMatched && timeMatched && topicMatched;
         },
 
-        checkTimeRange(employee, search) {
-            const employeeTime = moment(employee.updated_date);
+        checkTimeRange(detail, search) {
+            const detailTime = moment(detail.updated_date);
             const startTime = moment(search.start);
             const endTime = moment(search.end);
-            return (!startTime.isValid() || employeeTime.isSameOrAfter(startTime)) &&
-                (!endTime.isValid() || employeeTime.isSameOrBefore(endTime));
+            return (!startTime.isValid() || detailTime.isSameOrAfter(startTime)) &&
+                (!endTime.isValid() || detailTime.isSameOrBefore(endTime));
         },
 
         toggleSavedSearchesDialog() {
@@ -774,22 +816,32 @@ export default {
         exportCSV() {
             const filteredData = this.filtered.map(item => {
                 const dataItem = {};
-                this.filteredHeaders.forEach(header => {
-                    if (header.value === 'fname') {
-                        dataItem['ชื่อ-นามสกุล'] = `${item.fname} ${item.lname}`;
-                    } else if (header.value === 'ranks_id') {
-                        dataItem['ตำแหน่ง'] = this.item.ranks_id;
-                    } else if (header.value !== 'picture') {
-                        dataItem[header.text] = item[header.value];
-                    }
-                });
+                dataItem['ราคาที่ติด'] = item.price.toLocaleString();
+                dataItem['จำนวนที่ติด'] = item.amount.toLocaleString();
+                dataItem['จำนวนเงิน'] = item.money.toLocaleString();
+                dataItem['เปอร์เซ็น กำไร/ขาดทุน ปัจจุบัน'] = item.total_percent.toFixed(2) + '%';
+                dataItem['กำไร/ขาดทุน ปัจจุบัน'] = item.present_profit.toLocaleString();
+                dataItem['มูลค่าปัจจุบันและยอดเงินปันผล'] = item.total.toLocaleString();
+                dataItem['มูลค่าปัจจุบัน'] = item.present_price.toLocaleString();
+                dataItem['ยอดเงินปันผล'] = item.balance_dividend.toLocaleString();
+
+                const portInfo = this.getPortText(item.total_percent);
+                dataItem['ประเภทพอร์ต'] = portInfo.text;
+
+                const CustId = this.getCustomerByNo(item.customer_id);
+                dataItem['รหัสสมาชิก'] = CustId ? `${CustId.id}` : 'ไม่ทราบ';
+
+                const FromNo = this.getFromByNo(item.from_id);
+                dataItem['ที่มาที่ไป'] = FromNo ? `${FromNo.from}` : 'ไม่ทราบ';
+
+                const StockID = this.getStockByNo(item.stock_id);
+                dataItem['ชื่อหุ้นที่ติด'] = StockID ? `${StockID.name}` : 'ไม่ทราบ';
+
+                const CustName = this.getCustomerByNo(item.customer_id);
+                dataItem['ชื่อเล่น'] = CustName ? `${CustName.nickname}` : 'ไม่ทราบ';
 
                 const empDetail = this.getEmployeeByNo(item.emp_id);
-                if (empDetail) {
-                    dataItem['ทำรายการโดย'] = `${empDetail.fname} ${empDetail.lname}`;
-                } else {
-                    dataItem['ทำรายการโดย'] = 'ไม่ทราบ';
-                }
+                dataItem['ทำรายการโดย'] = empDetail ? `${empDetail.fname} ${empDetail.lname}` : 'ไม่ทราบ';
 
                 return dataItem;
             });
@@ -829,17 +881,21 @@ export default {
         },
 
         recordLog() {
+            const stock = this.getStockByNo(this.currentItem.stock_id);
+            const from = this.getFromByNo(this.currentItem.from_id);
+            const customer = this.getCustomerByNo(this.currentItem.customer_id)
             const log = {
+                customer_id: `${customer ? customer.id : 'ไม่พบรหัสลูกค้า'}`,
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ? `NAME ${this.currentItem.fname}\nSUR ${this.currentItem.lname}\nEMAIL ${this.currentItem.email}\nPHONE ${this.currentItem.phone}\nGENDER ${this.currentItem.gender}`
-                    : `NAME ${this.currentItem.fname}\nSUR ${this.currentItem.lname}\nEMAIL ${this.currentItem.email}\nPHONE ${this.currentItem.phone}\nGENDER ${this.currentItem.gender}`,
-                type: 4,
+                    ? `ชื่อหุ้น : ${stock ? stock.name : 'ไม่พบชื่อหุ้น'}\nที่มาที่ไป : ${from ? from.from : 'ไม่พบที่มาที่ไป'}\nราคาที่ติด : ${this.currentItem.price}\nจำนวนที่ติด : ${this.currentItem.amount}`
+                    : `ชื่อหุ้น : ${stock ? stock.name : 'ไม่พบชื่อหุ้น'}\nที่มาที่ไป : ${from ? from.from : 'ไม่พบที่มาที่ไป'}\nราคาที่ติด : ${this.currentItem.price}\nจำนวนที่ติด : ${this.currentItem.amount}`,
+                type: 1,
                 picture: this.$auth.user.picture || 'Unknown',
                 action: this.currentAction === 'delete'
-                    ? 'ลบผู้ใช้งาน'
-                    : 'ไม่ลบผู้ใช้งาน',
+                    ? 'ลบข้อมูลหุ้นของลูกค้า'
+                    : 'ไม่ลบข้อมูลหุ้นของลูกค้า',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
             this.$store.dispatch('api/log/addLogs', log);

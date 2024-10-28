@@ -159,8 +159,8 @@ export default {
                         item.dividend_amount = stock.dividend_amount;
                         item.closing_price = stock.closing_price;
                     } else {
-                        item.dividend_amount = null; // Reset if stock not found
-                        item.closing_price = null; // Reset if stock not found
+                        item.dividend_amount = null;
+                        item.closing_price = null;
                     }
                 }
             });
@@ -235,13 +235,13 @@ export default {
         async confirmAndAddDetails() {
             for (const detail of this.withdrawalItems) {
                 const stock = this.stocks.find(stock => stock.no === detail.stock_id);
+                const money = detail.price * detail.amount;
                 const balance_dividend = detail.dividend_amount * detail.amount;
                 const present_price = detail.closing_price * detail.amount;
                 const total = balance_dividend + present_price;
-                const money = detail.price * detail.amount;
                 const present_profit = total - money;
-                const percent = (present_price - money) / money;
-                const total_percent = present_profit / money;
+                const percent = ((present_profit - money) / money) * 100;
+                const total_percent = (present_profit / money) * 100;
 
                 const customerIdentifier = this.customer_id || this.customer_name;
 

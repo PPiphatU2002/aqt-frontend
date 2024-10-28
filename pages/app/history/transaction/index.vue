@@ -163,8 +163,9 @@
 
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
-                <v-card-title class="headline"
-                    style="justify-content: center; display: flex;">รายละเอียดเพิ่มเติม</v-card-title>
+                <v-card-title class="headline" style="justify-content: center; display: flex;">
+                    {{ getDetailTitle(selectedItemDetail.action) }}
+                </v-card-title>
                 <v-card-text>
                     <div v-for="(line, index) in formattedDetailLines" :key="`${line}-${index}`">
                         <template v-if="line.includes('.jpg') || line.includes('.png') || line.includes('.jpeg')">
@@ -173,42 +174,33 @@
                                     height="100" />
                             </div>
                         </template>
-                        <template v-else-if="line.includes('STOCK')">
-                            <v-icon color="green">mdi-archive-plus</v-icon>
-                            {{ line.replace('STOCK', '').trim() }}
+                        <template v-else-if="line.includes('ชื่อหุ้น ')">
+                            <span style="color: white">ชื่อหุ้น </span>{{ line.replace('ชื่อหุ้น', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('NAME')">
-                            <v-icon color="white">mdi-archive</v-icon>
-                            {{ line.replace('NAME', '').trim() }}
+                        <template v-else-if="line.includes('ที่มาที่ไป ')">
+                            <span style="color: blue">ที่มาที่ไป </span>{{ line.replace('ที่มาที่ไป', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('LOW')">
-                            <v-icon color="yellow">mdi-cash-minus</v-icon>
-                            {{ line.replace('LOW', '').trim() }}
+                        <template v-else-if="line.includes('ราคาที่ติด ')">
+                            <span style="color: orange">ราคาที่ติด </span>{{ line.replace('ราคาที่ติด', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('TYPE')">
-                            <v-icon color="blue">mdi-format-list-bulleted-type</v-icon>
-                            {{ line.replace('TYPE', '').trim() }}
+                        <template v-else-if="line.includes('จำนวนที่ติด ')">
+                            <span style="color: purple">จำนวนที่ติด </span>{{ line.replace('จำนวนที่ติด', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('UP')">
-                            <v-icon color="red">mdi-cash-plus</v-icon>
-                            {{ line.replace('UP', '').trim() }}
+                        <template v-else-if="line.includes('หมายเหตุ ')">
+                            <span style="color: pink">หมายเหตุ </span>{{ line.replace('หมายเหตุ', '').trim()
+                            }}
                         </template>
-                        <template v-else-if="line.includes('DIVIDEND')">
-                            <v-icon color="orange">mdi-bank</v-icon>
-                            {{ line.replace('DIVIDEND', '').trim() }}
+                        <template v-else-if="line.includes('ไม่มีข้อมูลเพิ่มเติม')">
+                            <div style="display: flex; justify-content: center; color: red;">
+                                <span>ไม่มีข้อมูลเพิ่มเติม</span>
+                                {{ line.replace('ไม่มีข้อมูลเพิ่มเติม', '').trim() }}
+                            </div>
                         </template>
-                        <template v-else-if="line.includes('CLOSE')">
-                            <v-icon color="purple">mdi-currency-thb</v-icon>
-                            {{ line.replace('CLOSE', '').trim() }}
-                        </template>
-                        <template v-else-if="line.includes('REMARK')">
-                            <v-icon color="pink">mdi-comment</v-icon>
-                            {{ line.replace('REMARK', '').trim() }}
-                        </template>
-                        <template v-else-if="line.includes('COMMENT')">
-                            <v-icon color="brown">mdi-comment-processing</v-icon>
-                            {{ line.replace('COMMENT', '').trim() }}
-                        </template>
+
                         <template v-else>
                             {{ line }}
                         </template>
@@ -274,7 +266,7 @@ export default {
             showColumnSelector: false,
             selectedTopics: [],
             savedSearches: [],
-            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'emp_name', 'detail'],
+            visibleColumns: ['time', 'picture', 'action', 'emp_email', 'customer_id', 'emp_name', 'detail'],
 
             searchQueries: {
                 'emp_name': [],
@@ -282,7 +274,7 @@ export default {
             },
 
             searchTypes: [
-                { text: 'ชื่อ-นามสกุล', value: 'emp_name' },
+                { text: 'ทำรายการโดย', value: 'emp_name' },
                 { text: 'อีเมล', value: 'emp_email' },
                 { text: 'การกระทำ', value: 'action' },
                 { text: 'เวลา', value: 'time' }
@@ -290,9 +282,9 @@ export default {
 
             actionTopics: [
                 { text: 'ลบหุ้น', value: 'ลบหุ้น' },
-                { text: 'เพิ่มหุ้น', value: 'เพิ่มหุ้น' },
+                { text: 'เพิ่มหุ้นใหม่', value: 'เพิ่มหุ้นใหม่' },
                 { text: 'แก้ไขข้อมูลหุ้น', value: 'แก้ไขข้อมูลหุ้น' },
-                { text: 'เพิ่มประเภทหุ้น', value: 'เพิ่มประเภทหุ้น' },
+                { text: 'เพิ่มประเภทหุ้นใหม่', value: 'เพิ่มประเภทหุ้นใหม่' },
                 { text: 'ลบประเภทหุ้น', value: 'ลบประเภทหุ้น' },
                 { text: 'แก้ไขข้อมูลประเภทหุ้น', value: 'แก้ไขข้อมูลประเภทหุ้น' },
             ],
@@ -314,8 +306,8 @@ export default {
                 },
 
                 {
-                    text: 'การกระทำ',
-                    value: 'action',
+                    text: 'ทำรายการโดย',
+                    value: 'emp_name',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -330,15 +322,23 @@ export default {
                 },
 
                 {
-                    text: 'ชื่อ-นามสกุล',
-                    value: 'emp_name',
+                    text: 'การกระทำ',
+                    value: 'action',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'หมายเหตุ',
+                    text: 'รหัสลูกค้า',
+                    value: 'customer_id',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'รายละเอียด',
                     value: 'detail',
                     sortable: false,
                     align: 'center',
@@ -360,16 +360,23 @@ export default {
         },
 
         formattedDetailLines() {
-            const lines = this.selectedItemDetail.split('\n');
-            const formattedLines = [];
+            if (!this.selectedItemDetail || !this.selectedItemDetail.detail) {
+                return [];
+            }
 
-            lines.forEach((line, index) => {
-                formattedLines.push(line);
-                if (line.trim() === '' && index < lines.length - 1) {
-                    formattedLines.push('---------------------------------------------------------------');
-                }
-            });
-            return formattedLines;
+            if (typeof this.selectedItemDetail.detail === 'string') {
+                const lines = this.selectedItemDetail.detail.split('\n');
+                const formattedLines = [];
+
+                lines.forEach((line, index) => {
+                    formattedLines.push(line);
+                    if (line.trim() === '' && index < lines.length - 1) {
+                        formattedLines.push('----------------------------------------------------------');
+                    }
+                });
+                return formattedLines;
+            }
+            return [];
         },
 
         filteredHeaders() {
@@ -378,6 +385,15 @@ export default {
     },
 
     methods: {
+        getDetailTitle(action) {
+            if (['เพิ่มหุ้นใหม่', 'ลบหุ้น', 'เพิ่มประเภทหุ้นใหม่', 'ลบประเภทหุ้น'].includes(action)) {
+                return 'ข้อมูลเพิ่มเติม';
+            } else if (['แก้ไขข้อมูลหุ้นของลูกค้า', 'แก้ไขข้อมูลประเภทหุ้น'].includes(action)) {
+                return 'ข้อมูลที่ถูกแก้ไข';
+            }
+            return 'ข้อมูลทั่วไป';
+        },
+
         onImageError(event, item) {
             event.target.src = `http://localhost:3001/file/default/${item.picture}`;
         },
@@ -424,13 +440,13 @@ export default {
         },
 
         getActionColor(action) {
-            if (action === 'เพิ่มหุ้น') {
+            if (action === 'เพิ่มหุ้นใหม่') {
                 return '#24b224';
             } else if (action === 'ลบหุ้น') {
                 return '#e50211';
-            } else if (action === 'แก้ไขข้อมูลหุ้น') {
+            } else if (action === 'แก้ไขข้อมูลหุ้นของลูกค้า') {
                 return '#ffc800';
-            } else if (action === 'เพิ่มประเภทหุ้น') {
+            } else if (action === 'เพิ่มประเภทหุ้นใหม่') {
                 return '#c1ff72';
             } else if (action === 'ลบประเภทหุ้น') {
                 return '#ff5757';
@@ -450,7 +466,7 @@ export default {
         },
 
         openDetail(item) {
-            this.selectedItemDetail = item.detail;
+            this.selectedItemDetail = item;
             this.dialog = true;
         },
 

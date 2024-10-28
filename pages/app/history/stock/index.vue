@@ -163,8 +163,9 @@
 
         <v-dialog v-model="dialog" max-width="300px">
             <v-card>
-                <v-card-title class="headline"
-                    style="justify-content: center; display: flex;">รายละเอียดเพิ่มเติม</v-card-title>
+                <v-card-title class="headline" style="justify-content: center; display: flex;">
+                    {{ getDetailTitle(selectedItemDetail.action) }}
+                </v-card-title>
                 <v-card-text>
                     <div v-for="(line, index) in formattedDetailLines" :key="`${line}-${index}`">
                         <template v-if="line.includes('.jpg') || line.includes('.png') || line.includes('.jpeg')">
@@ -197,6 +198,13 @@
                             <span style="color: pink">หมายเหตุ </span>{{ line.replace('หมายเหตุ', '').trim()
                             }}
                         </template>
+                        <template v-else-if="line.includes('ไม่มีข้อมูลเพิ่มเติม')">
+                            <div style="display: flex; justify-content: center; color: red;">
+                                <span>ไม่มีข้อมูลเพิ่มเติม</span>
+                                {{ line.replace('ไม่มีข้อมูลเพิ่มเติม', '').trim() }}
+                            </div>
+                        </template>
+
                         <template v-else>
                             {{ line }}
                         </template>
@@ -270,7 +278,7 @@ export default {
             },
 
             searchTypes: [
-                { text: 'ชื่อ-นามสกุล', value: 'emp_name' },
+                { text: 'ทำรายการโดย', value: 'emp_name' },
                 { text: 'อีเมล', value: 'emp_email' },
                 { text: 'การกระทำ', value: 'action' },
                 { text: 'เวลา', value: 'time' }
@@ -278,9 +286,9 @@ export default {
 
             actionTopics: [
                 { text: 'ลบหุ้น', value: 'ลบหุ้น' },
-                { text: 'เพิ่มหุ้น', value: 'เพิ่มหุ้น' },
+                { text: 'เพิ่มหุ้นใหม่', value: 'เพิ่มหุ้นใหม่' },
                 { text: 'แก้ไขข้อมูลหุ้น', value: 'แก้ไขข้อมูลหุ้น' },
-                { text: 'เพิ่มประเภทหุ้น', value: 'เพิ่มประเภทหุ้น' },
+                { text: 'เพิ่มประเภทหุ้นใหม่', value: 'เพิ่มประเภทหุ้นใหม่' },
                 { text: 'ลบประเภทหุ้น', value: 'ลบประเภทหุ้น' },
                 { text: 'แก้ไขข้อมูลประเภทหุ้น', value: 'แก้ไขข้อมูลประเภทหุ้น' },
             ],
@@ -326,7 +334,7 @@ export default {
                 },
 
                 {
-                    text: 'หุ้น',
+                    text: 'หุ้น/ประเภทหุ้น',
                     value: 'stock_id',
                     sortable: false,
                     align: 'center',
@@ -356,16 +364,23 @@ export default {
         },
 
         formattedDetailLines() {
-            const lines = this.selectedItemDetail.split('\n');
-            const formattedLines = [];
+            if (!this.selectedItemDetail || !this.selectedItemDetail.detail) {
+                return [];
+            }
 
-            lines.forEach((line, index) => {
-                formattedLines.push(line);
-                if (line.trim() === '' && index < lines.length - 1) {
-                    formattedLines.push('---------------------------------------------------------------');
-                }
-            });
-            return formattedLines;
+            if (typeof this.selectedItemDetail.detail === 'string') {
+                const lines = this.selectedItemDetail.detail.split('\n');
+                const formattedLines = [];
+
+                lines.forEach((line, index) => {
+                    formattedLines.push(line);
+                    if (line.trim() === '' && index < lines.length - 1) {
+                        formattedLines.push('----------------------------------------------------------');
+                    }
+                });
+                return formattedLines;
+            }
+            return [];
         },
 
         filteredHeaders() {
@@ -374,6 +389,15 @@ export default {
     },
 
     methods: {
+        getDetailTitle(action) {
+            if (['เพิ่มหุ้นใหม่', 'ลบหุ้น', 'เพิ่มประเภทหุ้นใหม่', 'ลบประเภทหุ้น'].includes(action)) {
+                return 'ข้อมูลเพิ่มเติม';
+            } else if (['แก้ไขข้อมูลหุ้น', 'แก้ไขข้อมูลประเภทหุ้น'].includes(action)) {
+                return 'ข้อมูลที่ถูกแก้ไข';
+            }
+            return 'ข้อมูลทั่วไป';
+        },
+
         onImageError(event, item) {
             event.target.src = `http://localhost:3001/file/default/${item.picture}`;
         },
@@ -420,13 +444,13 @@ export default {
         },
 
         getActionColor(action) {
-            if (action === 'เพิ่มหุ้น') {
+            if (action === 'เพิ่มหุ้นใหม่') {
                 return '#24b224';
             } else if (action === 'ลบหุ้น') {
                 return '#e50211';
             } else if (action === 'แก้ไขข้อมูลหุ้น') {
                 return '#ffc800';
-            } else if (action === 'เพิ่มประเภทหุ้น') {
+            } else if (action === 'เพิ่มประเภทหุ้นใหม่') {
                 return '#c1ff72';
             } else if (action === 'ลบประเภทหุ้น') {
                 return '#ff5757';
@@ -446,7 +470,7 @@ export default {
         },
 
         openDetail(item) {
-            this.selectedItemDetail = item.detail;
+            this.selectedItemDetail = item;
             this.dialog = true;
         },
 

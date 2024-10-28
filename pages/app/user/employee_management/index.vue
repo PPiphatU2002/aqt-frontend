@@ -76,7 +76,7 @@
                             <v-autocomplete v-if="searchType !== 'ranks_id' && searchType !== 'updated_date'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
-                                hide-details></v-autocomplete>
+                                hide-details clearable></v-autocomplete>
 
                             <v-select v-if="searchType === 'ranks_id'" v-model="selectedTopics" :items="actionTopics"
                                 dense outlined multiple class="mx-2 search-size small-font"></v-select>
@@ -264,7 +264,7 @@ export default {
             sortBy: 'updated_date',
             currentAction: '',
             searchQuery: '',
-            searchType: '',
+            searchType: 'fname',
             selectedItemDetail: '',
             startDateTime: '',
             endDateTime: '',
@@ -294,7 +294,7 @@ export default {
             },
 
             searchTypes: [
-                { text: 'ชื่อ-นามสกุล', value: 'fname' },
+                { text: 'ชื่อ', value: 'fname' },
                 { text: 'อีเมล', value: 'email' },
                 { text: 'เบอร์โทรศัพท์', value: 'phone' },
                 { text: 'ตำแหน่ง', value: 'ranks_id' },
@@ -348,7 +348,7 @@ export default {
                 },
 
                 {
-                    text: 'ชื่อ-นามสกุล',
+                    text: 'ชื่อ',
                     value: 'fname',
                     sortable: false,
                     align: 'center',
@@ -644,7 +644,7 @@ export default {
                 const dataItem = {};
                 this.filteredHeaders.forEach(header => {
                     if (header.value === 'fname') {
-                        dataItem['ชื่อ-นามสกุล'] = `${item.fname} ${item.lname}`;
+                        dataItem['ชื่อ'] = `${item.fname} ${item.lname}`;
                     } else if (header.value === 'ranks_id') {
                         dataItem['ตำแหน่ง'] = this.getRankName(item.ranks_id);
                     } else if (header.value !== 'picture') {

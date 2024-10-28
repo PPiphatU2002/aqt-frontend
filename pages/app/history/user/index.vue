@@ -267,7 +267,7 @@ export default {
             },
 
             searchTypes: [
-                { text: 'ชื่อ-นามสกุล', value: 'emp_name' },
+                { text: 'ทำรายการโดย', value: 'emp_name' },
                 { text: 'อีเมล', value: 'emp_email' },
                 { text: 'การกระทำ', value: 'action' },
                 { text: 'เวลา', value: 'time' }
@@ -366,10 +366,8 @@ export default {
                 });
                 return formattedLines;
             }
-
             return [];
         },
-
 
         filteredHeaders() {
             return this.headers.filter(header => this.visibleColumns.includes(header.value));

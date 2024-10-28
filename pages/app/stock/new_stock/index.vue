@@ -232,7 +232,7 @@ export default {
                 detail: details.trim(),
                 type: 2,
                 picture: this.$auth.user.picture || 'ไม่รู้จัก',
-                action: 'เพิ่มหุ้น',
+                action: 'เพิ่มหุ้นใหม่',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
 

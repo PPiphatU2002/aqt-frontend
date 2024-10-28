@@ -242,18 +242,18 @@ export default {
             Papa.parse(data, {
                 header: true,
                 complete: (results) => {
+                    const currentYear = new Date().getFullYear(); // Get current year
                     const latestData = {};
 
                     results.data.forEach(item => {
                         const symbol = item.symbol;
                         const year = parseInt(item.year);
                         const dividend = item.dividend;
-                        const remark = item.remark; // Extract the remark
+                        const remark = item.remark;
 
-                        if (symbol && !isNaN(year) && dividend) {
-                            if (!latestData[symbol] || year > latestData[symbol].year) {
-                                latestData[symbol] = { year: year, dividend: dividend, remark: remark }; // Store remark
-                            }
+                        if (symbol && !isNaN(year) && dividend && year === currentYear) {
+                            // Store data for current year only
+                            latestData[symbol] = { year: year, dividend: dividend, remark: remark };
                         }
                     });
 
@@ -262,7 +262,7 @@ export default {
                         year: latestData[symbol].year,
                         symbol: symbol,
                         dividend: latestData[symbol].dividend,
-                        remark: latestData[symbol].remark, // Include remark in the output
+                        remark: latestData[symbol].remark,
                     }));
 
                     this.isLoadingDividendYield = false;

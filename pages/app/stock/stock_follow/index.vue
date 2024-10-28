@@ -5,15 +5,15 @@
         <ModalConfirm :method="handleConfirm" :open="modalConfirmOpen" @update:confirm="modalConfirmOpen = false" />
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
-        <EditCustomer :open="editCustomer" :data="editAllData" @update:edit="editCustomer = false" />
+        <EditStock :open="editStock" :data="editAllData" @update:edit="editStock = false" />
 
         <v-card class="custom-card" flat>
             <v-container>
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon" color="#85d7df">mdi-account</v-icon>&nbsp;
-                            <h3 class="mb-0">ข้อมูลลูกค้า</h3>
+                            <v-icon class="little-icon" color="#85d7df">mdi-archive-eye</v-icon>&nbsp;
+                            <h3 class="mb-0">ข้อมูลการติดตามหุ้น</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
                             <div class="d-flex align-center mt-2 justify-center">
@@ -73,12 +73,12 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-autocomplete v-if="searchType !== 'type_id' && searchType !== 'updated_date'"
+                            <v-autocomplete v-if="searchType !== 'set_id' && searchType !== 'updated_date'"
                                 v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
                                 append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
-                                hide-details clearable></v-autocomplete>
+                                hide-details></v-autocomplete>
 
-                            <v-select v-if="searchType === 'type_id'" v-model="selectedTopics" :items="actionTopics"
+                            <v-select v-if="searchType === 'set_id'" v-model="selectedTopics" :items="actionTopics"
                                 dense outlined multiple class="mx-2 search-size small-font"></v-select>
 
                             <v-menu v-if="searchType === 'updated_date'" v-model="datePickerMenu"
@@ -129,9 +129,14 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <v-btn @click="goToNewUser" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
-                    <v-icon left color="#24b224">mdi-account-plus</v-icon> เพิ่มลูกค้า
-                </v-btn>
+                <div>
+                    <v-btn @click="goToTypeStock" class="tab-icon-three" style="font-size: 1.5 rem; margin-left: auto;">
+                        <v-icon left color="#85d7df">mdi-archive-alert</v-icon> ผลการติดตามหุ้น
+                    </v-btn>
+                    <v-btn @click="goToNewStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
+                        <v-icon left color="#24b224">mdi-archive-plus</v-icon> เพิ่มการติดตามหุ้น
+                    </v-btn>
+                </div>
             </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
@@ -141,20 +146,9 @@
                         <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />
                     </v-avatar>
                 </template>
-                <template v-slot:item.id="{ item }">
-                    <div class="text-center">{{ item.id }}</div>
-                </template>
-                <template v-slot:item.nickname="{ item }">
-                    <div class="text-center">{{ item.nickname }}</div>
-                </template>
-                <template v-slot:item.type_id="{ item }">
-                    <div class="text-center" :style="{ color: getTypeText(getTypeName(item.type_id)).color }">
-                        {{ getTypeName(item.type_id) }}
-                    </div>
-                </template>
-                <template v-slot:item.base_id="{ item }">
-                    <div class="text-center" :style="{ color: getBaseText(getBaseName(item.base_id)).color }">
-                        {{ getBaseName(item.base_id) }}
+                <template v-slot:item.set_id="{ item }">
+                    <div class="text-center" :style="{ color: getFromText(getSetName(item.set_id)).color }">
+                        {{ getSetName(item.set_id) }}
                     </div>
                 </template>
                 <template v-slot:item.emp_id="{ item }">
@@ -163,14 +157,14 @@
                 <template v-slot:item.updated_date="{ item }">
                     <div class="text-center">{{ formatDateTime(item.updated_date) }}</div>
                 </template>
-                <template v-if="$auth.user.ranks_id === 1 || $auth.user.ranks_id === 3" v-slot:item.detail="{ item }">
+                <template v-slot:item.detail="{ item }">
                     <div class="text-center">
                         <v-menu offset-y>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-icon v-bind="attrs" v-on="on" color="#85d7df">mdi-dots-vertical</v-icon>
                             </template>
                             <v-list class="custom-list">
-                                <v-list-item @click="openEditCustomer(item)" class="custom-list-item">
+                                <v-list-item @click="openEditStock(item)" class="custom-list-item">
                                     <v-list-item-icon style="margin-right: 4px;">
                                         <v-icon class="icon-tab" color="#ffc800">mdi-pencil</v-icon>
                                     </v-list-item-icon>
@@ -181,7 +175,7 @@
                                     <v-list-item-icon style="margin-right: 4px;">
                                         <v-icon class="icon-tab" color="#e50211">mdi-cancel</v-icon>
                                     </v-list-item-icon>
-                                    <v-list-item-content style="font-size: 0.8rem;">ลบลูกค้า</v-list-item-content>
+                                    <v-list-item-content style="font-size: 0.8rem;">ลบหุ้น</v-list-item-content>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
@@ -189,7 +183,7 @@
                 </template>
             </v-data-table>
             <div class="text-center">
-                <v-btn class = "mb-4" color="#e50211" @click="goToHome">
+                <v-btn class="mb-4" color="#e50211" @click="goToHome">
                     <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
                 </v-btn>
             </div>
@@ -228,10 +222,9 @@ export default {
 
     async mounted() {
         await this.checkRank();
-        await this.fetchCustomerData();
+        await this.fetchStockData();
         await this.fetchEmployeeData();
-        await this.fetchTypeData();
-        await this.fetchBaseData();
+        await this.fetchSetData();
     },
 
     components: {
@@ -254,15 +247,14 @@ export default {
                 },
             },
 
-            customers: [],
-            types: [],
+            stocks: [],
+            sets: [],
             employees: [],
-            bases: [],
 
             sortBy: 'updated_date',
             currentAction: '',
             searchQuery: '',
-            searchType: 'nickname',
+            searchType: 'name',
             selectedItemDetail: '',
             startDateTime: '',
             endDateTime: '',
@@ -273,34 +265,38 @@ export default {
             showSavedSearchesDialog: false,
             showColumnSelector: false,
             modalConfirmOpen: false,
-            editCustomer: false,
+            editStock: false,
             dialog: false,
             sortDesc: true,
-            selectedCustomer: null,
+            selectedStock: null,
             currentItem: null,
-            customerNo: null,
+            stockNo: null,
             actionType: null,
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'id', 'nickname', 'type_id', 'base_id', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'stock_id', 'low_price', 'up_price', 'type', 'comment', 'emp_id', 'detail'],
 
             searchQueries: {
-                'nickname': [],
-                'id': [],
+                'name': [],
+                'emp_id': [],
             },
 
             searchTypes: [
-                { text: 'ชื่อเล่น', value: 'nickname' },
-                { text: 'ไอดี', value: 'id' },
-                { text: 'ประเภท', value: 'type_id' },
+                { text: 'ชื่อหุ้น', value: 'name' },
+                { text: 'ทำรายการโดย', value: 'emp_id' },
+                { text: 'ประเภท', value: 'set_id' },
                 { text: 'เวลา', value: 'updated_date' }
             ],
 
             actionTopics: [
-                { text: 'เทรดเอง', value: 'เทรดเอง' },
-                { text: 'เทรดตามโค้ช', value: 'เทรดตามโค้ช' },
-                { text: 'ยังไม่ระบุ', value: 'ยังไม่ระบุ' },
+                { text: 'SET', value: 'SET' },
+                { text: 'SET50', value: 'SET50' },
+                { text: 'SET100', value: 'SET100' },
+                { text: 'ETF', value: 'ETF' },
+                { text: 'MAI', value: 'MAI' },
+                { text: 'Warrants', value: 'Warrants' },
+                { text: 'DR', value: 'DR' },
             ],
 
             headers: [
@@ -312,32 +308,40 @@ export default {
                 },
 
                 {
+                    text: 'ชื่อหุ้น',
+                    value: 'stock_id',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'LOW PRICE',
+                    value: 'low_price',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'UP PRICE',
+                    value: 'up_price',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
                     text: 'ประเภท',
-                    value: 'type_id',
+                    value: 'type',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'ไอดี',
-                    value: 'id',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ชื่อเล่น',
-                    value: 'nickname',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ฐานทุน',
-                    value: 'base_id',
+                    text: 'หมายเหตุ',
+                    value: 'comment',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -364,13 +368,13 @@ export default {
 
     computed: {
         filtered() {
-            let filteredCustomers = this.customers;
+            let filteredStocks = this.stocks;
             this.savedSearches.forEach(search => {
-                filteredCustomers = filteredCustomers.filter(customer => {
-                    return this.applySearchFilter(customer, search);
+                filteredStocks = filteredStocks.filter(stock => {
+                    return this.applySearchFilter(stock, search);
                 });
             });
-            return filteredCustomers;
+            return filteredStocks;
         },
 
         formattedDetailLines() {
@@ -387,26 +391,17 @@ export default {
             this.$router.push('/app/home');
         },
 
-        async fetchTypeData() {
-            this.types = await this.$store.dispatch('api/type/getTypes')
+        async fetchSetData() {
+            this.sets = await this.$store.dispatch('api/set/getSets')
         },
 
-        getTypeName(typeId) {
-            const type = this.types.find(t => t.no === typeId);
-            return type ? type.type : 'ยังไม่ระบุ';
+        getSetName(setId) {
+            const set = this.sets.find(t => t.no === setId);
+            return set ? set.set : '';
         },
 
-        async fetchBaseData() {
-            this.bases = await this.$store.dispatch('api/base/getBases')
-        },
-
-        getBaseName(baseId) {
-            const base = this.bases.find(b => b.no === baseId);
-            return base ? base.base : 'ยังไม่ระบุ';
-        },
-
-        async fetchCustomerData() {
-            this.customers = await this.$store.dispatch('api/customer/getCustomers');
+        async fetchStockData() {
+            this.stocks = await this.$store.dispatch('api/stock/getStocks');
         },
 
         async fetchEmployeeData() {
@@ -418,24 +413,25 @@ export default {
             return employee ? employee.fname + ' ' + employee.lname : 'ไม่ทราบ';
         },
 
-        openEditCustomer(customer) {
-            this.editAllData = customer;
-            this.editCustomer = true;
+        openEditStock(stock) {
+            this.editAllData = stock;
+            this.editStock = true;
         },
 
         showEditDialog(item) {
-            this.selectedCustomer = item;
+            this.selectedStock = item;
             this.editDialogOpen = true;
         },
 
         getSearchItems(type) {
-            if (type === 'nickname') {
-                return this.customers.map(emp => emp.nickname);
-            } else if (type === 'id') {
-                return this.customers.map(emp => emp.id);
+            if (type === 'name') {
+                return this.stocks.map(emp => emp.name);
+            } else if (type === 'emp_id') {
+                return this.stocks.map(emp => this.getEmployeeName(emp.emp_id));
             }
             return [];
-        },
+        }
+        ,
 
         showConfirmDialog(action, item) {
             this.currentAction = action;
@@ -446,8 +442,8 @@ export default {
         async handleConfirm() {
             if (this.currentAction === 'delete') {
                 try {
-                    await this.$store.dispatch('api/customer/deleteCustomer', this.currentItem.no);
-                    this.modal.complete.message = 'ลบลูกค้าเรียบร้อยแล้ว';
+                    await this.$store.dispatch('api/stock/deleteStock', this.currentItem.no);
+                    this.modal.complete.message = 'ลบหุ้นนี้เรียบร้อยแล้ว';
                     this.recordLog();
                     this.modal.complete.open = true;
                 } catch (warning) {
@@ -468,11 +464,11 @@ export default {
                 }
                 else {
                     if (RankID === '1') {
-                        this.$router.push('/app/user/management');
+                        this.$router.push('/app/stock/stock_follow');
                     } else if (RankID === '2') {
-                        this.$router.push('/app/user/management');
+                        this.$router.push('/app/home');
                     } else if (RankID === '3') {
-                        this.$router.push('/app/user/management');
+                        this.$router.push('/app/stock/stock_follow');
                     } else {
                         this.$router.push('/auth');
                     }
@@ -482,25 +478,23 @@ export default {
             }
         },
 
-        getTypeText(type) {
-            if (type === 'เทรดเอง') {
-                return { text: 'เทรดเอง', color: '#24b224' };
-            } else if (type === 'เทรดตามโค้ช') {
-                return { text: 'เทรดตามโค้ช', color: '#ffc800' };
+        getFromText(set) {
+            if (set === 'SET') {
+                return { text: 'SET', color: '#24b224' };
+            } else if (set === 'SET50') {
+                return { text: 'SET50', color: '#ffc800' };
+            } else if (set === 'SET100') {
+                return { text: 'SET100', color: '#38b6ff' };
+            } else if (set === 'ETF') {
+                return { text: 'ETF', color: '#8c52ff' };
+            } else if (set === 'MAI') {
+                return { text: 'MAI', color: '#ff914d' };
+            } else if (set === 'Warrants') {
+                return { text: 'Warrants', color: '#c1ff72' };
+            } else if (set === 'DR') {
+                return { text: 'DR', color: '#ff5757' };
             } else {
-                return { text: 'ยังไม่ระบุ', color: '#e50211' };
-            }
-        },
-
-        getBaseText(base) {
-            if (base === 'มีเงิน') {
-                return { text: 'มีเงิน', color: '#24b224' };
-            } else if (base === 'รอจังหวะ') {
-                return { text: 'รอจังหวะ', color: '#ffc800' };
-            } else if (base === 'รอคุย') {
-                return { text: 'รอคุย', color: '#85d7df' };
-            } else {
-                return { text: 'ยังไม่ระบุ', color: '#e50211' };
+                return { text: '', color: 'inherit' };
             }
         },
 
@@ -517,7 +511,7 @@ export default {
         },
 
         onSearchTypeChange() {
-            this.isSearchFieldVisible = this.searchType !== 'updated_date' && this.searchType !== 'type_id';
+            this.isSearchFieldVisible = this.searchSet !== 'updated_date' && this.searchType !== 'set_id';
         },
 
         validateDateRange() {
@@ -535,10 +529,9 @@ export default {
             if (!this.validateDateRange()) {
                 return;
             }
-
-            if (this.searchType === 'type_id') {
+            if (this.searchType === 'set_id') {
                 this.addTopicToSearch();
-            } else if (this.searchType === 'nickname' || this.searchType === 'id') {
+            } else if (this.searchType === 'name' || this.searchType === 'emp_id') {
                 this.addTextToSearch();
             } else {
                 this.savedSearches.push({
@@ -556,23 +549,27 @@ export default {
         },
 
         addTextToSearch() {
-            const trimmedQuery = this.searchQuery.trim();
-            if (trimmedQuery) {
-                this.searchQueries[this.searchType].push(trimmedQuery);
-                this.savedSearches.push({
-                    query: this.searchQueries[this.searchType],
-                    type: this.searchType,
-                    start: this.startDateTime,
-                    end: this.endDateTime
-                });
-                this.searchQuery = '';
+            if (typeof this.searchQuery === 'string') {
+                const trimmedQuery = this.searchQuery.trim();
+                if (trimmedQuery) {
+                    this.searchQueries[this.searchType].push(trimmedQuery);
+                    this.savedSearches.push({
+                        query: this.searchQueries[this.searchType],
+                        type: this.searchType,
+                        start: this.startDateTime,
+                        end: this.endDateTime
+                    });
+                    this.searchQuery = '';
+                }
+            } else {
+                console.error('searchQuery is not a string:', this.searchQuery);
             }
         },
 
         addTopicToSearch() {
             this.savedSearches.push({
                 query: '',
-                type: 'type_id',
+                type: 'set_id',
                 topics: [...this.selectedTopics],
                 start: this.startDateTime,
                 end: this.endDateTime
@@ -582,11 +579,17 @@ export default {
             this.endDateTime = '';
         },
 
-        applySearchFilter(customer, search) {
-            const field = customer[search.type];
+        applySearchFilter(stock, search) {
+            const field = stock[search.type];
             let queryMatched = true;
             const lowerCaseField = typeof field === 'string' ? field.toLowerCase() : '';
-            if (search.type === 'id' || search.type === 'nickname') {
+            if (search.type === 'emp_id') {
+                queryMatched = this.searchQueries[search.type].some(query => {
+                    const empName = this.getEmployeeName(stock.emp_id);
+                    return empName.toLowerCase().includes(query.toLowerCase());
+                });
+            }
+            else if (search.type === 'name') {
                 queryMatched = this.searchQueries[search.type].some(query =>
                     lowerCaseField.includes(query.toLowerCase())
                 );
@@ -594,18 +597,17 @@ export default {
                 const searchQuery = search.query.toLowerCase();
                 queryMatched = lowerCaseField.includes(searchQuery);
             }
-            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(customer, search) : true;
-            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getTypeName(customer.type_id)) : true;
+            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(stock, search) : true;
+            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getSetName(stock.set_id)) : true;
             return queryMatched && timeMatched && topicMatched;
-        }
-        ,
+        },
 
-        checkTimeRange(customer, search) {
-            const customerTime = moment(customer.updated_date);
+        checkTimeRange(stock, search) {
+            const stockTime = moment(stock.updated_date);
             const startTime = moment(search.start);
             const endTime = moment(search.end);
-            return (!startTime.isValid() || customerTime.isSameOrAfter(startTime)) &&
-                (!endTime.isValid() || customerTime.isSameOrBefore(endTime));
+            return (!startTime.isValid() || stockTime.isSameOrAfter(startTime)) &&
+                (!endTime.isValid() || stockTime.isSameOrBefore(endTime));
         },
 
         toggleSavedSearchesDialog() {
@@ -627,8 +629,8 @@ export default {
                 this.filteredHeaders.forEach(header => {
                     if (header.value === 'updated_date') {
                         dataItem['เวลา'] = this.formatDateTime(item.updated_date);
-                    } else if (header.value === 'type_id') {
-                        dataItem['ประเภท'] = this.getTypeName(item.type_id);
+                    } else if (header.value === 'set_id') {
+                        dataItem['ประเภท'] = this.getSetName(item.set_id);
                     } else if (header.value === 'emp_id') {
                         dataItem['ทำรายการโดย'] = this.getEmployeeName(item.emp_id);
                     } else {
@@ -644,7 +646,7 @@ export default {
             const link = document.createElement('a');
             const currentDate = moment().format('YYYY-MM-DD');
             link.href = URL.createObjectURL(blob);
-            link.setAttribute('download', `ข้อมูลลูกค้า-${currentDate}.csv`);
+            link.setAttribute('download', `ข้อมูลหุ้น-${currentDate}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -673,24 +675,32 @@ export default {
 
         recordLog() {
             const log = {
-                customer_id: this.currentItem.nickname,
+                stock_id: this.currentItem.name,
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ? `รหัส : ${this.currentItem.id}\nประเภท : ${this.getTypeName(this.currentItem.type_id)}\nฐานทุน : ${this.getBaseName(this.currentItem.base_id)}`
-                    : `รหัส : ${this.currentItem.id}\nประเภท : ${this.getTypeName(this.currentItem.type_id)}\nฐานทุน : ${this.getBaseName(this.currentItem.base_id)}`,
-                type: 3,
-                picture: this.$auth.user.picture || 'ไม่รู้จัก',
-                action: this.currentAction === 'delete'
-                    ? 'ลบลูกค้า'
-                    : 'ไม่ลบลูกค้า',
+                    ? `ประเภท : ${this.getSetName(this.currentItem.set_id) || 'ยังไม่ระบุ'}\n` +
+                    `จำนวนปันผล : ${this.currentItem.dividend_amount || 'ยังไม่ระบุ'}\n` +
+                    `ราคาปิด : ${this.currentItem.closing_price || 'ยังไม่ระบุ'}\n` +
+                    `หมายเหตุ : ${this.currentItem.comment || 'ยังไม่ระบุ'}`
+                    : `ประเภท : ${this.getSetName(this.currentItem.set_id) || 'ยังไม่ระบุ'}\n` +
+                    `จำนวนปันผล : ${this.currentItem.dividend_amount || 'ยังไม่ระบุ'}\n` +
+                    `ราคาปิด : ${this.currentItem.closing_price || 'ยังไม่ระบุ'}\n` +
+                    `หมายเหตุ : ${this.currentItem.comment || 'ยังไม่ระบุ'}`,
+                type: 2,
+                picture: this.$auth.user.picture || 'Unknown',
+                action: this.currentAction === 'delete' ? 'ลบหุ้น' : 'ไม่ลบหุ้น',
                 time: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
             };
             this.$store.dispatch('api/log/addLogs', log);
         },
 
-        goToNewUser() {
-            this.$router.push('/app/user/new');
+        goToNewStock() {
+            this.$router.push('/app/stock/new_stock');
+        },
+
+        goToTypeStock() {
+            this.$router.push('/app/stock/type');
         },
     },
 };
@@ -729,6 +739,12 @@ export default {
 .tab-icon-two {
     cursor: pointer;
     margin-right: 24px;
+    margin-left: 0px;
+}
+
+.tab-icon-three {
+    cursor: pointer;
+    margin-right: 8px;
     margin-left: 0px;
 }
 
@@ -846,7 +862,7 @@ export default {
 }
 
 .custom-card {
-    max-width: 1000px;
+    max-width: 1200px;
     width: 100%;
     margin: auto;
 }

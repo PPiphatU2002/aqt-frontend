@@ -36,6 +36,8 @@
               <v-list-item-content>
                 <v-list-item-title style="font-size: 0.8rem;">ข้อมูลสมาชิก</v-list-item-title>
               </v-list-item-content>
+              <v-icon v-if="pendingEmployeesCount > 0" class="small-bell-icon"
+                style="margin-left: 6px;">mdi-bell</v-icon>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -178,12 +180,14 @@ moment.locale('th');
 export default {
   async mounted() {
     await this.fetchEmployeeData();
+    await this.fetchPendingEmployeeCount();
   },
 
   data() {
     return {
       profileImage: `http://localhost:3001/file/profile/${this.$auth.user.picture}`,
       employees: [],
+      pendingEmployeesCount: 0,
       clipped: false,
       fixed: false,
       menuActive: false,
@@ -196,6 +200,15 @@ export default {
   },
 
   methods: {
+    async fetchPendingEmployeeCount() {
+      try {
+        const response = await this.$store.dispatch('api/employee/getEmployeesStatus', '2');
+        this.pendingEmployeesCount = response.length;
+      } catch (error) {
+        console.error('Error fetching pending employees:', error);
+      }
+    },
+
     onImageError() {
       this.profileImage = `http://localhost:3001/file/default/${this.$auth.user.picture}`;
     },
@@ -433,4 +446,20 @@ export default {
 .non-clickable {
   pointer-events: none;
 }
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.small-bell-icon {
+  font-size: 0.8rem;
+  vertical-align: middle;
+  color: #ffc800;
+  animation: shake 0.8s ease infinite;
+}
+
 </style>
