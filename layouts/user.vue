@@ -160,6 +160,15 @@
               </v-list-item>
             </v-list>
           </v-menu>
+
+          <v-snackbar v-if="$auth.user.ranks_id === 1 || $auth.user.ranks_id === 3" v-model="snackbar" :timeout="3000"
+            style="width: 100px; height: 40px;" color="#24b224" absolute top right>
+            <div class="snackbar-content">
+              <v-icon class="small-bell-icon" style="margin-right: 8px; font-size: 16px;">mdi-bell</v-icon>{{
+              snackbarText }}
+            </div>
+          </v-snackbar>
+
         </div>
       </v-app-bar>
       <v-main>
@@ -181,6 +190,9 @@ export default {
   async mounted() {
     await this.fetchEmployeeData();
     await this.fetchPendingEmployeeCount();
+    setInterval(async () => {
+      await this.fetchPendingEmployeeCount();
+    }, 10000);
   },
 
   data() {
@@ -191,6 +203,8 @@ export default {
       clipped: false,
       fixed: false,
       menuActive: false,
+      snackbar: false,
+      snackbarText: '',
       modal: {
         confirmLogout: {
           open: false,
@@ -203,7 +217,14 @@ export default {
     async fetchPendingEmployeeCount() {
       try {
         const response = await this.$store.dispatch('api/employee/getEmployeesStatus', '2');
-        this.pendingEmployeesCount = response.length;
+        const newCount = response.length;
+
+        if (newCount !== this.pendingEmployeesCount) {
+          this.pendingEmployeesCount = newCount;
+
+          this.snackbarText = `มีคำร้องขอสมัครสมาชิก : ${this.pendingEmployeesCount} คน`;
+          this.snackbar = true;
+        }
       } catch (error) {
         console.error('Error fetching pending employees:', error);
       }
@@ -448,11 +469,25 @@ export default {
 }
 
 @keyframes shake {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(-10deg); }
-  50% { transform: rotate(10deg); }
-  75% { transform: rotate(-10deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-10deg);
+  }
+
+  50% {
+    transform: rotate(10deg);
+  }
+
+  75% {
+    transform: rotate(-10deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 .small-bell-icon {
@@ -462,4 +497,19 @@ export default {
   animation: shake 0.8s ease infinite;
 }
 
+.v-snackbar {
+  top: 50% !important;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+}
+
+.snackbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
 </style>
