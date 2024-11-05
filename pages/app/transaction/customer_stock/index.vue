@@ -227,6 +227,9 @@
                 <template v-slot:item.updated_date="{ item }">
                     <div class="text-center">{{ formatDateTime(item.updated_date) }}</div>
                 </template>
+                <template v-slot:item.created_date="{ item }">
+                    <div class="text-center">{{ formatDate(item.created_date) }}</div>
+                </template>
                 <template v-slot:item.detail="{ item }">
                     <div class="text-center">
                         <v-menu offset-y>
@@ -335,7 +338,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'customer_id', 'customer_name', 'stock_id', 'price', 'amount', 'money', 'balance_dividend', 'present_price', 'total', 'present_profit', 'percent', 'total_percent', 'port', 'from_id', 'comment', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'customer_id', 'customer_name', 'stock_id', 'price', 'amount', 'money', 'balance_dividend', 'present_price', 'total', 'present_profit', 'percent', 'total_percent', 'created_date', 'port', 'from_id', 'comment', 'emp_id', 'detail'],
 
             searchQueries: {
                 'customer_id': [],
@@ -451,6 +454,14 @@ export default {
                 {
                     text: 'เปอร์เซ็น กำไร/ขาดทุน ปัจจุบัน',
                     value: 'total_percent',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'วันที่ซื้อหุ้น',
+                    value: 'created_date',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -683,6 +694,13 @@ export default {
         formatDateTime(date) {
             if (moment(date).isValid()) {
                 return moment(date).format('YYYY-MM-DD HH:mm');
+            }
+            return 'Invalid Date';
+        },
+
+        formatDate(date) {
+            if (moment(date).isValid()) {
+                return moment(date).format('YYYY-MM-DD');
             }
             return 'Invalid Date';
         },

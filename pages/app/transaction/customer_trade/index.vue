@@ -150,110 +150,55 @@
                     </div>
                 </template>
 
-                <template v-slot:item.buy_amount="{ item }">
+                <template v-slot:item.amount="{ item }">
                     <div class="text-center">
-                        <span v-if="item.buy_amount !== null && item.buy_amount !== undefined">
-                            {{ item.buy_amount.toLocaleString() }}
+                        <span v-if="item.amount !== null && item.amount !== undefined">
+                            {{ item.amount.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>
                     </div>
                 </template>
-                <template v-slot:item.buy_price="{ item }">
+                <template v-slot:item.price="{ item }">
                     <div class="text-center">
-                        <span v-if="item.buy_price !== null && item.buy_price !== undefined">
-                            {{ item.buy_price.toLocaleString() }}
+                        <span v-if="item.price !== null && item.price !== undefined">
+                            {{ item.price.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>
                     </div>
                 </template>
-                <template v-slot:item.buy_result="{ item }">
+                <template v-slot:item.result="{ item }">
                     <div class="text-center">
-                        <span v-if="item.buy_result !== null && item.buy_result !== undefined">
-                            {{ item.buy_result.toLocaleString() }}
+                        <span v-if="item.result !== null && item.result !== undefined">
+                            {{ item.result.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>
                     </div>
                 </template>
-                <template v-slot:item.buy_comfee="{ item }">
+                <template v-slot:item.comfee="{ item }">
                     <div class="text-center">
-                        <span v-if="item.buy_comfee !== null && item.buy_comfee !== undefined">
-                            {{ item.buy_comfee.toLocaleString() }}
+                        <span v-if="item.comfee !== null && item.comfee !== undefined">
+                            {{ item.comfee.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>
                     </div>
                 </template>
-                <template v-slot:item.buy_vat="{ item }">
+                <template v-slot:item.vat="{ item }">
                     <div class="text-center">
-                        <span v-if="item.buy_vat !== null && item.buy_vat !== undefined">
-                            {{ item.buy_vat.toLocaleString() }}
+                        <span v-if="item.vat !== null && item.vat !== undefined">
+                            {{ item.vat.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>
                     </div>
                 </template>
-                <template v-slot:item.buy_total="{ item }">
+                <template v-slot:item.total="{ item }">
                     <div class="text-center">
-                        <span v-if="item.buy_total !== null && item.buy_total !== undefined">
-                            {{ item.buy_total.toLocaleString() }}
-                        </span>
-                        <span v-else>
-                        </span>
-                    </div>
-                </template>
-
-                <template v-slot:item.sale_amount="{ item }">
-                    <div class="text-center">
-                        <span v-if="item.sale_amount !== null && item.sale_amount !== undefined">
-                            {{ item.sale_amount.toLocaleString() }}
-                        </span>
-                        <span v-else>
-                        </span>
-                    </div>
-                </template>
-                <template v-slot:item.sale_price="{ item }">
-                    <div class="text-center">
-                        <span v-if="item.sale_price !== null && item.sale_price !== undefined">
-                            {{ item.sale_price.toLocaleString() }}
-                        </span>
-                        <span v-else>
-                        </span>
-                    </div>
-                </template>
-                <template v-slot:item.sale_result="{ item }">
-                    <div class="text-center">
-                        <span v-if="item.sale_result !== null && item.sale_result !== undefined">
-                            {{ item.sale_result.toLocaleString() }}
-                        </span>
-                        <span v-else>
-                        </span>
-                    </div>
-                </template>
-                <template v-slot:item.sale_comfee="{ item }">
-                    <div class="text-center">
-                        <span v-if="item.sale_comfee !== null && item.sale_comfee !== undefined">
-                            {{ item.sale_comfee.toLocaleString() }}
-                        </span>
-                        <span v-else>
-                        </span>
-                    </div>
-                </template>
-                <template v-slot:item.sale_vat="{ item }">
-                    <div class="text-center">
-                        <span v-if="item.sale_vat !== null && item.sale_vat !== undefined">
-                            {{ item.sale_vat.toLocaleString() }}
-                        </span>
-                        <span v-else>
-                        </span>
-                    </div>
-                </template>
-                <template v-slot:item.sale_total="{ item }">
-                    <div class="text-center">
-                        <span v-if="item.sale_total !== null && item.sale_total !== undefined">
-                            {{ item.sale_total.toLocaleString() }}
+                        <span v-if="item.total !== null && item.total !== undefined">
+                            {{ item.total.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>
@@ -265,7 +210,7 @@
                         {{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}
                     </div>
                 </template>
-                <template v-slot:item.money="{ item }"> 
+                <template v-slot:item.money="{ item }">
                     <div class="text-center" style="color:#ff66c4">
                         {{ getDetailByNo(item.stock_detail_id)?.money || 'N/A' }}
                     </div>
@@ -275,6 +220,11 @@
                         {{ getStockByNo(item.stock_id)?.name || 'N/A' }}
                     </div>
                 </template>
+                <template v-slot:item.commission_id="{ item }">
+                    <div class="text-center" style="color:#38b6ff">
+                        {{ getCommissionByNo(item.commission_id)?.commission || 'N/A' }}
+                    </div>
+                </template>
                 <template v-slot:item.from_id="{ item }">
                     <div class="text-center">
                         <span :style="{ color: getFromText(getFromByNo(item.from_id)?.from).color }">
@@ -282,31 +232,10 @@
                         </span>
                     </div>
                 </template>
-                <template v-slot:item.present_profit="{ item }">
+                <template v-slot:item.type="{ item }">
                     <div class="text-center">
-                        <span :style="{ color: getColorForNumber(item.present_profit) }">
-                            {{ item.present_profit.toLocaleString() }}
-                        </span>
-                    </div>
-                </template>
-                <template v-slot:item.percent="{ item }">
-                    <div class="text-center">
-                        <span :style="{ color: getColorForPercent(item.percent) }">
-                            {{ item.percent.toFixed(2) }}%
-                        </span>
-                    </div>
-                </template>
-                <template v-slot:item.port="{ item }">
-                    <div class="text-center">
-                        <span :style="{ color: getPortText(item.total_percent).color }">
-                            {{ getPortText(item.total_percent).text }}
-                        </span>
-                    </div>
-                </template>
-                <template v-slot:item.total_percent="{ item }">
-                    <div class="text-center">
-                        <span :style="{ color: getColorForPercent(item.total_percent) }">
-                            {{ item.total_percent.toFixed(2) }}%
+                        <span :style="{ color: getTypeText(item.type).color }">
+                            {{ getTypeText(item.type).text }}
                         </span>
                     </div>
                 </template>
@@ -371,6 +300,7 @@ export default {
         await this.fetchCustomerData();
         await this.fetchStockData();
         await this.fetchFromData();
+        await this.fetchCommissionData();
     },
 
     components: {
@@ -399,6 +329,7 @@ export default {
             customers: [],
             stocks: [],
             froms: [],
+            commissions: [],
 
             sortBy: 'updated_date',
             currentAction: '',
@@ -424,7 +355,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'customer_id', 'customer_name', 'stock_id', 'money', 'buy_amount', 'buy_price', 'buy_result', 'buy_comfee', 'buy_vat', 'buy_total', 'sale_amount', 'sale_price', 'sale_result', 'sale_comfee', 'sale_vat', 'sale_total', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'customer_id', 'customer_name', 'stock_id', 'money', 'type', 'amount', 'price', 'result', 'comfee', 'vat', 'total', 'commission_id', 'emp_id', 'detail'],
 
             searchQueries: {
                 'customer_id': [],
@@ -490,96 +421,64 @@ export default {
                 },
 
                 {
-                    text: 'จำนวนที่ซื้อ',
-                    value: 'buy_amount',
+                    text: 'การกระทำ',
+                    value: 'type',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'ราคาที่ซื้อ',
-                    value: 'buy_price',
+                    text: 'จำนวน',
+                    value: 'amount',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'มูลค่าที่ซื้อ',
-                    value: 'buy_result',
+                    text: 'ราคา',
+                    value: 'price',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'Com+Fee ซื้อ',
-                    value: 'buy_comfee',
+                    text: 'มูลค่า',
+                    value: 'result',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'Vat ซื้อ',
-                    value: 'buy_vat',
+                    text: 'ค่าธรรมเนียม',
+                    value: 'comfee',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'รวมมูลค่าที่ซื้อ',
-                    value: 'buy_total',
+                    text: 'ภาษี',
+                    value: 'vat',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'จำนวนที่ขาย',
-                    value: 'sale_amount',
+                    text: 'รวมมูลค่า',
+                    value: 'total',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'ราคาที่ขาย',
-                    value: 'sale_price',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'มูลค่าที่ขาย',
-                    value: 'sale_result',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'Com+Fee ขาย',
-                    value: 'sale_comfee',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'Vat ขาย',
-                    value: 'sale_vat',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'รวมมูลค่าที่ขาย',
-                    value: 'sale_total',
+                    text: 'ตัวคูณค่าธรรมเนียม',
+                    value: 'commission_id',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -751,6 +650,14 @@ export default {
             return this.froms.find(from => from.no === fromNo);
         },
 
+        async fetchCommissionData() {
+            this.commissions = await this.$store.dispatch('api/commission/getCommissions');
+        },
+
+        getCommissionByNo(commissionNo) {
+            return this.commissions.find(commission => commission.no === commissionNo);
+        },
+
         getFromText(from) {
             if (from === 'หุ้นเก่า') {
                 return { text: 'หุ้นเก่า', color: '#ffc800' };
@@ -763,43 +670,13 @@ export default {
             }
         },
 
-        getPortText(total_percent) {
-            let port, color;
-            if (total_percent >= 0) {
-                port = 'กำไร';
-                color = '#c1ff72';
-            } else if (total_percent >= -10 && total_percent < 0) {
-                port = 'ระวัง';
-                color = '#ffde59';
-            } else if (total_percent >= -19.99 && total_percent <= -10.01) {
-                port = 'แก้เกมได้';
-                color = '#85d7df';
+        getTypeText(value) {
+            if (value === 1) {
+                return { text: 'ซื้อ', color: '#24b224' };
+            } else if (value === 2) {
+                return { text: 'ขาย', color: '#e50211' };
             } else {
-                port = 'ถือ';
-                color = '#ff5757';
-            }
-            return { text: port, color: color };
-        },
-
-        getColorForNumber(value) {
-            if (value < 0) {
-                return '#e50211';
-            } else if (value >= 0) {
-                return '#24b224';
-            } else {
-                return 'inherit';
-            }
-        },
-
-        getColorForPercent(value) {
-            if (value >= 0) {
-                return '#24b224';
-            } else if (value >= -10 && value < 0) {
-                return '#ffc800';
-            } else if (value >= -19.99 && value <= -10.01) {
-                return '#38b6ff';
-            } else {
-                return '#e50211';
+                return { text: '', color: 'inherit' };
             }
         },
 
@@ -910,7 +787,7 @@ export default {
                 queryMatched = lowerCaseField.includes(searchQuery);
             }
             const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(transaction, search) : true;
-            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getPortText(transaction.total_percent).text) : true;
+            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getTypeText(transaction.total_percent).text) : true;
             return queryMatched && timeMatched && topicMatched;
         },
 
@@ -947,7 +824,7 @@ export default {
                 dataItem['มูลค่าปัจจุบัน'] = item.present_price.toLocaleString();
                 dataItem['ยอดเงินปันผล'] = item.balance_dividend.toLocaleString();
 
-                const portInfo = this.getPortText(item.total_percent);
+                const portInfo = this.getTypeText(item.total_percent);
                 dataItem['ประเภทพอร์ต'] = portInfo.text;
 
                 const CustId = this.getCustomerByNo(item.customer_id);

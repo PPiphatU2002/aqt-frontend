@@ -5,7 +5,7 @@
         <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
         <ResultDetail :open="showModalResult" :details="withdrawalItems" :froms="froms" :stocks="stocks"
             :customers="customers" :customer_id="customer_id" :customer_name="customer_name"
-            @confirm="confirmAndAddDetails" @cancel="showModalResult = false" />
+            :created_date="created_date" @confirm="confirmAndAddDetails" @cancel="showModalResult = false" />
 
         <v-card class="custom-card" flat>
             <v-card-title class="d-flex align-center justify-center">
@@ -33,7 +33,7 @@
             <v-card-text class="mb-0 mt-0 pa-0">
                 <v-form>
                     <v-row class="mb-0 mt-0 pa-0" v-for="(item, index) in withdrawalItems" :key="index" align="center">
-                        <v-col cols="3" class="ml-6">
+                        <v-col cols="2" class="ml-6">
                             <v-autocomplete v-model="item.stock_id" :items="stocks" item-text="name" item-value="no"
                                 label="ชื่อหุ้นที่ติด" dense outlined :rules="[(v) => !!v || 'กรุณากรอกชื่อหุ้น']"
                                 clearable @change="updateStockData(item)">
@@ -53,12 +53,26 @@
                         </v-col>
 
                         <v-col cols="2">
+                            <v-menu ref="datePickerMenu" v-model="datePickerMenu" :close-on-content-click="false"
+                                transition="scale-transition" offset-y min-width="auto">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field v-model="item.created_date" label="วันที่ซื้อหุ้น" readonly
+                                        v-bind="attrs" v-on="on" :rules="[(v) => !!v || 'กรุณาเลือกวันที่']" outlined
+                                        dense>
+                                    </v-text-field>
+                                </template>
+                                <v-date-picker v-model="item.created_date" @input="datePickerMenu = false"
+                                    locale="th"></v-date-picker>
+                            </v-menu>
+                        </v-col>
+
+                        <v-col cols="2">
                             <v-select v-model="item.from_id" :items="froms" item-text="name" item-value="no"
                                 label="ที่มาที่ไป" dense outlined>
                             </v-select>
                         </v-col>
 
-                        <v-col cols="2" class="d-flex align-center">
+                        <v-col cols="1" class="d-flex align-center">
                             <v-btn icon color="#e50211" @click="removeProduct(index)" class="mb-6">
                                 <v-icon>mdi-delete</v-icon>
                             </v-btn>
@@ -84,8 +98,9 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from 'moment-timezone'
 moment.locale('th')
+import Decimal from 'decimal.js';
 
 export default {
     layout: 'user',
@@ -118,10 +133,12 @@ export default {
             customer_id: null,
             customer_name: null,
             valid: false,
+            created_date: '', // ตัวแปรเก็บวันที่ที่เลือก
+            datePickerMenu: false,
             showModalResult: false,
             withdrawalItems: [{
                 stock_id: null, dividend_amount: null, price: null, amount: null,
-                closing_price: null, from_id: 1, comment: null
+                closing_price: null, from_id: 1, comment: null, created_date: null
             }],
             customers: [],
             stocks: [],
@@ -234,11 +251,49 @@ export default {
         },
 
         async confirmAndAddDetails() {
-            for (const detail of this.withdrawalItems) {
-                const stock = this.stocks.find(stock => stock.no === detail.stock_id);
-                const money = detail.price * detail.amount;
-                const balance_dividend = detail.dividend_amount * detail.amount;
-                const present_price = detail.closing_price * detail.amount;
+            for (const item of this.withdrawalItems) {
+                const stock = this.stocks.find(stock => stock.no === item.stock_id);
+                const money = item.price * item.amount;
+
+                // เรียก API เพื่อดึงค่า dividend_amount
+                try {
+                    const dividendData = await this.$store.dispatch('api/dividend/getDividends', {
+                        stock_id: item.stock_id,
+                        created_date: item.created_date
+                    });
+
+                    // ตรวจสอบข้อมูลที่ดึงมา
+                    console.log('ข้อมูลปันผลที่ดึงมา:', dividendData);
+
+                    // กรองข้อมูลเพื่อให้ได้ปันผลเฉพาะสำหรับ stock_id และวันที่ที่กำหนด
+                    const filteredDividendData = dividendData.filter(dividend => {
+                        const dividendDate = moment(dividend.created_date); // เปลี่ยนเป็น created_date
+                        const createdDate = moment(item.created_date);
+
+                        // ตรวจสอบว่า stock_id ตรงกันและวันปันผลหลังจากหรือเท่ากับวันที่ที่กำหนด
+                        return dividend.stock_id === item.stock_id && dividendDate.isSameOrAfter(createdDate);
+                    });
+
+                    // ตรวจสอบข้อมูลที่กรองแล้ว
+                    console.log('ข้อมูลปันผลที่กรองแล้ว:', filteredDividendData);
+
+                    // รวมค่า dividend ด้วย Decimal.js
+                    const totalDividend = filteredDividendData.reduce((sum, dividend) => {
+                        console.log(`Dividend: ${dividend.dividend}`); // แสดงค่าปันผลแต่ละรายการ
+                        return sum.plus(new Decimal(dividend.dividend || 0)); // ใช้ 0 ถ้า dividend ไม่มีค่า
+                    }, new Decimal(0));
+
+                    item.dividend_amount = totalDividend.toNumber(); // กำหนดค่า dividend_amount
+                    console.log('จำนวนปันผลคือ : ' + item.dividend_amount);
+
+                } catch (error) {
+                    this.modal.error.message = 'ไม่สามารถดึงข้อมูล Dividend ได้';
+                    this.modal.error.open = true;
+                    return;
+                }
+
+                const balance_dividend = item.dividend_amount * item.amount;
+                const present_price = item.closing_price * item.amount;
                 const total = balance_dividend + present_price;
                 const present_profit = total - money;
                 const percent = ((present_profit - money) / money) * 100;
@@ -249,9 +304,9 @@ export default {
                 try {
                     await this.$store.dispatch('api/detail/addDetail', {
                         customer_id: customerIdentifier,
-                        stock_id: detail.stock_id,
-                        price: detail.price,
-                        amount: detail.amount,
+                        stock_id: item.stock_id,
+                        price: item.price,
+                        amount: item.amount,
                         money,
                         balance_dividend,
                         present_price,
@@ -259,20 +314,20 @@ export default {
                         present_profit,
                         percent,
                         total_percent,
-                        from_id: detail.from_id,
+                        from_id: item.from_id,
                         emp_id: this.$auth.user.no,
-                        created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+                        created_date: item.created_date,
                         updated_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                     });
                 } catch (error) {
                     if (error.response && error.response.status === 400) {
-                        this.modal.error.message = `มีชื่อหุ้นนี้ในระบบแล้ว : ${detail.stock_id}`;
+                        this.modal.error.message = `มีชื่อหุ้นนี้ในระบบแล้ว : ${item.stock_id}`;
                         this.modal.error.open = true;
                         return;
                     }
                 }
             }
-            this.recordLog()
+            this.recordLog();
             this.modal.complete.message = 'เพิ่มหุ้นเรียบร้อยแล้ว!';
             this.modal.complete.open = true;
             this.showModalResult = false;
@@ -304,6 +359,7 @@ export default {
                 dividend_amount: null,
                 closing_price: null,
                 from_id: 1,
+                created_date: null,
                 comment: null,
             });
         },
@@ -352,7 +408,7 @@ export default {
 }
 
 .custom-card {
-    max-width: 800px;
+    max-width: 1200px;
     width: 100%;
     margin: auto;
 }

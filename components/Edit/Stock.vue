@@ -238,23 +238,19 @@ export default {
 
     async updateDetailData() {
       try {
-        // ค้นหารายการที่ตรงตาม stock_id
         const detailsToUpdate = this.details.filter(detail => {
           const stockName = this.getStockNameByNo(detail.stock_id);
-          return stockName === this.formData.name; // เงื่อนไขการค้นหาแค่ stock_name
+          return stockName === this.formData.name;
         });
 
         if (detailsToUpdate.length === 0) {
           throw new Error("ไม่พบข้อมูลที่ตรงกับชื่อหุ้น");
         }
 
-        // อัพเดทข้อมูลใน formData สำหรับแต่ละ detail ที่ค้นพบ
         for (const detail of detailsToUpdate) {
-          // ดึงข้อมูล money และ amount จากรายการที่ค้นพบ
           const money = detail.money;
           const amount = detail.amount;
 
-          // คำนวณค่าต่าง ๆ ตามที่ระบุ
           const balance_dividend = amount * this.formData.dividend_amount;
           const present_price = amount * this.formData.closing_price;
           const total = balance_dividend + present_price;
@@ -262,7 +258,6 @@ export default {
           const percent = ((present_profit - money) / money) * 100;
           const total_percent = (present_profit / money) * 100;
 
-          // อัพเดทค่าใน formData สำหรับ detail ปัจจุบัน
           const updatedData = {
             money: money,
             balance_dividend: balance_dividend,
@@ -273,7 +268,6 @@ export default {
             total_percent: total_percent
           };
 
-          // อัพเดทข้อมูลใน store
           await this.$store.dispatch('api/detail/updateDetail', {
             ...detail,
             ...updatedData

@@ -3,9 +3,10 @@
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
         <ModalError :open="modal.error.open" :message="modal.error.message" :error.sync="modal.error.open" />
-        <ResultDetail :open="showModalResult" :details="withdrawalItems" :froms="froms" :stocks="stocks"
-            :customers="customers" :customer_id="customer_id" :customer_name="customer_name"
-            @confirm="confirmAndAddDetails" @cancel="showModalResult = false" />
+        <ResultTransaction :open="showModalResult" :details="withdrawalItems"
+            :stocks="withdrawalItems.map(item => ({ stock_id: item.stock_id }))" :customers="customers"
+            :customer_id="customer_id" :customer_name="customer_name" :type="type" @confirm="confirmAndAddDetails"
+            @cancel="showModalResult = false" />
 
         <v-card class="custom-card" flat>
             <v-card-title class="d-flex align-center justify-center">
@@ -29,25 +30,18 @@
                     </v-autocomplete>
                 </v-col>
                 <v-col cols="3">
-                    <v-autocomplete v-model="commission_id" :items="commissions"
-                        item-text="name" item-value="no" label="ค่าธรรมเนียม" dense outlined clearable
-                        :rules="[(v) => !!v || 'กรุณากรอกค่าธรรมเนียม']">
-                    </v-autocomplete>
-                </v-col>
-                <v-col cols="2">
-                    <v-autocomplete v-model="customer_name" :items="customers"
-                        item-text="name" item-value="no" label="ซื้อ/ขาย" dense outlined clearable
-                        :rules="[(v) => !!v || 'กรุณาเลือกซื้อหรือขาย']">
+                    <v-autocomplete v-model="commission_id" :items="commissions" item-text="name" item-value="no"
+                        label="ค่าธรรมเนียม" dense outlined clearable :rules="[(v) => !!v || 'กรุณากรอกค่าธรรมเนียม']">
                     </v-autocomplete>
                 </v-col>
             </v-row>
-            
+
 
             <v-card-text class="mb-0 mt-0 pa-0">
                 <v-form>
                     <v-row class="mb-0 mt-0 pa-0" v-for="(item, index) in withdrawalItems" :key="index" align="center">
                         <v-col cols="3" class="ml-6">
-                            <v-autocomplete v-model="item.stock_id" :items="stocks" item-text="name" item-value="no"
+                            <v-autocomplete v-model="item.stock_id" :items="details" item-text="name" item-value="no"
                                 label="ชื่อหุ้นที่ติด" dense outlined :rules="[(v) => !!v || 'กรุณากรอกชื่อหุ้น']"
                                 clearable @change="updateStockData(item)">
                             </v-autocomplete>
@@ -66,10 +60,13 @@
                         </v-col>
 
                         <v-col cols="2">
-                            <v-select v-model="item.from_id" :items="froms" item-text="name" item-value="no"
-                                label="ที่มาที่ไป" dense outlined>
+                            <v-select v-model="item.type"
+                                :items="[{ value: 1, text: 'ซื้อ' }, { value: 2, text: 'ขาย' }]" item-text="text"
+                                item-value="value" label="ซื้อ/ขาย" dense outlined clearable
+                                :rules="[(v) => !!v || 'กรุณาเลือกซื้อหรือขาย']">
                             </v-select>
                         </v-col>
+
 
                         <v-col cols="2" class="d-flex align-center">
                             <v-btn icon color="#e50211" @click="removeProduct(index)" class="mb-6">
@@ -82,10 +79,11 @@
                     </v-row>
 
                     <div class="text-center">
-                        <v-btn color="#24b224" @click="showModalResult = true" :disabled="!isFormValid" class="mr-2 mb-3">
+                        <v-btn color="#24b224" @click="showModalResult = true" :disabled="!isFormValid"
+                            class="mr-2 mb-3">
                             บันทึก
                         </v-btn>
-                        <v-btn color="#e50211" @click="goToStocksDetail" class="mb-3">
+                        <v-btn color="#e50211" @click="goToStocksTransaction" class="mb-3">
                             ย้อนกลับ
                         </v-btn>
                     </div>
@@ -107,8 +105,19 @@ export default {
         await this.checkRank()
         await this.fetchCustomerData()
         await this.fetchStockData()
-        await this.fetchFromData()
         await this.fetchCommissionData()
+        await this.fetchDetailData()
+    },
+
+    watch: {
+        customer_id: {
+            handler: 'fetchDetailData',
+            immediate: true
+        },
+        customer_name: {
+            handler: 'fetchDetailData',
+            immediate: true
+        }
     },
 
     data() {
@@ -131,16 +140,18 @@ export default {
             customer_id: null,
             customer_name: null,
             commission_id: 1,
+
             valid: false,
             showModalResult: false,
             withdrawalItems: [{
                 stock_id: null, dividend_amount: null, price: null, amount: null,
-                closing_price: null, from_id: 1, comment: null
+                closing_price: null, type: 1,
             }],
+            type: null,
             customers: [],
             commissions: [],
             stocks: [],
-            froms: [],
+            details: []
 
         }
     },
@@ -156,8 +167,7 @@ export default {
                 this.withdrawalItems.every(item =>
                     this.isStockValid(item.stock_id) &&
                     this.isPriceValid(item.price) &&
-                    this.isAmountValid(item.amount) &&
-                    this.isFromValid(item.from_id)
+                    this.isAmountValid(item.amount)
                 )
             );
         },
@@ -182,30 +192,38 @@ export default {
             });
         },
 
-        updateStockData(item) {
-            const stock = this.stocks.find(stock => stock.no === item.stock_id);
-            if (stock) {
-                item.dividend_amount = stock.dividend_amount;
-                item.closing_price = stock.closing_price;
-            } else {
-                item.dividend_amount = null;
-                item.closing_price = null;
-                item.stock_id = null;
-            }
-        },
+        async fetchDetailData() {
+            this.details = [];
+            const customerIdentifier = this.customer_id || this.customer_name;
+            if (!customerIdentifier) return;
 
-        async fetchFromData() {
             try {
-                const response = await this.$store.dispatch('api/from/getFroms');
-                if (response) {
-                    this.froms = response.map(item => ({ no: item.no, name: item.from }));
-                }
+                const response = await this.$store.dispatch('api/detail/getDetails', { customer_id: customerIdentifier });
+                this.details = response.filter(detail =>
+                    detail.customer_id === customerIdentifier || detail.customer_name === customerIdentifier
+                );
+                await this.fetchStockData();
+
+                this.details = this.details.map(detail => {
+                    const stock = this.stocks.find(stock => stock.no === detail.stock_id);
+                    return {
+                        ...detail,
+                        name: stock ? `${stock.name} (${detail.money})` : 'ไม่พบหุ้น',
+                    };
+                });
+
             } catch (error) {
+                this.details = [];
             }
         },
 
-        isFromValid(from_id) {
-            return from_id !== null && from_id !== '';
+        updateStockData(item) {
+            const stockDetail = this.details.find(d => d.no === item.stock_id);
+            if (stockDetail) {
+                item.stock_detail_id = stockDetail.no;
+            } else {
+                item.stock_detail_id = null; // ถ้าไม่พบ ให้เซ็ตเป็น null
+            }
         },
 
         isStockValid(stock_id) {
@@ -251,30 +269,29 @@ export default {
         async confirmAndAddDetails() {
             for (const detail of this.withdrawalItems) {
                 const stock = this.stocks.find(stock => stock.no === detail.stock_id);
-                const money = detail.price * detail.amount;
-                const balance_dividend = detail.dividend_amount * detail.amount;
-                const present_price = detail.closing_price * detail.amount;
-                const total = balance_dividend + present_price;
-                const present_profit = total - money;
-                const percent = ((present_profit - money) / money) * 100;
-                const total_percent = (present_profit / money) * 100;
+                const result = detail.price * detail.amount;
 
-                const customerIdentifier = this.customer_id || this.customer_name;
+                // หาค่าธรรมเนียมจาก commissions
+                const commission = this.commissions.find(comm => comm.no === this.commission_id);
+                const commissionRate = commission ? commission.name : 0; // ใช้ค่าธรรมเนียม หากไม่พบให้ใช้ 0
+
+                const comfee = result * commissionRate; // คำนวณค่าธรรมเนียม
+                const vat = comfee * 0.07;
+                const total = result + comfee + vat;
+
+                const stockDetailId = detail.stock_detail_id;
 
                 try {
-                    await this.$store.dispatch('api/detail/addDetail', {
-                        customer_id: customerIdentifier,
-                        stock_id: detail.stock_id,
-                        price: detail.price,
-                        amount: detail.amount,
-                        money,
-                        balance_dividend,
-                        present_price,
+                    await this.$store.dispatch('api/transaction/addTransaction', {
+                        stock_detail_id: stockDetailId,
+                        type: detail.type,
+                        price: parseFloat(detail.price),
+                        amount: parseFloat(detail.amount),
+                        result,
+                        comfee,
+                        vat,
                         total,
-                        present_profit,
-                        percent,
-                        total_percent,
-                        from_id: detail.from_id,
+                        commission_id: this.commission_id, // ใช้ no ของค่าธรรมเนียม
                         emp_id: this.$auth.user.no,
                         created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                         updated_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
@@ -319,11 +336,12 @@ export default {
 
         addProduct() {
             this.withdrawalItems.push({
+                stock_id: null,
                 name: '',
+                commission_id: null,
                 dividend_amount: null,
                 closing_price: null,
-                from_id: 1,
-                comment: null,
+                type: null,
             });
         },
 
@@ -332,12 +350,12 @@ export default {
         },
 
         goBack() {
-            this.$router.push('/app/transaction/customer_stock');
+            this.$router.push('/app/transaction/customer_trade');
         },
 
         recordLog() {
             const details = this.withdrawalItems.map((item, index) => {
-                return `TRANSACTION ${index + 1}\nNAME ${item.name}\nTYPE ${setName}\nDIVIDEND ${item.dividend_amount}\nCLOSE ${item.closing_price}\nCOMMENT ${item.comment}`;
+                return `TRANSACTION ${index + 1}\nNAME ${item.name}\nTYPE ${setName}\nDIVIDEND ${item.dividend_amount}\nCLOSE ${item.closing_price}}`;
             }).join('\n\n');
 
             const log = {
@@ -353,8 +371,8 @@ export default {
             this.$store.dispatch('api/log/addLogs', log);
         },
 
-        goToStocksDetail() {
-            this.$router.push('/app/transaction/customer_stock');
+        goToStocksTransaction() {
+            this.$router.push('/app/transaction/customer_trade');
         },
     },
 };

@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="localOpen" max-width="500px">
+    <v-dialog v-model="localOpen" max-width="600px">
         <v-card>
             <v-card-title class="d-flex justify-center">
                 <v-icon justify="center" class="mr-3" size="40" color="#24b224">mdi-bank-check</v-icon>
@@ -28,7 +28,8 @@ export default {
         stocks: Array,
         customers: Array,
         customer_id: Number,
-        customer_name: Number
+        customer_name: Number,
+        created_date: String,
     },
     data() {
         return {
@@ -38,6 +39,7 @@ export default {
                 { text: 'ชื่อหุ้น', value: 'stock_name' },
                 { text: 'จำนวนที่ติด', value: 'price' },
                 { text: 'ราคาที่ติด', value: 'amount' },
+                { text: 'วันที่ซื้อหุ้น', value: 'created_date' },
                 { text: 'ที่มาที่ไป', value: 'from_name' },
             ],
         };
