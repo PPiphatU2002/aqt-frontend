@@ -6,15 +6,14 @@
         <ModalComplete :open="modal.complete.open" :message="modal.complete.message"
             :complete.sync="modal.complete.open" :method="goBack" />
         <EditStock :open="editStock" :data="editAllData" @update:edit="editStock = false" />
-        <CreateDividend :open="createSetOpen" @update:open="createSetOpen = false" />
 
         <v-card class="custom-card" flat>
             <v-container>
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon" color="#85d7df">mdi-basket</v-icon>&nbsp;
-                            <h3 class="mb-0">ข้อมูลจำนวนปันผล</h3>
+                            <v-icon class="little-icon" color="#85d7df">mdi-archive-alert</v-icon>&nbsp;
+                            <h3 class="mb-0">ผลการติดตามหุ้น</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
                             <div class="d-flex align-center mt-2 justify-center">
@@ -74,12 +73,15 @@
                             <v-select v-model="searchType" :items="searchTypes" dense outlined
                                 class="mx-2 search-size small-font" @change="onSearchTypeChange"></v-select>
 
-                            <v-autocomplete v-if="searchType !== 'created_date'" v-model="searchQuery"
-                                :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
-                                append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data hide-details
-                                clearable></v-autocomplete>
+                            <v-autocomplete v-if="searchType !== 'set_id' && searchType !== 'updated_date'"
+                                v-model="searchQuery" :items="getSearchItems(searchType)" label="ค้นหา" dense outlined
+                                append-icon="mdi-magnify" class="mx-2 same-size small-font" hide-no-data
+                                hide-details></v-autocomplete>
 
-                            <v-menu v-if="searchType === 'created_date'" v-model="datePickerMenu"
+                            <v-select v-if="searchType === 'set_id'" v-model="selectedTopics" :items="actionTopics"
+                                dense outlined multiple class="mx-2 search-size small-font"></v-select>
+
+                            <v-menu v-if="searchType === 'updated_date'" v-model="datePickerMenu"
                                 :close-on-content-click="false" transition="scale-transition" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <div v-bind="attrs" v-on="on" class="date-picker-activator">
@@ -90,7 +92,7 @@
                                 </template>
                             </v-menu>
 
-                            <v-menu v-if="searchType === 'created_date'" v-model="endDatePickerMenu"
+                            <v-menu v-if="searchType === 'updated_date'" v-model="endDatePickerMenu"
                                 :close-on-content-click="false" transition="scale-transition" offset-y>
                                 <template v-slot:activator="{ on, attrs }">
                                     <div v-bind="attrs" v-on="on" class="date-picker-activator ml-2">
@@ -104,7 +106,7 @@
                                 <v-icon class="small-icon ">mdi-plus</v-icon>
                             </v-btn>
 
-                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportExcel" icon>
+                            <v-btn color="success" v-if="$auth.user.ranks_id === 1" @click="exportCSV" icon>
                                 <v-icon>mdi-file-excel</v-icon>
                             </v-btn>
                         </div>
@@ -127,12 +129,6 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <div>
-                    <v-btn @click="createSetOpen = true" class="tab-icon-two"
-                        style="font-size: 1.5 rem; margin-left: auto;">
-                        <v-icon left color="#24b224">mdi-basket-plus</v-icon> เพิ่มจำนวนปันผล
-                    </v-btn>
-                </div>
             </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
@@ -142,14 +138,16 @@
                         <img :src="`http://localhost:3001/file/profile/${item.picture}`" alt="picture" />
                     </v-avatar>
                 </template>
+                <template v-slot:item.set_id="{ item }">
+                    <div class="text-center" :style="{ color: getFromText(getSetName(item.set_id)).color }">
+                        {{ getSetName(item.set_id) }}
+                    </div>
+                </template>
                 <template v-slot:item.emp_id="{ item }">
                     <div class="text-center">{{ getEmployeeName(item.emp_id) }}</div>
                 </template>
-                <template v-slot:item.stock_id="{ item }">
-                    <div class="text-center">{{ getStockName(item.stock_id) }}</div>
-                </template>
-                <template v-slot:item.created_date="{ item }">
-                    <div class="text-center">{{ formatDateTime(item.created_date) }}</div>
+                <template v-slot:item.updated_date="{ item }">
+                    <div class="text-center">{{ formatDateTime(item.updated_date) }}</div>
                 </template>
                 <template v-slot:item.detail="{ item }">
                     <div class="text-center">
@@ -167,7 +165,7 @@
 
                                 <v-list-item @click="showConfirmDialog('delete', item)" class="custom-list-item">
                                     <v-list-item-icon style="margin-right: 4px;">
-                                        <v-icon class="icon-tab" color="#e50211">mdi-delete</v-icon>
+                                        <v-icon class="icon-tab" color="#e50211">mdi-cancel</v-icon>
                                     </v-list-item-icon>
                                     <v-list-item-content style="font-size: 0.8rem;">ลบหุ้น</v-list-item-content>
                                 </v-list-item>
@@ -178,7 +176,7 @@
             </v-data-table>
             <div class="text-center">
                 <v-btn class="mb-4" color="#e50211" @click="goToHome">
-                    <v-icon>mdi-keyboard-backspace</v-icon>ย้อนกลับ
+                    <v-icon>mdi-home</v-icon>กลับไปหน้าหลัก
                 </v-btn>
             </div>
         </v-card>
@@ -202,12 +200,12 @@
 
 <script>
 
-import ExcelJS from 'exceljs';
-import moment from 'moment-timezone';
+import * as XLSX from 'xlsx';
+import moment from 'moment';
 import 'moment/locale/th'
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
-import Decimal from 'decimal.js';
+import Papa from 'papaparse';
 
 export default {
 
@@ -218,7 +216,7 @@ export default {
         await this.checkRank();
         await this.fetchStockData();
         await this.fetchEmployeeData();
-        await this.fetchDividendData();
+        await this.fetchSetData();
     },
 
     components: {
@@ -242,17 +240,16 @@ export default {
             },
 
             stocks: [],
+            sets: [],
             employees: [],
-            dividends: [],
 
-            sortBy: 'created_date',
+            sortBy: 'updated_date',
             currentAction: '',
             searchQuery: '',
-            searchType: 'stock_id',
+            searchType: 'name',
             selectedItemDetail: '',
             startDateTime: '',
             endDateTime: '',
-            createSetOpen: false,
             editDialogOpen: false,
             isSearchFieldVisible: false,
             datePickerMenu: false,
@@ -270,25 +267,34 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['created_date', 'stock_id', 'dividend', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'stock_id', 'low_price', 'up_price', 'type', 'comment', 'emp_id', 'detail'],
 
             searchQueries: {
-                'stock_id': [],
+                'name': [],
                 'emp_id': [],
             },
 
             searchTypes: [
-                { text: 'ชื่อหุ้น', value: 'stock_id' },
+                { text: 'ชื่อหุ้น', value: 'name' },
                 { text: 'ทำรายการโดย', value: 'emp_id' },
-                { text: 'วันที่จ่ายปันผล', value: 'created_date' }
+                { text: 'ประเภท', value: 'set_id' },
+                { text: 'เวลา', value: 'updated_date' }
             ],
 
-            actionTopics: [],
+            actionTopics: [
+                { text: 'SET', value: 'SET' },
+                { text: 'SET50', value: 'SET50' },
+                { text: 'SET100', value: 'SET100' },
+                { text: 'ETF', value: 'ETF' },
+                { text: 'MAI', value: 'MAI' },
+                { text: 'Warrants', value: 'Warrants' },
+                { text: 'DR', value: 'DR' },
+            ],
 
             headers: [
                 {
-                    text: 'วันที่จ่ายปันผล',
-                    value: 'created_date',
+                    text: 'เวลา',
+                    value: 'updated_date',
                     align: 'center',
                     cellClass: 'text-center',
                 },
@@ -302,8 +308,32 @@ export default {
                 },
 
                 {
-                    text: 'จำนวนปันผล',
-                    value: 'dividend',
+                    text: 'LOW PRICE',
+                    value: 'low_price',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'UP PRICE',
+                    value: 'up_price',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'ประเภท',
+                    value: 'type',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'หมายเหตุ',
+                    value: 'comment',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -330,13 +360,13 @@ export default {
 
     computed: {
         filtered() {
-            let filteredDividends = this.dividends;
+            let filteredStocks = this.stocks;
             this.savedSearches.forEach(search => {
-                filteredDividends = filteredDividends.filter(dividend => {
-                    return this.applySearchFilter(dividend, search);
+                filteredStocks = filteredStocks.filter(stock => {
+                    return this.applySearchFilter(stock, search);
                 });
             });
-            return filteredDividends;
+            return filteredStocks;
         },
 
         formattedDetailLines() {
@@ -349,39 +379,21 @@ export default {
     },
 
     methods: {
-        async fetchDividendData() {
-            try {
-                // Fetch dividends from the API
-                this.dividends = await this.$store.dispatch('api/dividend/getDividends');
-            } catch (error) {
-                console.error('Failed to fetch dividends:', error);
-            }
-        },
-
         goToHome() {
-            this.$router.push('/app/stock/management');
+            this.$router.push('/app/home');
         },
 
-        getTotalDividends(stockId) {
-            const currentYear = new Date().getFullYear();
-            const total = this.dividends
-                .filter(dividend => dividend.stock_id === stockId &&
-                    new Date(dividend.created_date).getFullYear() === currentYear)
-                .reduce((total, dividend) => {
-                    return total.add(new Decimal(dividend.dividend));
-                }, new Decimal(0));
-
-            return total.toString(); // แสดงผลลัพธ์ที่ไม่มีการตัดทศนิยม
+        async fetchSetData() {
+            this.sets = await this.$store.dispatch('api/set/getSets')
         },
 
+        getSetName(setId) {
+            const set = this.sets.find(t => t.no === setId);
+            return set ? set.set : '';
+        },
 
         async fetchStockData() {
             this.stocks = await this.$store.dispatch('api/stock/getStocks');
-        },
-
-        getStockName(stockID) {
-            const stock = this.stocks.find(s => s.no === stockID);
-            return stock ? stock.name : '';
         },
 
         async fetchEmployeeData() {
@@ -393,8 +405,8 @@ export default {
             return employee ? employee.fname + ' ' + employee.lname : 'ไม่ทราบ';
         },
 
-        openEditStock(dividend) {
-            this.editAllData = dividend;
+        openEditStock(stock) {
+            this.editAllData = stock;
             this.editStock = true;
         },
 
@@ -404,8 +416,8 @@ export default {
         },
 
         getSearchItems(type) {
-            if (type === 'stock_id') {
-                return this.stocks.map(stock => stock.name);
+            if (type === 'name') {
+                return this.stocks.map(emp => emp.name);
             } else if (type === 'emp_id') {
                 return this.stocks.map(emp => this.getEmployeeName(emp.emp_id));
             }
@@ -422,7 +434,7 @@ export default {
         async handleConfirm() {
             if (this.currentAction === 'delete') {
                 try {
-                    await this.$store.dispatch('api/dividend/deleteDividend', this.currentItem.no);
+                    await this.$store.dispatch('api/stock/deleteStock', this.currentItem.no);
                     this.modal.complete.message = 'ลบหุ้นนี้เรียบร้อยแล้ว';
                     this.recordLog();
                     this.modal.complete.open = true;
@@ -444,11 +456,11 @@ export default {
                 }
                 else {
                     if (RankID === '1') {
-                        this.$router.push('/app/stock/dividend');
+                        this.$router.push('/app/stock/result_follow');
                     } else if (RankID === '2') {
                         this.$router.push('/app/home');
                     } else if (RankID === '3') {
-                        this.$router.push('/app/stock/dividend');
+                        this.$router.push('/app/stock/result_follow');
                     } else {
                         this.$router.push('/auth');
                     }
@@ -473,8 +485,6 @@ export default {
                 return { text: 'Warrants', color: '#c1ff72' };
             } else if (set === 'DR') {
                 return { text: 'DR', color: '#ff5757' };
-            } else if (set === 'Preferred Stock') {
-                return { text: 'Preferred Stock', color: '#ff66c4' };
             } else {
                 return { text: '', color: 'inherit' };
             }
@@ -482,7 +492,7 @@ export default {
 
         formatDateTime(date) {
             if (moment(date).isValid()) {
-                return moment(date).format('YYYY-MM-DD');
+                return moment(date).format('YYYY-MM-DD HH:mm');
             }
             return 'Invalid Date';
         },
@@ -493,7 +503,7 @@ export default {
         },
 
         onSearchTypeChange() {
-            this.isSearchFieldVisible = this.searchSet !== 'created_date';
+            this.isSearchFieldVisible = this.searchSet !== 'updated_date' && this.searchType !== 'set_id';
         },
 
         validateDateRange() {
@@ -511,7 +521,9 @@ export default {
             if (!this.validateDateRange()) {
                 return;
             }
-            if (this.searchType === 'stock_id' || this.searchType === 'emp_id') {
+            if (this.searchType === 'set_id') {
+                this.addTopicToSearch();
+            } else if (this.searchType === 'name' || this.searchType === 'emp_id') {
                 this.addTextToSearch();
             } else {
                 this.savedSearches.push({
@@ -549,7 +561,7 @@ export default {
         addTopicToSearch() {
             this.savedSearches.push({
                 query: '',
-                type: 'stock_id',
+                type: 'set_id',
                 topics: [...this.selectedTopics],
                 start: this.startDateTime,
                 end: this.endDateTime
@@ -559,36 +571,35 @@ export default {
             this.endDateTime = '';
         },
 
-        applySearchFilter(dividend, search) {
-            const field = dividend[search.type];
+        applySearchFilter(stock, search) {
+            const field = stock[search.type];
             let queryMatched = true;
             const lowerCaseField = typeof field === 'string' ? field.toLowerCase() : '';
             if (search.type === 'emp_id') {
                 queryMatched = this.searchQueries[search.type].some(query => {
-                    const empName = this.getEmployeeName(dividend.emp_id);
+                    const empName = this.getEmployeeName(stock.emp_id);
                     return empName.toLowerCase().includes(query.toLowerCase());
                 });
             }
-            else if (search.type === 'stock_id') {
-                queryMatched = this.searchQueries[search.type].some(query => {
-                    const stockName = this.getStockName(dividend.stock_id);
-                    return stockName.toLowerCase().includes(query.toLowerCase());
-                });
+            else if (search.type === 'name') {
+                queryMatched = this.searchQueries[search.type].some(query =>
+                    lowerCaseField.includes(query.toLowerCase())
+                );
             } else {
                 const searchQuery = search.query.toLowerCase();
                 queryMatched = lowerCaseField.includes(searchQuery);
             }
-            const timeMatched = search.type === 'created_date' ? this.checkTimeRange(dividend, search) : true;
-            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getStockName(dividend.stock_id)) : true;
+            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(stock, search) : true;
+            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getSetName(stock.set_id)) : true;
             return queryMatched && timeMatched && topicMatched;
         },
 
-        checkTimeRange(dividend, search) {
-            const dividendTime = moment(dividend.created_date);
+        checkTimeRange(stock, search) {
+            const stockTime = moment(stock.updated_date);
             const startTime = moment(search.start);
             const endTime = moment(search.end);
-            return (!startTime.isValid() || dividendTime.isSameOrAfter(startTime)) &&
-                (!endTime.isValid() || dividendTime.isSameOrBefore(endTime));
+            return (!startTime.isValid() || stockTime.isSameOrAfter(startTime)) &&
+                (!endTime.isValid() || stockTime.isSameOrBefore(endTime));
         },
 
         toggleSavedSearchesDialog() {
@@ -604,62 +615,50 @@ export default {
             return found ? found.text : type;
         },
 
-        exportExcel() {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Sheet1');
-
-            const headers = this.filteredHeaders
-                .filter(header => header.value !== 'picture' && header.value !== 'detail')
-                .map(header => ({
-                    header: header.text,
-                    key: header.value,
-                    style: { font: { name: 'Angsana New', size: 16 } }
-                }));
-
-            worksheet.columns = headers;
-
-            this.filtered.forEach((item, index) => {
-                const rowData = {};
+        exportCSV() {
+            const filteredData = this.filtered.map(item => {
+                const dataItem = {};
                 this.filteredHeaders.forEach(header => {
-                    if (header.value === 'created_date') {
-                        rowData[header.value] = moment(item[header.value]).tz('Asia/Bangkok').format('YYYY-MM-DD');
-                    } else if (header.value === 'stock_id') {
-                        rowData[header.value] = this.getStockName(item.stock_id);
+                    if (header.value === 'updated_date') {
+                        dataItem['เวลา'] = this.formatDateTime(item.updated_date);
+                    } else if (header.value === 'set_id') {
+                        dataItem['ประเภท'] = this.getSetName(item.set_id);
                     } else if (header.value === 'emp_id') {
-                        rowData[header.value] = this.getEmployeeName(item.emp_id);
-                    } else if (header.value !== 'picture' && header.value !== 'detail') {
-                        rowData[header.value] = item[header.value];
+                        dataItem['ทำรายการโดย'] = this.getEmployeeName(item.emp_id);
+                    } else {
+                        dataItem[header.text] = item[header.value];
                     }
                 });
-                worksheet.addRow(rowData);
+                return dataItem;
             });
+            const csv = Papa.unparse(filteredData);
+            const bom = '\uFEFF';
+            const csvWithBom = bom + csv;
+            const blob = new Blob([csvWithBom], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const currentDate = moment().format('YYYY-MM-DD');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', `ข้อมูลหุ้น-${currentDate}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
 
-            worksheet.getRow(1).eachCell({ includeEmpty: true }, (cell) => {
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.font = { bold: true, name: 'Angsana New', size: 18 };
-            });
+        convertToCSV(objArray) {
+            const array = [Object.keys(objArray[0])].concat(objArray);
+            return array.map(row => {
+                return Object.values(row).map(value => `"${value}"`).join(',');
+            }).join('\n');
+        },
 
-            worksheet.eachRow((row) => {
-                row.eachCell({ includeEmpty: true }, (cell) => {
-                    cell.border = {
-                        top: { style: 'thin' },
-                        left: { style: 'thin' },
-                        bottom: { style: 'thin' },
-                        right: { style: 'thin' },
-                    };
-                });
-            });
-
-            const currentDate = moment().tz('Asia/Bangkok').format('YYYY-MM-DD');
-            workbook.xlsx.writeBuffer().then(buffer => {
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.setAttribute('download', `ข้อมูลจำนวนปันผล-${currentDate}.xlsx`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
+        maskNewData(data) {
+            if (!data) return '';
+            const length = data.length;
+            if (length <= 4) return data;
+            const firstPart = data.slice(0, 1);
+            const lastPart = data.slice(-1);
+            const maskedPart = '*'.repeat(length - 4)
+            return `${firstPart}${maskedPart}${lastPart}`;
         },
 
         goBack() {
@@ -672,11 +671,11 @@ export default {
                 emp_name: this.$auth.user.fname + ' ' + this.$auth.user.lname,
                 emp_email: this.$auth.user.email,
                 detail: this.currentAction === 'delete'
-                    ?
+                    ? `ประเภท : ${this.getSetName(this.currentItem.set_id) || 'ยังไม่ระบุ'}\n` +
                     `จำนวนปันผล : ${this.currentItem.dividend_amount || 'ยังไม่ระบุ'}\n` +
                     `ราคาปิด : ${this.currentItem.closing_price || 'ยังไม่ระบุ'}\n` +
                     `หมายเหตุ : ${this.currentItem.comment || 'ยังไม่ระบุ'}`
-                    :
+                    : `ประเภท : ${this.getSetName(this.currentItem.set_id) || 'ยังไม่ระบุ'}\n` +
                     `จำนวนปันผล : ${this.currentItem.dividend_amount || 'ยังไม่ระบุ'}\n` +
                     `ราคาปิด : ${this.currentItem.closing_price || 'ยังไม่ระบุ'}\n` +
                     `หมายเหตุ : ${this.currentItem.comment || 'ยังไม่ระบุ'}`,
@@ -688,6 +687,13 @@ export default {
             this.$store.dispatch('api/log/addLogs', log);
         },
 
+        goToNewStock() {
+            this.$router.push('/app/stock/new_stock');
+        },
+
+        goToTypeStock() {
+            this.$router.push('/app/stock/type');
+        },
     },
 };
 

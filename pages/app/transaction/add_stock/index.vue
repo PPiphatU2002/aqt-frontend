@@ -253,52 +253,6 @@ export default {
         async confirmAndAddDetails() {
             for (const item of this.withdrawalItems) {
                 const stock = this.stocks.find(stock => stock.no === item.stock_id);
-                const money = item.price * item.amount;
-
-                // เรียก API เพื่อดึงค่า dividend_amount
-                try {
-                    const dividendData = await this.$store.dispatch('api/dividend/getDividends', {
-                        stock_id: item.stock_id,
-                        created_date: item.created_date
-                    });
-
-                    // ตรวจสอบข้อมูลที่ดึงมา
-                    console.log('ข้อมูลปันผลที่ดึงมา:', dividendData);
-
-                    // กรองข้อมูลเพื่อให้ได้ปันผลเฉพาะสำหรับ stock_id และวันที่ที่กำหนด
-                    const filteredDividendData = dividendData.filter(dividend => {
-                        const dividendDate = moment(dividend.created_date); // เปลี่ยนเป็น created_date
-                        const createdDate = moment(item.created_date);
-
-                        // ตรวจสอบว่า stock_id ตรงกันและวันปันผลหลังจากหรือเท่ากับวันที่ที่กำหนด
-                        return dividend.stock_id === item.stock_id && dividendDate.isSameOrAfter(createdDate);
-                    });
-
-                    // ตรวจสอบข้อมูลที่กรองแล้ว
-                    console.log('ข้อมูลปันผลที่กรองแล้ว:', filteredDividendData);
-
-                    // รวมค่า dividend ด้วย Decimal.js
-                    const totalDividend = filteredDividendData.reduce((sum, dividend) => {
-                        console.log(`Dividend: ${dividend.dividend}`); // แสดงค่าปันผลแต่ละรายการ
-                        return sum.plus(new Decimal(dividend.dividend || 0)); // ใช้ 0 ถ้า dividend ไม่มีค่า
-                    }, new Decimal(0));
-
-                    item.dividend_amount = totalDividend.toNumber(); // กำหนดค่า dividend_amount
-                    console.log('จำนวนปันผลคือ : ' + item.dividend_amount);
-
-                } catch (error) {
-                    this.modal.error.message = 'ไม่สามารถดึงข้อมูล Dividend ได้';
-                    this.modal.error.open = true;
-                    return;
-                }
-
-                const balance_dividend = item.dividend_amount * item.amount;
-                const present_price = item.closing_price * item.amount;
-                const total = balance_dividend + present_price;
-                const present_profit = total - money;
-                const percent = ((present_profit - money) / money) * 100;
-                const total_percent = (present_profit / money) * 100;
-
                 const customerIdentifier = this.customer_id || this.customer_name;
 
                 try {
@@ -307,13 +261,6 @@ export default {
                         stock_id: item.stock_id,
                         price: item.price,
                         amount: item.amount,
-                        money,
-                        balance_dividend,
-                        present_price,
-                        total,
-                        present_profit,
-                        percent,
-                        total_percent,
                         from_id: item.from_id,
                         emp_id: this.$auth.user.no,
                         created_date: item.created_date,

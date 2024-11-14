@@ -60,6 +60,15 @@
               </v-list-item-content>
             </v-list-item>
 
+            <v-list-item @click="goToStocksFollow" class="custom-list-item">
+              <v-list-item-icon style="margin-right: 4px;">
+                <v-icon class="icon-tab">mdi-archive-search</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลการติดตามหุ้น</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
             <v-list-item @click="goToStocksUpdate" class="custom-list-item">
               <v-list-item-icon style="margin-right: 4px;">
                 <v-icon class="icon-tab">mdi-archive-arrow-up</v-icon>
@@ -192,7 +201,7 @@ export default {
     await this.fetchPendingEmployeeCount();
     setInterval(async () => {
       await this.fetchPendingEmployeeCount();
-    }, 10000);
+    }, 15000);
   },
 
   data() {
@@ -315,6 +324,10 @@ export default {
 
     goToStocksManagement() {
       this.$router.push('/app/stock/management');
+    },
+
+    goToStocksFollow() {
+      this.$router.push('/app/stock/stock_follow');
     },
 
     goToStocksUpdate() {

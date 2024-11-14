@@ -18,16 +18,6 @@
                                 ข้อมูลการซื้อขายหุ้นของลูกค้า
                             </v-btn>
                         </v-col>
-
-                        <v-col cols="12" class="d-flex justify-center">
-                            <v-btn color="#24b224" @click="goToStocksFollowManagement"
-                                :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
-                                <v-icon v-if="pendingEmployeesCount > 0" class="small-bell-icon"
-                                    style="margin-right: 6px;">mdi-bell</v-icon>
-                                ข้อมูลการติดตามหุ้น<v-icon v-if="pendingEmployeesCount > 0" class="small-bell-icon"
-                                    style="margin-left: 6px;">mdi-bell</v-icon>
-                            </v-btn>
-                        </v-col>
                     </v-row>
                 </v-col>
             </v-row>

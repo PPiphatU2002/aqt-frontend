@@ -15,10 +15,22 @@
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
 
-              <v-col cols="5" sm="11" class="pa-0 ml-4 mb-8">
+              <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
                 <v-autocomplete v-model="formData.customer_id" :items="customers" :item-text="item => item.text"
                   :item-value="item => item.value" :rules="[(v) => !!v || 'โปรดกรอกรหัสสมาชิก']" label="รหัสสมาชิก"
                   outlined clearable solo hide-no-data hide-details />
+              </v-col>
+
+              <v-col cols="6" sm="5" class="pa-0">
+                <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                  :return-value.sync="formData.created_date" transition="scale-transition" offset-y min-width="290px">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field v-model="formattedCreatedDate" label="วันที่" outlined readonly v-bind="attrs"
+                      v-on="on" :rules="[(v) => !!v || 'โปรดเลือกวันที่']"></v-text-field>
+                  </template>
+                  <v-date-picker v-model="formData.created_date" no-title scrollable @input="onDateSelected"
+                    :locale="'th'" :first-day-of-week="1"></v-date-picker>
+                </v-menu>
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0 mr-8 ml-4">
@@ -76,6 +88,7 @@
 
 import moment from 'moment';
 moment.locale('th');
+import Decimal from 'decimal.js';
 
 export default {
 
@@ -106,13 +119,13 @@ export default {
           message: 'มีหุ้นชื่อนี้แล้ว',
         },
       },
-
+      menu: false,
       formData: { ...this.data },
       valid: false,
       fromOptions: [],
       originalData: {},
       customers: [],
-      stocks: []
+      stocks: [],
 
     };
   },
@@ -120,7 +133,7 @@ export default {
   computed: {
     hasChanges() {
       return JSON.stringify(this.formData) !== JSON.stringify(this.originalData);
-    }
+    },
   },
 
   async mounted() {
@@ -131,8 +144,14 @@ export default {
     this.fetchCustomerData();
     this.fetchStockData();
     this.setFromOptions();
+
     this.formData = JSON.parse(JSON.stringify(this.data));
     this.originalData = JSON.parse(JSON.stringify(this.data));
+    if (moment(this.formData.created_date).isValid()) {
+      this.formattedCreatedDate = moment(this.formData.created_date).format('YYYY-MM-DD');
+    } else {
+      this.formattedCreatedDate = '';
+    }
     document.addEventListener('keydown', this.handleKeydown);
   },
 
@@ -141,6 +160,11 @@ export default {
       handler(newData) {
         this.formData = JSON.parse(JSON.stringify(newData));
         this.originalData = JSON.parse(JSON.stringify(newData));
+        if (moment(this.formData.created_date).isValid()) {
+          this.formattedCreatedDate = moment(this.formData.created_date).format('YYYY-MM-DD');
+        } else {
+          this.formattedCreatedDate = '';
+        }
       },
       deep: true,
       immediate: true
@@ -155,11 +179,23 @@ export default {
     }
   },
 
+
   beforeDestroy() {
     document.removeEventListener('keydown', this.handleKeydown);
   },
 
   methods: {
+    onDateSelected(date) {
+      if (moment(date).isValid()) {
+        this.formData.created_date = date;
+        this.formattedCreatedDate = moment(date).format('YYYY-MM-DD');
+      } else {
+        this.formData.created_date = null;
+        this.formattedCreatedDate = '';
+      }
+      this.menu = false;
+    },
+
     async fetchCustomerData() {
       try {
         this.customers = await this.$store.dispatch('api/customer/getCustomers');
@@ -186,14 +222,12 @@ export default {
           value: stock.no,
           text: stock.name,
           closing_price: stock.closing_price,
-          dividend_amount: stock.dividend_amount
         }));
 
         if (this.formData && this.formData.stock_id) {
           const selectedType = this.stocks.find(r => r.value === this.formData.stock_id);
           if (selectedType) {
             this.formData.closing_price = selectedType.closing_price;
-            this.formData.dividend_amount = selectedType.dividend_amount;
           }
           this.stocks = selectedType
             ? [selectedType, ...this.stocks.filter(r => r.value !== this.formData.stock_id)]
@@ -270,28 +304,15 @@ export default {
 
     async updateData() {
       try {
-        const money = this.formData.price * this.formData.amount;
-        const balance_dividend = this.formData.amount * this.formData.dividend_amount;
-        const present_price = this.formData.amount * this.formData.closing_price;
-        const total = balance_dividend + present_price;
-        const present_profit = total - money;
-        const percent = ((present_profit - money) / money) * 100;
-        const total_percent = (present_profit / money) * 100;
-
         this.formData.emp_id = this.$auth.user.no;
-        this.formData.money = money;
-        this.formData.balance_dividend = balance_dividend;
-        this.formData.present_price = present_price;
-        this.formData.total = total;
-        this.formData.present_profit = present_profit;
-        this.formData.percent = percent;
-        this.formData.total_percent = total_percent;
+        this.formData.created_date = this.formattedCreatedDate
         const req = await this.$store.dispatch('api/detail/updateDetail', this.formData);
         this.modal.complete.open = true;
         this.data = { ...this.formData };
         this.recordLogUpdate();
       } catch (warning) {
         this.modal.warning.open = true;
+        this.modal.warning.message = 'มีบางอย่างผิดปกติ';
       }
     },
 

@@ -19,6 +19,11 @@ export const actions = {
             .$put(`detail/update-detail/${data.no}`, data)
             .then((res) => res.data)
     },
+    async updateDetailbyTransaction({ getters }, data) {
+        return await this.$axios
+            .$put(`detail/update-detail-bytransaction/${data.no}`, data)
+            .then((res) => res.data)
+    },
     async deleteDetail({ getters }, no) {
         return await this.$axios
             .delete(`detail/${no}`)

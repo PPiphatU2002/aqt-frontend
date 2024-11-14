@@ -42,13 +42,6 @@
               </v-col>
 
               <v-col cols="6" sm="5" class="pa-0">
-                <v-text-field v-model="formData.dividend_amount" :rules="[
-                  (v) => !!v || 'โปรดกรอกจำนวนปันผล',
-                  (v) => /^[0-9]*\.?[0-9]+$/.test(v) || 'กรุณากรอกตัวเลข'
-                ]" label="จำนวนปันผล" outlined required />
-              </v-col>
-
-              <v-col cols="5" sm="11" class="pa-0 ml-4">
                 <v-text-field v-model="formData.comment" label="หมายเหตุ" outlined />
               </v-col>
             </v-row>
@@ -206,8 +199,6 @@ export default {
       if (!this.modal.confirm.open) {
         return;
       }
-
-      await this.updateDetailData();
       await this.updateData();
     },
 
@@ -236,52 +227,6 @@ export default {
       return stock ? stock.name : "ไม่พบข้อมูลหุ้น";
     },
 
-    async updateDetailData() {
-      try {
-        const detailsToUpdate = this.details.filter(detail => {
-          const stockName = this.getStockNameByNo(detail.stock_id);
-          return stockName === this.formData.name;
-        });
-
-        if (detailsToUpdate.length === 0) {
-          throw new Error("ไม่พบข้อมูลที่ตรงกับชื่อหุ้น");
-        }
-
-        for (const detail of detailsToUpdate) {
-          const money = detail.money;
-          const amount = detail.amount;
-
-          const balance_dividend = amount * this.formData.dividend_amount;
-          const present_price = amount * this.formData.closing_price;
-          const total = balance_dividend + present_price;
-          const present_profit = total - money;
-          const percent = ((present_profit - money) / money) * 100;
-          const total_percent = (present_profit / money) * 100;
-
-          const updatedData = {
-            money: money,
-            balance_dividend: balance_dividend,
-            present_price: present_price,
-            total: total,
-            present_profit: present_profit,
-            percent: percent,
-            total_percent: total_percent
-          };
-
-          await this.$store.dispatch('api/detail/updateDetail', {
-            ...detail,
-            ...updatedData
-          });
-        }
-
-        this.modal.complete.open = true;
-        this.data = { ...this.formData };
-      } catch (error) {
-        this.modal.warning.open = true;
-        console.error("Error updating detail data:", error);
-      }
-    },
-
     handleKeydown(event) {
       if (event.key === 'Escape') {
         this.cancel();
@@ -300,7 +245,6 @@ export default {
     handleConfirmMethod() {
       this.modal.confirm.open = false;
       this.updateData();
-      this.updateDetailData();
     },
 
     recordLogUpdate() {

@@ -64,6 +64,8 @@ export default {
                     stock_name: stock ? stock.name : '',
                     customer_id: customer.id,
                     customer_name: customer.id,
+                    created_date: detail.created_date || 'ยังไม่ระบุ',
+                    
                 };
             });
         },

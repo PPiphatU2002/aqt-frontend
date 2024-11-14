@@ -208,7 +208,7 @@ export default {
                     const stock = this.stocks.find(stock => stock.no === detail.stock_id);
                     return {
                         ...detail,
-                        name: stock ? `${stock.name} (${detail.money})` : 'ไม่พบหุ้น',
+                        name: stock ? `${stock.name} (${detail.amount})` : 'ไม่พบหุ้น',
                     };
                 });
 
@@ -222,7 +222,7 @@ export default {
             if (stockDetail) {
                 item.stock_detail_id = stockDetail.no;
             } else {
-                item.stock_detail_id = null; // ถ้าไม่พบ ให้เซ็ตเป็น null
+                item.stock_detail_id = null;
             }
         },
 
@@ -267,43 +267,66 @@ export default {
         },
 
         async confirmAndAddDetails() {
-            for (const detail of this.withdrawalItems) {
-                const stock = this.stocks.find(stock => stock.no === detail.stock_id);
-                const result = detail.price * detail.amount;
+            
+            const commissions = await this.$store.dispatch('api/commission/getCommissions');
 
-                // หาค่าธรรมเนียมจาก commissions
-                const commission = this.commissions.find(comm => comm.no === this.commission_id);
-                const commissionRate = commission ? commission.name : 0; // ใช้ค่าธรรมเนียม หากไม่พบให้ใช้ 0
-
-                const comfee = result * commissionRate; // คำนวณค่าธรรมเนียม
-                const vat = comfee * 0.07;
-                const total = result + comfee + vat;
-
-                const stockDetailId = detail.stock_detail_id;
+            for (const transaction of this.withdrawalItems) {
+                const stock = this.stocks.find(stock => stock.no === transaction.stock_id);
+                const stockDetailId = transaction.stock_detail_id;
 
                 try {
                     await this.$store.dispatch('api/transaction/addTransaction', {
                         stock_detail_id: stockDetailId,
-                        type: detail.type,
-                        price: parseFloat(detail.price),
-                        amount: parseFloat(detail.amount),
-                        result,
-                        comfee,
-                        vat,
-                        total,
-                        commission_id: this.commission_id, // ใช้ no ของค่าธรรมเนียม
+                        type: transaction.type,
+                        price: parseFloat(transaction.price),
+                        amount: parseFloat(transaction.amount),
+                        commission_id: this.commission_id,
+                        from_id: 3,
                         emp_id: this.$auth.user.no,
                         created_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                         updated_date: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
                     });
+
+                    // await this.fetchDetailData();
+                    // if (transaction.type === 2){
+                    //     const commissionData = commissions.find(c => c.no === this.commission_id);
+                    //     const detail = this.details.find(d => d.no === stockDetailId);
+                    //     const commission = commissionData ? commissionData.commission : 0;
+                    //     const result = parseFloat(transaction.price) * parseFloat(transaction.amount);
+                    //     const comfee = result * commission;
+                    //     const vat = comfee * 0.07;
+                    //     const total = result + comfee + vat;
+                    //     const detailresult = detail ? detail.price * detail.amount : 0;
+                    //     const summed = total + detailresult;
+                    //     const amount = detail ? detail.amount - parseFloat(transaction.amount) : parseFloat(transaction.amount);
+                    //     const newprice = summed / amount
+
+                    //     console.log("Commission:", commission + '\n' + 
+                    //                 "Result:", result + '\n' +
+                    //                 "Comfee:", comfee + '\n' +
+                    //                 "vat:", vat + '\n' + 
+                    //                 "total:", total + '\n' +
+                    //                 "detailresult:", detailresult + '\n' +
+                    //                 "summed:", summed  + '\n' + 
+                    //                 "amount:", amount  + '\n' + 
+                    //                 "newprice:", newprice);
+
+                    //     await this.$store.dispatch('api/detail/updateDetailbyTransaction', {
+                    //         no: stockDetailId,
+                    //         price: detail ? detail.price : 0,
+                    //         amount: amount,
+                    //     });
+                    // }
+
                 } catch (error) {
                     if (error.response && error.response.status === 400) {
-                        this.modal.error.message = `มีชื่อหุ้นนี้ในระบบแล้ว : ${detail.stock_id}`;
+                        this.modal.error.message = `มีชื่อหุ้นนี้ในระบบแล้ว : ${detail ? detail.stock_id : ''}`;
                         this.modal.error.open = true;
                         return;
                     }
                 }
             }
+
             this.modal.complete.message = 'เพิ่มหุ้นเรียบร้อยแล้ว!';
             this.modal.complete.open = true;
             this.showModalResult = false;

@@ -12,7 +12,7 @@
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon" color="#85d7df">mdi-archive-eye</v-icon>&nbsp;
+                            <v-icon class="little-icon" color="#85d7df">mdi-archive-search</v-icon>&nbsp;
                             <h3 class="mb-0">ข้อมูลการติดตามหุ้น</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
@@ -130,7 +130,7 @@
                     </v-list>
                 </v-menu>
                 <div>
-                    <v-btn @click="goToTypeStock" class="tab-icon-three" style="font-size: 1.5 rem; margin-left: auto;">
+                    <v-btn @click="goToFollowResult" class="tab-icon-three" style="font-size: 1.5 rem; margin-left: auto;">
                         <v-icon left color="#85d7df">mdi-archive-alert</v-icon> ผลการติดตามหุ้น
                     </v-btn>
                     <v-btn @click="goToNewStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
@@ -150,6 +150,14 @@
                     <div class="text-center" :style="{ color: getFromText(getSetName(item.set_id)).color }">
                         {{ getSetName(item.set_id) }}
                     </div>
+                </template>
+                <template v-slot:item.remark_type="{ item }">
+                    <div class="text-center" :style="{ color: getTypeText(item.remark_type).color }">
+                        {{ getTypeText(item.remark_type).text }}
+                    </div>
+                </template>
+                <template v-slot:item.stock_id="{ item }">
+                    <div class="text-center">{{ getStockName(item.stock_id) }}</div>
                 </template>
                 <template v-slot:item.emp_id="{ item }">
                     <div class="text-center">{{ getEmployeeName(item.emp_id) }}</div>
@@ -225,6 +233,7 @@ export default {
         await this.fetchStockData();
         await this.fetchEmployeeData();
         await this.fetchSetData();
+        await this.fetchFollowData();
     },
 
     components: {
@@ -250,6 +259,7 @@ export default {
             stocks: [],
             sets: [],
             employees: [],
+            follows: [],
 
             sortBy: 'updated_date',
             currentAction: '',
@@ -275,7 +285,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'stock_id', 'low_price', 'up_price', 'type', 'comment', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'stock_id', 'low_price', 'up_price', 'remark_type', 'comment', 'emp_id', 'detail'],
 
             searchQueries: {
                 'name': [],
@@ -333,7 +343,7 @@ export default {
 
                 {
                     text: 'ประเภท',
-                    value: 'type',
+                    value: 'remark_type',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -368,13 +378,13 @@ export default {
 
     computed: {
         filtered() {
-            let filteredStocks = this.stocks;
+            let filteredFollows = this.follows;
             this.savedSearches.forEach(search => {
-                filteredStocks = filteredStocks.filter(stock => {
-                    return this.applySearchFilter(stock, search);
+                filteredFollows = filteredFollows.filter(follow => {
+                    return this.applySearchFilter(follow, search);
                 });
             });
-            return filteredStocks;
+            return filteredFollows;
         },
 
         formattedDetailLines() {
@@ -404,6 +414,15 @@ export default {
             this.stocks = await this.$store.dispatch('api/stock/getStocks');
         },
 
+        getStockName(stockId) {
+            const stock = this.stocks.find(s => s.no === stockId);
+            return stock ? stock.name : '';
+        },
+
+        async fetchFollowData() {
+            this.follows = await this.$store.dispatch('api/follow/getFollows');
+        },
+
         async fetchEmployeeData() {
             this.employees = await this.$store.dispatch('api/employee/getEmployees');
         },
@@ -413,8 +432,8 @@ export default {
             return employee ? employee.fname + ' ' + employee.lname : 'ไม่ทราบ';
         },
 
-        openEditStock(stock) {
-            this.editAllData = stock;
+        openEditStock(follow) {
+            this.editAllData = follow;
             this.editStock = true;
         },
 
@@ -427,7 +446,7 @@ export default {
             if (type === 'name') {
                 return this.stocks.map(emp => emp.name);
             } else if (type === 'emp_id') {
-                return this.stocks.map(emp => this.getEmployeeName(emp.emp_id));
+                return this.follows.map(emp => this.getEmployeeName(emp.emp_id));
             }
             return [];
         }
@@ -475,6 +494,16 @@ export default {
                 }
             } else {
                 this.$router.push('/');
+            }
+        },
+
+        getTypeText(type) {
+            if (type === 1) {
+                return { text: 'กรอบเล็ก', color: '#24b224' };
+            } else if (type === 2) {
+                return { text: 'กรอบใหญ่', color: '#ffc800' };
+            } else {
+                return { text: '', color: 'inherit' };
             }
         },
 
@@ -579,13 +608,13 @@ export default {
             this.endDateTime = '';
         },
 
-        applySearchFilter(stock, search) {
-            const field = stock[search.type];
+        applySearchFilter(follow, search) {
+            const field = follow[search.type];
             let queryMatched = true;
             const lowerCaseField = typeof field === 'string' ? field.toLowerCase() : '';
             if (search.type === 'emp_id') {
                 queryMatched = this.searchQueries[search.type].some(query => {
-                    const empName = this.getEmployeeName(stock.emp_id);
+                    const empName = this.getEmployeeName(follow.emp_id);
                     return empName.toLowerCase().includes(query.toLowerCase());
                 });
             }
@@ -597,17 +626,17 @@ export default {
                 const searchQuery = search.query.toLowerCase();
                 queryMatched = lowerCaseField.includes(searchQuery);
             }
-            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(stock, search) : true;
-            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getSetName(stock.set_id)) : true;
+            const timeMatched = search.type === 'updated_date' ? this.checkTimeRange(follow, search) : true;
+            const topicMatched = search.topics ? search.topics.some(topic => topic === this.getSetName(follow.set_id)) : true;
             return queryMatched && timeMatched && topicMatched;
         },
 
-        checkTimeRange(stock, search) {
-            const stockTime = moment(stock.updated_date);
+        checkTimeRange(follow, search) {
+            const followTime = moment(follow.updated_date);
             const startTime = moment(search.start);
             const endTime = moment(search.end);
-            return (!startTime.isValid() || stockTime.isSameOrAfter(startTime)) &&
-                (!endTime.isValid() || stockTime.isSameOrBefore(endTime));
+            return (!startTime.isValid() || followTime.isSameOrAfter(startTime)) &&
+                (!endTime.isValid() || followTime.isSameOrBefore(endTime));
         },
 
         toggleSavedSearchesDialog() {
@@ -699,8 +728,8 @@ export default {
             this.$router.push('/app/stock/new_stock');
         },
 
-        goToTypeStock() {
-            this.$router.push('/app/stock/type');
+        goToFollowResult() {
+            this.$router.push('/app/stock/result_follow');
         },
     },
 };

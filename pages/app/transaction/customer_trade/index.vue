@@ -150,6 +150,7 @@
                     </div>
                 </template>
 
+
                 <template v-slot:item.amount="{ item }">
                     <div class="text-center">
                         <span v-if="item.amount !== null && item.amount !== undefined">
@@ -180,7 +181,7 @@
                 <template v-slot:item.comfee="{ item }">
                     <div class="text-center">
                         <span v-if="item.comfee !== null && item.comfee !== undefined">
-                            {{ item.comfee.toLocaleString() }}
+                            {{ item.comfee }}
                         </span>
                         <span v-else>
                         </span>
@@ -189,7 +190,7 @@
                 <template v-slot:item.vat="{ item }">
                     <div class="text-center">
                         <span v-if="item.vat !== null && item.vat !== undefined">
-                            {{ item.vat.toLocaleString() }}
+                            {{ item.vat }}
                         </span>
                         <span v-else>
                         </span>
@@ -198,7 +199,7 @@
                 <template v-slot:item.total="{ item }">
                     <div class="text-center">
                         <span v-if="item.total !== null && item.total !== undefined">
-                            {{ item.total.toLocaleString() }}
+                            {{ item.total }}
                         </span>
                         <span v-else>
                         </span>
@@ -210,9 +211,9 @@
                         {{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}
                     </div>
                 </template>
-                <template v-slot:item.money="{ item }">
+                <template v-slot:item.detail_amount="{ item }">
                     <div class="text-center" style="color:#ff66c4">
-                        {{ getDetailByNo(item.stock_detail_id)?.money || 'N/A' }}
+                        {{ getDetailByNo(item.stock_detail_id)?.amount || 'N/A' }}
                     </div>
                 </template>
                 <template v-slot:item.stock_id="{ item }">
@@ -220,9 +221,9 @@
                         {{ getStockByNo(item.stock_id)?.name || 'N/A' }}
                     </div>
                 </template>
-                <template v-slot:item.commission_id="{ item }">
+                <template v-slot:item.commission="{ item }">
                     <div class="text-center" style="color:#38b6ff">
-                        {{ getCommissionByNo(item.commission_id)?.commission || 'N/A' }}
+                        {{ item.commission || 'N/A' }}
                     </div>
                 </template>
                 <template v-slot:item.from_id="{ item }">
@@ -355,7 +356,7 @@ export default {
             selectedTopics: [],
             savedSearches: [],
             editAllData: {},
-            visibleColumns: ['updated_date', 'customer_id', 'customer_name', 'stock_id', 'money', 'type', 'amount', 'price', 'result', 'comfee', 'vat', 'total', 'commission_id', 'emp_id', 'detail'],
+            visibleColumns: ['updated_date', 'customer_id', 'customer_name', 'stock_id', 'detail_amount', 'type', 'amount', 'price', 'result', 'comfee', 'vat', 'total', 'commission', 'from_id', 'emp_id', 'detail'],
 
             searchQueries: {
                 'customer_id': [],
@@ -413,8 +414,8 @@ export default {
                 },
 
                 {
-                    text: 'จำนวนเงิน',
-                    value: 'money',
+                    text: 'จำนวนคงเหลือ',
+                    value: 'detail_amount',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -429,7 +430,7 @@ export default {
                 },
 
                 {
-                    text: 'จำนวน',
+                    text: 'จำนวนที่ซื้อ/ขาย',
                     value: 'amount',
                     sortable: false,
                     align: 'center',
@@ -478,7 +479,15 @@ export default {
 
                 {
                     text: 'ตัวคูณค่าธรรมเนียม',
-                    value: 'commission_id',
+                    value: 'commission',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                },
+
+                {
+                    text: 'ที่มาที่ไป',
+                    value: 'from_id',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -526,12 +535,12 @@ export default {
     methods: {
         async fetchDetailData() {
             this.details = await this.$store.dispatch('api/detail/getDetails');
-
             this.transactions.forEach(transaction => {
                 const detail = this.details.find(detail => detail.no === transaction.stock_detail_id);
                 if (detail) {
                     transaction.customer_id = detail.customer_id;
                     transaction.stock_id = detail.stock_id;
+                    transaction.from_id = detail.from_id;
                 }
             });
         },
@@ -622,6 +631,35 @@ export default {
 
         async fetchTransactionData() {
             this.transactions = await this.$store.dispatch('api/transaction/getTransactions');
+
+            // ดึงข้อมูล commission
+            const commissionData = await this.fetchCommissionData();
+
+            // ตรวจสอบว่า commissionData มีค่าเป็นอาเรย์
+            if (Array.isArray(commissionData)) {
+                this.transactions.forEach(transaction => {
+                    // หา commission ที่ตรงกับ transaction.commission_id
+                    const matchingCommission = commissionData.find(c => c.no === transaction.commission_id);
+
+                    if (matchingCommission) {
+                        const result = transaction.price * transaction.amount;
+                        const comfee = result * matchingCommission.commission;
+                        const vat = comfee * 0.07;
+
+                        transaction.commission = matchingCommission.commission;
+                        transaction.result = result; // คำนวณ result
+                        transaction.comfee = comfee;
+                        transaction.vat = vat;
+                        transaction.total = result + comfee + vat;
+                        
+                    } else {
+                        transaction.comfee = 0; // หรือกำหนดค่าเริ่มต้นในกรณีที่ไม่มี commission ตรงกัน
+                    }
+                });
+            } else {
+                console.error("commissionData ไม่ได้เป็นอาเรย์", commissionData);
+            }
+
             await this.fetchDetailData();
         },
 
@@ -651,11 +689,13 @@ export default {
         },
 
         async fetchCommissionData() {
-            this.commissions = await this.$store.dispatch('api/commission/getCommissions');
-        },
-
-        getCommissionByNo(commissionNo) {
-            return this.commissions.find(commission => commission.no === commissionNo);
+            try {
+                const data = await this.$store.dispatch('api/commission/getCommissions');
+                return data || [];
+            } catch (error) {
+                console.error("Error fetching commission data:", error);
+                return [];
+            }
         },
 
         getFromText(from) {
@@ -817,7 +857,7 @@ export default {
                 const dataItem = {};
                 dataItem['ราคาที่ติด'] = item.price.toLocaleString();
                 dataItem['จำนวนที่ติด'] = item.amount.toLocaleString();
-                dataItem['จำนวนเงิน'] = item.money.toLocaleString();
+                dataItem['จำนวนเงิน'] = item.detail_amount.toLocaleString();
                 dataItem['เปอร์เซ็น กำไร/ขาดทุน ปัจจุบัน'] = item.total_percent.toFixed(2) + '%';
                 dataItem['กำไร/ขาดทุน ปัจจุบัน'] = item.present_profit.toLocaleString();
                 dataItem['มูลค่าปัจจุบันและยอดเงินปันผล'] = item.total.toLocaleString();
