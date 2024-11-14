@@ -129,9 +129,14 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <v-btn @click="goToAddStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
-                    <v-icon left color="#24b224">mdi-cash-plus</v-icon> เพิ่มการซื้อขายหุ้นของลูกค้า
+                <div>
+                    <v-btn @click="goToTypeStock" class="tab-icon-three" style="font-size: 1.5 rem; margin-left: auto;">
+                        <v-icon left color="#85d7df">mdi-cash-register</v-icon> ประเภทหุ้น
+                    </v-btn>
+                    <v-btn @click="goToAddStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
+                    <v-icon left color="#24b224">mdi-cash-plus</v-icon> เพิ่มการซื้อขายหุ้น
                 </v-btn>
+                </div>
             </div>
 
             <v-data-table :headers="filteredHeaders" :items="filtered" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
@@ -980,6 +985,12 @@ export default {
 .tab-icon-two {
     cursor: pointer;
     margin-right: 24px;
+    margin-left: 0px;
+}
+
+.tab-icon-three {
+    cursor: pointer;
+    margin-right: 8px;
     margin-left: 0px;
 }
 

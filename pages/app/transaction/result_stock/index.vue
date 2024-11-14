@@ -131,7 +131,7 @@
                     </v-list>
                 </v-menu>
                 <v-btn @click="goToAddStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
-                    <v-icon left color="#24b224">mdi-bank-plus</v-icon> เพิ่มข้อมูลหุ้น
+                    <v-icon left color="#24b224">mdi-bank-plus</v-icon> เพิ่มข้อมูลหุ้นของลูกค้า
                 </v-btn>
             </div>
 
