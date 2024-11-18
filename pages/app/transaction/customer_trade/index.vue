@@ -130,9 +130,6 @@
                     </v-list>
                 </v-menu>
                 <div>
-                    <v-btn @click="goToTypeStock" class="tab-icon-three" style="font-size: 1.5 rem; margin-left: auto;">
-                        <v-icon left color="#85d7df">mdi-cash-register</v-icon> ประเภทหุ้น
-                    </v-btn>
                     <v-btn @click="goToAddStock" class="tab-icon-two" style="font-size: 1.5 rem; margin-left: auto;">
                     <v-icon left color="#24b224">mdi-cash-plus</v-icon> เพิ่มการซื้อขายหุ้น
                 </v-btn>
@@ -186,7 +183,7 @@
                 <template v-slot:item.comfee="{ item }">
                     <div class="text-center">
                         <span v-if="item.comfee !== null && item.comfee !== undefined">
-                            {{ item.comfee }}
+                            {{ item.comfee.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>
@@ -195,7 +192,7 @@
                 <template v-slot:item.vat="{ item }">
                     <div class="text-center">
                         <span v-if="item.vat !== null && item.vat !== undefined">
-                            {{ item.vat }}
+                            {{ item.vat.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>
@@ -204,7 +201,7 @@
                 <template v-slot:item.total="{ item }">
                     <div class="text-center">
                         <span v-if="item.total !== null && item.total !== undefined">
-                            {{ item.total }}
+                            {{ item.total.toLocaleString() }}
                         </span>
                         <span v-else>
                         </span>

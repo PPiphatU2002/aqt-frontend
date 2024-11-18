@@ -12,8 +12,8 @@
                 <v-row justify="center" align="center">
                     <v-col cols="auto">
                         <v-card-title class="d-flex align-center justify-center">
-                            <v-icon class="little-icon" color="#85d7df">mdi-bank</v-icon>&nbsp;
-                            <h3 class="mb-0">ข้อมูลหุ้นของลูกค้า</h3>
+                            <v-icon class="little-icon" color="#85d7df">mdi-cash-register</v-icon>&nbsp;
+                            <h3 class="mb-0">สรุปผลการซื้อขายหุ้นของลูกค้า</h3>
                         </v-card-title>
                         <div class="d-flex align-center mt-2 justify-center">
                             <div class="d-flex align-center mt-2 justify-center">
@@ -149,138 +149,39 @@
                         <td class="text-center">{{ formatDateTime(item.updated_date) }}</td>
                         <td class="text-center">{{ getCustomerByNo(item.customer_id)?.id || 'N/A' }}</td>
                         <td class="text-center">{{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}</td>
-                        <td class="text-center">{{ getStockByNo(item.stock_id)?.name || 'N/A' }}</td>
-                        <td class="text-center" :style="{ color: getDateColor(item.created_date) }">{{
-                            formatDate(item.created_date) }}</td>
-                        <td class="text-center" style="color:#00bf63">{{ item.price.toLocaleString(2) }}</td>
-                        <td class="text-center" style="color:#ff66c4">{{ item.amount.toLocaleString(2) }}</td>
-                        <td class="text-center">{{ item.money }}</td>
-                        <td class="text-center" style="color:#8c52ff">{{ item.dividend_amount }}</td>
-                        <td class="text-center">{{ item.balance_dividend }}</td>
-                        <td class="text-center" style="color:#ff914d">{{ item.closing_price }}</td>
-                        <td class="text-center">{{ item.present_price }}</td>
-                        <td class="text-center">{{ item.total }}</td>
-                        <td class="text-center" :style="{ color: getColorForNumber(item.present_profit) }">{{
-                            item.present_profit }}</td>
-                        <td class="text-center" :style="{ color: getColorForPercent(item.total_percent) }">{{
-                            item.total_percent }}%</td>
-                        <td class="text-center" :style="{ color: getPortText(item.total_percent).color }">{{
-                            getPortText(item.total_percent).text }}</td>
-                        <td class="text-center" :style="{ color: getFromText(getFromByNo(item.from_id)?.from).color }">
-                            {{ getFromByNo(item.from_id)?.from || 'N/A' }}</td>
-                        <td class="text-center">{{ getEmployeeByNo(item.emp_id)?.fname + ' ' +
-                            getEmployeeByNo(item.emp_id)?.lname || 'ไม่ทราบ' }}</td>
+                        <td class="text-center">{{ 'ผลรวมหุ้นเก่า' }}</td>
+                        <td class="text-center" style="color:#00bf63">{{ 'ผลรวมหุ้นใหม่' }}</td>
+                        <td class="text-center" style="color:#ff66c4">{{ 'กำไร/ขาดทุน' }}</td>
+                    </tr>
+
+                    <tr v-if="item.isOpen">
+                        <td></td>
                         <td class="text-center">
-                            <v-menu offset-y>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-icon v-bind="attrs" v-on="on" color="#85d7df">mdi-dots-vertical</v-icon>
-                                </template>
-                                <v-list class="custom-list">
-                                    <v-list-item @click="openEditAllDialog(item)" class="custom-list-item">
-                                        <v-list-item-icon style="margin-right: 4px;">
-                                            <v-icon class="icon-tab" color="#ffc800">mdi-pencil</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-content style="font-size: 0.8rem;">แก้ไข</v-list-item-content>
-                                    </v-list-item>
-                                    <v-list-item @click="showConfirmDialog('delete', item)" class="custom-list-item">
-                                        <v-list-item-icon style="margin-right: 4px;">
-                                            <v-icon class="icon-tab" color="#e50211">mdi-delete</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-content style="font-size: 0.8rem;">ลบ</v-list-item-content>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
+                            <v-icon style="color:#85d7df" @click="toggleOpen(item)">
+                                {{ item.isOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+                            </v-icon>
                         </td>
+                        <td class="text-center" :style="{ color: getFromText(getFromByNo(item.from_id)?.from).color }">
+                            {{ getFromByNo(item.from_id)?.from || 'N/A' }}</td>
+                        <td class="text-center">{{ getStockByNo(item.stock_id)?.name || 'N/A' }}</td>
+                        <td class="text-center" style="color:#00bf63">{{ item.money.toLocaleString(2) }}</td>
+                        <td class="text-center" style="color:#ff66c4">{{ item.money.toLocaleString(2) }}</td>
+                        <td class="text-center">{{ item.total.toLocaleString(2) }}</td>
                     </tr>
 
                     <tr v-if="item.isOpen">
-                        <td><v-icon color="#ffc800">mdi-cash-register</v-icon></td>
-                        <td class="text-center">{{ formatDateTime(item.detailupdated_date) }}</td>
-                        <td class="text-center">{{ getCustomerByNo(item.customer_id)?.id || 'N/A' }}</td>
-                        <td class="text-center">{{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}</td>
-                        <td class="text-center">{{ getStockByNo(item.stock_id)?.name || 'N/A' }}</td>
-                        <td class="text-center" :style="{ color: getDateColor(item.created_date) }">{{
-                            formatDate(item.created_date) }}</td>
-                        <td class="text-center" style="color:#00bf63">{{ item.detailprice.toLocaleString(2) }}</td>
-                        <td class="text-center" style="color:#ff66c4">{{ item.detailamount.toLocaleString(2) }}</td>
-                        <td class="text-center">{{ item.detailmoney }}</td>
-                        <td class="text-center" style="color:#8c52ff">{{ item.detaildividend_amount }}</td>
-                        <td class="text-center">{{ item.detailbalance_dividend }}</td>
-                        <td class="text-center" style="color:#ff914d">{{ item.closing_price }}</td>
-                        <td class="text-center">{{ item.detailpresent_price }}</td>
-                        <td class="text-center">{{ item.detailtotal }}</td>
-                        <td class="text-center" :style="{ color: getColorForNumber(item.detailpresent_profit) }">{{
-                            item.detailpresent_profit }}</td>
-                        <td class="text-center" :style="{ color: getColorForPercent(item.detailtotal_percent) }">{{
-                            item.detailtotal_percent }}%</td>
-                        <td class="text-center" :style="{ color: getPortText(item.detailtotal_percent).color }">{{
-                            getPortText(item.detailtotal_percent).text }}</td>
-                        <td class="text-center" :style="{ color: getFromText(getFromByNo(item.from_id)?.from).color }">
-                            {{ getFromByNo(item.from_id)?.from || 'N/A' }}</td>
-                        <td class="text-center">{{ getEmployeeByNo(item.detailemp_id)?.fname + ' ' +
-                            getEmployeeByNo(item.detailemp_id)?.lname || 'ไม่ทราบ' }}</td>
-                        <td class="text-center"></td>
-                    </tr>
-
-                    <tr v-if="item.transactions && item.isOpen" v-for="transaction in item.transactions"
-                        :key="transaction.id">
-                        <td><v-icon color="#24b224">mdi-cash-fast</v-icon></td>
-                        <td class="text-center">{{ formatDateTime(transaction.updated_date) }}</td>
-                        <td class="text-center">{{ getCustomerByNo(item.customer_id)?.id || 'N/A' }}</td>
-                        <td class="text-center">{{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}</td>
-                        <td class="text-center">{{ getStockByNo(item.stock_id)?.name || 'N/A' }}</td>
-                        <td class="text-center" :style="{ color: getDateColor(transaction.created_date) }">{{
-                            formatDate(transaction.created_date) }}</td>
-                        <td class="text-center" style="color:#00bf63">{{ transaction.price.toLocaleString(2) }}</td>
-                        <td class="text-center" style="color:#ff66c4">{{ transaction.amount.toLocaleString(2) }}</td>
-                        <td class="text-center">{{ transaction.money }}</td>
-                        <td class="text-center" style="color:#8c52ff">{{ transaction.dividend_amount }}</td>
-                        <td class="text-center">{{ transaction.balance_dividend }}</td>
-                        <td class="text-center" style="color:#ff914d">{{ item.closing_price }}</td>
-                        <td class="text-center">{{ transaction.present_price }}</td>
-                        <td class="text-center">{{ transaction.total }}</td>
-                        <td class="text-center" :style="{ color: getColorForNumber(transaction.present_profit) }">{{
-                            transaction.present_profit }}</td>
-                        <td class="text-center" :style="{ color: getColorForPercent(transaction.total_percent) }">{{
-                            transaction.total_percent }}%</td>
-                        <td class="text-center" :style="{ color: getPortText(transaction.total_percent).color }">{{
-                            getPortText(transaction.total_percent).text }}</td>
+                        <td></td>
+                        <td></td>
                         <td class="text-center"
-                            :style="{ color: getFromText(getFromByNo(transaction.from_id)?.from).color }">
-                            {{ getFromByNo(transaction.from_id)?.from || 'N/A' }}</td>
-                        <td class="text-center">{{ getEmployeeByNo(transaction.emp_id)?.fname + ' ' +
-                            getEmployeeByNo(transaction.emp_id)?.lname || 'ไม่ทราบ' }}</td>
-                        <td class="text-center"></td>
+                            :style="{ color: getFromText(getFromByNo(item.transaction_from_id)?.from).color }">
+                            {{ getFromByNo(item.transaction_from_id)?.from || 'N/A' }}</td>
+                        <td class="text-center">{{ getStockByNo(item.stock_id)?.name || 'N/A' }}</td>
+                        <td class="text-center" style="color:#00bf63">{{ item.type1money.toLocaleString(2) }}</td>
+                        <td class="text-center" style="color:#ff66c4">{{ item.type2money.toLocaleString(2) }}</td>
+                        <td class="text-center">{{ item.total.toLocaleString(2) }}</td>
+
                     </tr>
 
-                    <tr v-if="item.isOpen">
-                        <td><v-icon color="#e30311">mdi-cash-minus</v-icon></td>
-                        <td class="text-center">{{ formatDateTime(item.updated_date) }}</td>
-                        <td class="text-center">{{ getCustomerByNo(item.customer_id)?.id || 'N/A' }}</td>
-                        <td class="text-center">{{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}</td>
-                        <td class="text-center">{{ getStockByNo(item.stock_id)?.name || 'N/A' }}</td>
-                        <td class="text-center" :style="{ color: getDateColor(item.created_date) }">{{
-                            formatDate(item.created_date) }}</td>
-                        <td class="text-center" style="color:#00bf63">{{ item.dividendprice.toLocaleString(2) }}</td>
-                        <td class="text-center" style="color:#ff66c4">{{ item.amount.toLocaleString(2) }}</td>
-                        <td class="text-center">{{ item.dividendmoney }}</td>
-                        <td class="text-center" style="color:#8c52ff">{{ item.dividend_amount }}</td>
-                        <td class="text-center">{{ item.balance_dividend }}</td>
-                        <td class="text-center" style="color:#ff914d">{{ item.closing_price }}</td>
-                        <td class="text-center">{{ item.present_price }}</td>
-                        <td class="text-center">{{ item.total }}</td>
-                        <td class="text-center" :style="{ color: getColorForNumber(item.present_profit) }">{{
-                            item.present_profit }}</td>
-                        <td class="text-center" :style="{ color: getColorForPercent(item.total_percent) }">{{
-                            item.total_percent }}%</td>
-                        <td class="text-center" :style="{ color: getPortText(item.total_percent).color }">{{
-                            getPortText(item.total_percent).text }}</td>
-                        <td class="text-center" :style="{ color: getFromText(getFromByNo(item.from_id)?.from).color }">
-                            {{ getFromByNo(item.from_id)?.from || 'N/A' }}</td>
-                        <td class="text-center">{{ getEmployeeByNo(item.emp_id)?.fname + ' ' +
-                            getEmployeeByNo(item.emp_id)?.lname || 'ไม่ทราบ' }}</td>
-                        <td class="text-center"></td>
-                    </tr>
                 </template>
 
             </v-data-table>
@@ -394,7 +295,7 @@ export default {
                 { text: 'กำไร', value: 'กำไร' },
             ],
 
-            visibleColumns: ['action', 'updated_date', 'customer_id', 'customer_name', 'stock_id', 'created_date', 'price', 'amount', 'money', 'dividend_amount', 'balance_dividend', 'closing_price', 'present_price', 'total', 'present_profit', 'percent', 'total_percent', 'port', 'from_id', 'comment', 'emp_id', 'detail'],
+            visibleColumns: ['action', 'updated_date', 'customer_id', 'customer_name', 'stock_id', 'type1money', 'type2money', 'total', 'from_id', 'detail'],
 
             headers: [
 
@@ -429,7 +330,7 @@ export default {
                 },
 
                 {
-                    text: 'ชื่อหุ้นที่ติด',
+                    text: 'หุ้นเก่า',
                     value: 'stock_id',
                     sortable: false,
                     align: 'center',
@@ -437,128 +338,16 @@ export default {
                 },
 
                 {
-                    text: 'วันที่ซื้อหุ้น',
-                    value: 'created_date',
+                    text: 'หุ้นใหม่',
+                    value: 'type1money',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
 
                 {
-                    text: 'ราคาที่ติด',
-                    value: 'price',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'จำนวนที่ติด',
-                    value: 'amount',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'จำนวนเงิน',
-                    value: 'money',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'จำนวนปันผล',
-                    value: 'dividend_amount',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ยอดเงินปันผล',
-                    value: 'balance_dividend',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ราคาปิด',
-                    value: 'closing_price',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'มูลค่าปัจจุบัน',
-                    value: 'present_price',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'มูลค่าปัจจุบัน(รวมยอดเงินปันผล)',
+                    text: 'กำไร/ขาดทุน',
                     value: 'total',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'กำไร/ขาดทุน ปัจจุบัน',
-                    value: 'present_profit',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'เปอร์เซ็น กำไร/ขาดทุน ปัจจุบัน',
-                    value: 'total_percent',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ประเภทพอร์ต',
-                    value: 'port',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ที่มาที่ไป',
-                    value: 'from_id',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ความเห็นลูกค้า',
-                    value: 'comment',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: 'ทำรายการโดย',
-                    value: 'emp_id',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
-                    text: '',
-                    value: 'detail',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
@@ -569,15 +358,19 @@ export default {
 
     computed: {
         filtered() {
-            let filteredDetails = this.details.map(detail => {
-                const transactions = detail.transactions || [];
-                const type1Transactions = transactions.filter(t => t.type === 1 && t.stock_detail_id === detail.no);
+            let filteredDetails = this.details
+                .map(detail => {
+                    const transactions = detail.transactions || [];
+                    const transaction = transactions.filter(
+                        t => t.stock_detail_id === detail.no
+                    );
 
-                return {
-                    ...detail,
-                    type1Transactions: type1Transactions
-                };
-            });
+                    return {
+                        ...detail,
+                        transaction
+                    };
+                })
+                .filter(detail => detail.transaction && detail.transaction.length > 0);
 
             this.savedSearches.forEach(search => {
                 filteredDetails = filteredDetails.filter(detail => {
@@ -656,11 +449,11 @@ export default {
                 }
                 else {
                     if (RankID === '1') {
-                        this.$router.push('/app/transaction/customer_stock');
+                        this.$router.push('/app/transaction/result_stock');
                     } else if (RankID === '2') {
-                        this.$router.push('/app/transaction/customer_stock');
+                        this.$router.push('/app/transaction/result_stock');
                     } else if (RankID === '3') {
-                        this.$router.push('/app/transaction/customer_stock');
+                        this.$router.push('/app/transaction/result_stock');
                     } else {
                         this.$router.push('/auth');
                     }
@@ -691,9 +484,6 @@ export default {
                             const closingPriceData = stock ? stock.closing_price : null;
                             let detail_total_Dividend = new Decimal(0);
                             let balance_dividend = 0;
-                            let transaction_total_Dividend = 0;
-                            let present_price = 0;
-                            let total = 0;
                             let transactionTotalSum = 0;
                             let transactionDividendTotalSum = 0;
                             let transactionAmountSum = 0;
@@ -718,41 +508,17 @@ export default {
 
                             const transactions = await this.$store.dispatch('api/transaction/getTransactions', { stock_detail_id: detail.no });
 
-                            const type1Transactions = transactions.filter(t => t.type === 1 && t.stock_detail_id === detail.no);
-                            const type2Transactions = transactions.filter(t => t.type === 2 && t.stock_detail_id === detail.no);
+                            detail.transactions = transactions;
 
-                            detail.transactions = type1Transactions;
-                            let remainingAmount = 0;
+                            const type1Transactions = transactions.filter(t => t.type === 1);
+                            const type2Transactions = transactions.filter(t => t.type === 2);
 
-                            const sortedType1Transactions = type1Transactions.sort((a, b) => moment(b.created_date).diff(moment(a.created_date)));
+                            let type1TransactionTotal = 0;
+                            let type2TransactionTotal = 0;
+                            let type1AmountRemaining = type1Transactions.reduce((sum, t) => sum + t.amount, 0);
+                            let type2DetailTotal = 0;
 
-                            for (const type1 of sortedType1Transactions) {
-                                let remainingAmount = type1.amount;
-
-                                for (const type2 of type2Transactions) {
-                                    if (moment(type2.created_date).isAfter(moment(type1.created_date)) && type2.amount > 0) {
-                                        if (type2.amount >= remainingAmount) {
-                                            type2.amount -= remainingAmount;
-                                            remainingAmount = 0;
-                                            break;
-                                        } else {
-                                            remainingAmount -= type2.amount;
-                                            type2.amount = 0;
-                                        }
-                                    }
-                                }
-
-                                type1.amount = remainingAmount;
-                            }
-
-                            detail.transactions = type1Transactions.filter(type1 => type1.amount > 0);
-                            const remainingType2Amount = type2Transactions.reduce((sum, type2) => sum + type2.amount, 0);
-
-                            if (remainingType2Amount > 0) {
-                                detail.amount -= remainingType2Amount;
-                            }
-
-                            for (const transaction of [...sortedType1Transactions]) {
+                            for (const transaction of type1Transactions) {
                                 if (transaction.amount > 0) {
                                     const commissionData = await this.$store.dispatch('api/commission/getCommissions', { no: transaction.commission_id });
                                     const commission = commissionData.length > 0 ? commissionData[0] : null;
@@ -779,90 +545,97 @@ export default {
                                         const transactioncomfee = transactionmoney * commission.commission;
                                         const transactionvat = transactioncomfee * 0.07;
                                         const transactiontotal = transactionmoney + transactioncomfee + transactionvat;
-                                        const transactionamount = transaction.amount;
 
-                                        const transactionbalancedividend = transaction.amount * transactiontotalDividend.toNumber();
-                                        const transactionpresentprice = transaction.amount * closingPriceData;
-                                        const transactionresult = transactionbalancedividend + transactionpresentprice;
+                                        type1TransactionTotal += transactiontotal;
 
-                                        transaction.money = transactiontotal.toLocaleString(2);
-                                        transaction.balance_dividend = transactionbalancedividend.toLocaleString(2);
-                                        transaction.present_price = transactionpresentprice.toLocaleString(2);
-                                        transaction.total = transactionresult.toLocaleString(2);
-                                        transaction.present_profit = (transactionresult - transactiontotal).toLocaleString(2);
-                                        transaction.total_percent = (((transactionresult - transactiontotal) / transactiontotal) * 100).toLocaleString(2);
-
-                                        transactionTotalSum += transactiontotal;
-                                        transactionAmountSum += transactionamount;
-                                        transactionDividendTotalSum += transactionbalancedividend;
-                                        transaction_total_Dividend += transactiontotalDividend.toNumber();
-                                    } else {
-                                        console.warn(`No commission found for commission_id: ${transaction.commission_id}`);
                                     }
                                 }
                             }
 
-                            const detailamount = detail.amount;
-                            const detailprice = detail.price;
-                            const detailmoney = detailamount * detailprice;
-                            const detailpresent_price = detailamount * closingPriceData;
-                            const detailtotal = detailpresent_price + balance_dividend;
+                            for (const transaction of type2Transactions) {
+                                if (transaction.amount > 0) {
+                                    const commissionData = await this.$store.dispatch('api/commission/getCommissions', { no: transaction.commission_id });
+                                    const commission = commissionData.length > 0 ? commissionData[0] : null;
 
-                            detail.detailupdated_date = detail.updated_date;
-                            detail.detailamount = detailamount;
-                            detail.detailprice = detailprice;
-                            detail.detaildividend_amount = detail_total_Dividend.toNumber();
-                            detail.detailmoney = detailmoney.toLocaleString(2);
-                            detail.detailpresent_price = detailpresent_price.toLocaleString(2);
-                            detail.detailtotal = detailtotal.toLocaleString(2);
-                            detail.detailbalance_dividend = balance_dividend.toLocaleString(2);
-                            detail.detailpresent_profit = (detailtotal - detailmoney).toLocaleString(2);
-                            detail.detailtotal_percent = (((detailtotal - detailmoney) / detailmoney) * 100).toLocaleString(2);
-                            detail.detailemp_id = detail.emp_id;
+                                    if (commission && transaction.created_date) {
+                                        const dividendData = await this.$store.dispatch('api/dividend/getDividends', {
+                                            stock_id: detail.stock_id,
+                                            created_date: transaction.created_date
+                                        });
 
-                            const lasted_updated_date = transactions
+                                        const filteredDividendData = dividendData.filter(dividend => {
+                                            const dividendDate = moment(dividend.created_date);
+                                            return dividend.stock_id === detail.stock_id && dividendDate.isSameOrAfter(moment(transaction.created_date));
+                                        });
+
+                                        const transactiontotalDividend = filteredDividendData.reduce((sum, dividend) =>
+                                            sum.plus(new Decimal(dividend.dividend || 0)), new Decimal(0)
+                                        );
+                                        transactionnumberOfDividends = filteredDividendData.length;
+                                        transaction.dividend_amount = transactiontotalDividend.toNumber();
+
+                                        let transactionAmountToProcess = transaction.amount;
+
+                                        if (type1AmountRemaining > 0) {
+                                            if (transactionAmountToProcess <= type1AmountRemaining) {
+                                                // ใช้ transaction.amount ทั้งหมด
+                                                const transactionmoney = transaction.price * transactionAmountToProcess;
+                                                const transactioncomfee = transactionmoney * commission.commission;
+                                                const transactionvat = transactioncomfee * 0.07;
+                                                const transactiontotal = transactionmoney + transactioncomfee + transactionvat;
+
+                                                type2TransactionTotal += transactiontotal;
+                                                type1AmountRemaining -= transactionAmountToProcess;
+                                                transactionAmountToProcess = 0;
+                                            } else {
+                                                // ใช้ transaction.amount ตาม type1AmountRemaining
+                                                const transactionmoney = transaction.price * type1AmountRemaining;
+                                                const transactioncomfee = transactionmoney * commission.commission;
+                                                const transactionvat = transactioncomfee * 0.07;
+                                                const transactiontotal = transactionmoney + transactioncomfee + transactionvat;
+
+                                                type2TransactionTotal += transactiontotal;
+                                                transactionAmountToProcess -= type1AmountRemaining;
+                                                type1AmountRemaining = 0;
+                                            }
+                                        }
+
+                                        if (transactionAmountToProcess > 0) {
+                                            // คำนวณส่วนที่เหลือจาก type1
+                                            const transactionmoney = transaction.price * transactionAmountToProcess;
+                                            const transactioncomfee = transactionmoney * commission.commission;
+                                            const transactionvat = transactioncomfee * 0.07;
+                                            const transactiontotal = transactionmoney + transactioncomfee + transactionvat;
+
+                                            type2DetailTotal += transactiontotal;
+                                        }
+                                    }
+                                }
+                            }
+
+                            const transaction_updated_date = transactions
                                 .filter(transaction => transaction.stock_detail_id === detail.no)
                                 .map(transaction => transaction.updated_date);
 
-                            const latest_updated_date = lasted_updated_date.length > 0
-                                ? moment.max(lasted_updated_date.map(date => moment(date)))
+                            const latest_updated_date = transaction_updated_date.length > 0
+                                ? moment.max(transaction_updated_date.map(date => moment(date)))
                                 : moment(detail.updated_date);
 
-                            const lasted_emp_id = lasted_updated_date.length > 0
-                                ? transactions
-                                    .filter(transaction => transaction.stock_detail_id === detail.no)
-                                    .map(transaction => transaction.emp_id)
-                                    .pop()
-                                : detail.emp_id;
-
-
-                            const money = (detail.price * detail.amount) + transactionTotalSum;
+                            const money = (detail.price * detail.amount) + type2DetailTotal;
                             const amount = detail.amount + transactionAmountSum;
                             const price = money / amount;
                             const balance = balance_dividend + transactionDividendTotalSum;
-                            present_price = amount * closingPriceData;
-                            total = present_price + balance;
+                            const present_price = amount * closingPriceData;
 
-                            detail.updated_date = latest_updated_date;
+                            detail.transaction_updated_date = latest_updated_date;
+                            detail.transaction_from_id = 3;
+                            detail.type1money = type1TransactionTotal;
+                            detail.type2money = type2TransactionTotal;
+                            detail.total = type2TransactionTotal - type1TransactionTotal;
+
                             detail.price = price;
                             detail.amount = amount;
-                            detail.money = money.toLocaleString(2);
-                            detail.totalprice = price;
-                            detail.dividend_amount = ((detail_total_Dividend.toNumber() + transaction_total_Dividend) / (1 + transactionnumberOfDividends)).toLocaleString(2);
-                            detail.balance_dividend = balance.toLocaleString(2);
-                            detail.closing_price = closingPriceData;
-                            detail.present_price = present_price.toLocaleString(2);
-                            detail.total = total.toLocaleString(2);
-                            detail.present_profit = (total - money).toLocaleString(2);
-                            detail.total_percent = (((total - money) / money) * 100).toLocaleString(2);
-                            detail.emp_id = lasted_emp_id;
-                            detail.type1Transactions = type1Transactions;
-
-                            const dividendmoney = money - (transactionDividendTotalSum + balance_dividend);
-                            const dividendprice = dividendmoney / amount;
-
-                            detail.dividendprice = dividendprice;
-                            detail.dividendmoney = dividendmoney.toLocaleString(2);
+                            detail.money = money;
                         }
                     }
                 } else {
@@ -1121,26 +894,12 @@ export default {
                 this.filteredHeaders.forEach(header => {
                     if (header.value === 'updated_date') {
                         rowData[header.value] = moment(item[header.value]).tz('Asia/Bangkok').format('YYYY-MM-DD HH:mm');
-                    } else if (header.value === 'created_date') {
-                        rowData[header.value] = moment(item[header.value]).tz('Asia/Bangkok').format('YYYY-MM-DD');
-                    } else if (header.value === 'price') {
-                        rowData[header.value] = item.price.toLocaleString(2);
-                    } else if (header.value === 'amount') {
-                        rowData[header.value] = item.amount.toLocaleString(2);
-                    } else if (header.value === 'money') {
-                        rowData[header.value] = item.money;
-                    } else if (header.value === 'total_percent') {
-                        rowData[header.value] = item.total_percent + '%';
-                    } else if (header.value === 'present_profit') {
-                        rowData[header.value] = item.present_profit;
+                    } else if (header.value === 'type1money') {
+                        rowData[header.value] = item.type1money;
+                    } else if (header.value === 'type2money') {
+                        rowData[header.value] = item.type2money;
                     } else if (header.value === 'total') {
                         rowData[header.value] = item.total;
-                    } else if (header.value === 'dividend_amount') {
-                        rowData[header.value] = item.dividend_amount;
-                    } else if (header.value === 'present_price') {
-                        rowData[header.value] = item.present_price;
-                    } else if (header.value === 'balance_dividend') {
-                        rowData[header.value] = item.balance_dividend;
                     } else if (header.value === 'from_id') {
                         rowData[header.value] = this.getFromByNo(item.from_id).from;
                     } else if (header.value === 'stock_id') {
@@ -1151,8 +910,6 @@ export default {
                         rowData[header.value] = this.getCustomerByNo(item.customer_id).nickname;
                     } else if (header.value === 'port') {
                         rowData[header.value] = this.getPortText(item.total_percent).text;
-                    } else if (header.value === 'emp_id') {
-                        rowData[header.value] = this.getEmployeeByNo(item.emp_id).fname + ' ' + this.getEmployeeByNo(item.emp_id).lname;
                     } else if (header.value !== 'detail' && header.value !== 'action') {
                         rowData[header.value] = item[header.value];
                     }

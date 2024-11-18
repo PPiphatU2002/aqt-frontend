@@ -24,7 +24,7 @@
                 <v-icon class="icon-tab">mdi-account</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลลูกค้า</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">ลูกค้า</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -34,7 +34,7 @@
                 <v-icon class="icon-tab">mdi-home-account</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลสมาชิก</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">สมาชิก</v-list-item-title>
               </v-list-item-content>
               <v-icon v-if="pendingEmployeesCount > 0" class="small-bell-icon"
                 style="margin-left: 6px;">mdi-bell</v-icon>
@@ -56,7 +56,7 @@
                 <v-icon class="icon-tab">mdi-archive</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลหุ้น</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">หุ้น</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -65,7 +65,7 @@
                 <v-icon class="icon-tab">mdi-archive-search</v-icon>
               </v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title style="font-size: 0.8rem;">ข้อมูลการติดตามหุ้น</v-list-item-title>
+                <v-list-item-title style="font-size: 0.8rem;">การติดตามหุ้น</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
 
@@ -75,6 +75,44 @@
               </v-list-item-icon>
               <v-list-item-content>
                 <v-list-item-title style="font-size: 0.8rem;">อัพเดทหุ้น</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
+        <v-menu bottom right :offset-y="true" :nudge-top="8" :nudge-right="8" class="user-menu">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn text v-bind="attrs" v-on="on" rounded>
+              <v-icon class="icon-host">mdi-cash</v-icon>
+            </v-btn>
+          </template>
+
+          <v-list class="custom-list">
+            <v-list-item @click="goToStockDetail" class="custom-list-item">
+              <v-list-item-icon style="margin-right: 4px;">
+                <v-icon class="icon-tab">mdi-bank</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title style="font-size: 0.8rem;">หุ้นของลูกค้า</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item v-if="$auth.user.ranks_id === 1 || $auth.user.ranks_id === 3" @click="goToStockTrade"
+              class="custom-list-item">
+              <v-list-item-icon style="margin-right: 4px;">
+                <v-icon class="icon-tab">mdi-cash</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title style="font-size: 0.8rem;">การซื้อขายหุ้นของลูกค้า</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item @click="goToStockResult" class="custom-list-item">
+              <v-list-item-icon style="margin-right: 4px;">
+                <v-icon class="icon-tab">mdi-cash-register</v-icon>
+              </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title style="font-size: 0.8rem;">สรุปผลการซื้อขายหุ้น</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -332,6 +370,19 @@ export default {
 
     goToStocksUpdate() {
       this.$router.push('/app/stock/update');
+    },
+
+
+    goToStockDetail() {
+      this.$router.push('/app/transaction/customer_stock');
+    },
+
+    goToStockTrade() {
+      this.$router.push('/app/transaction/customer_trade');
+    },
+
+    goToStockResult() {
+      this.$router.push('/app/transaction/result_stock');
     },
 
   },

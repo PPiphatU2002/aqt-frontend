@@ -5,19 +5,12 @@
             <v-row justify="center">
                 <v-col cols="12" sm="8" md="4" :style="{ marginTop: '10vh' }">
                     <v-row justify="center">
-                        <v-col cols="12" class="d-flex justify-center">
+                        <!-- <v-col cols="12" class="d-flex justify-center">
                             <v-btn color="#24b224" @click="fixport"
                                 :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
                                 ข้อมูลหุ้นของลูกค้า
                             </v-btn>
-                        </v-col>
-
-                        <v-col cols="12" class="d-flex justify-center">
-                            <v-btn color="#24b224" @click="transaction"
-                                :style="{ fontSize: '20px', height: '60px', width: '150%', marginBottom: '15px' }">
-                                ข้อมูลการซื้อขายหุ้นของลูกค้า
-                            </v-btn>
-                        </v-col>
+                        </v-col> -->
                     </v-row>
                 </v-col>
             </v-row>

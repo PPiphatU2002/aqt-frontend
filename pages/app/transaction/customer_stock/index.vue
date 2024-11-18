@@ -170,6 +170,7 @@
                             {{ getFromByNo(item.from_id)?.from || 'N/A' }}</td>
                         <td class="text-center">{{ getEmployeeByNo(item.emp_id)?.fname + ' ' +
                             getEmployeeByNo(item.emp_id)?.lname || 'ไม่ทราบ' }}</td>
+                        <td class="text-center">{{ item.comment }}</td>
                         <td class="text-center">
                             <v-menu offset-y>
                                 <template v-slot:activator="{ on, attrs }">
@@ -194,7 +195,7 @@
                     </tr>
 
                     <tr v-if="item.isOpen">
-                        <td><v-icon color="#ffc800">mdi-cash-register</v-icon></td>
+                        <td></td>
                         <td class="text-center">{{ formatDateTime(item.detailupdated_date) }}</td>
                         <td class="text-center">{{ getCustomerByNo(item.customer_id)?.id || 'N/A' }}</td>
                         <td class="text-center">{{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}</td>
@@ -224,7 +225,7 @@
 
                     <tr v-if="item.transactions && item.isOpen" v-for="transaction in item.transactions"
                         :key="transaction.id">
-                        <td><v-icon color="#24b224">mdi-cash-fast</v-icon></td>
+                        <td></td>
                         <td class="text-center">{{ formatDateTime(transaction.updated_date) }}</td>
                         <td class="text-center">{{ getCustomerByNo(item.customer_id)?.id || 'N/A' }}</td>
                         <td class="text-center">{{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}</td>
@@ -254,7 +255,7 @@
                     </tr>
 
                     <tr v-if="item.isOpen">
-                        <td><v-icon color="#e30311">mdi-cash-minus</v-icon></td>
+                        <td class="text-center" style="color:#cb6ce6">หักปันผล</td>
                         <td class="text-center">{{ formatDateTime(item.updated_date) }}</td>
                         <td class="text-center">{{ getCustomerByNo(item.customer_id)?.id || 'N/A' }}</td>
                         <td class="text-center">{{ getCustomerByNo(item.customer_id)?.nickname || 'N/A' }}</td>
@@ -541,20 +542,20 @@ export default {
                 },
 
                 {
-                    text: 'ความเห็นลูกค้า',
-                    value: 'comment',
-                    sortable: false,
-                    align: 'center',
-                    cellClass: 'text-center',
-                },
-
-                {
                     text: 'ทำรายการโดย',
                     value: 'emp_id',
                     sortable: false,
                     align: 'center',
                     cellClass: 'text-center',
                 },
+
+                {
+                    text: 'ความเห็นลูกค้า',
+                    value: 'comment',
+                    sortable: false,
+                    align: 'center',
+                    cellClass: 'text-center',
+                }, 
 
                 {
                     text: '',
