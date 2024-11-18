@@ -291,7 +291,7 @@ export default {
 
             searchTypes: [
                 { text: 'ชื่อเล่น', value: 'nickname' },
-                { text: 'ไอดี', value: 'id' },
+                { text: 'รหัสสมาชิก', value: 'id' },
                 { text: 'ประเภท', value: 'type_id' },
                 { text: 'เวลา', value: 'updated_date' }
             ],
@@ -319,7 +319,7 @@ export default {
                 },
 
                 {
-                    text: 'ไอดี',
+                    text: 'รหัสสมาชิก',
                     value: 'id',
                     sortable: false,
                     align: 'center',
